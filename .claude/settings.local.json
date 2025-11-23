@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(wc -l echo echo 'Files with old namespace (App\\Domain\\Flutterwave):' grep -r 'namespace App\\Domain\\Flutterwave' . --include=*.php)",
+      "Bash(wc -l echo echo 'New use statements (use Gowelle\\Flutterwave):' grep -r 'use Gowelle\\Flutterwave' . --include=*.php)",
+      "Bash(wc -l echo echo 'Old use statements (use App\\Domain\\Flutterwave):' grep -r 'use App\\Domain\\Flutterwave' . --include=*.php)",
+      "Bash(__NEW_LINE__ cd \"c:/Users/John Gowelle/Apps/flutterwave-php/src\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

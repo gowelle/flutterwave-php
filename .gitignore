@@ -1,0 +1,55 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+.phpstorm.meta.php
+_ide_helper.php
+
+# Laravel specific
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+*.log
+*.cache
+
+# Testing
+.phpunit.cache
+coverage/
+.nyc_output/
+.phpunit.cache/
+
+# Environment files
+.env
+.env.backup
+.env.production
+.env.local
+.env.*.local
+
+# Build files
+/build/
+/dist/
+
+# Composer
+composer.phar
+composer.lock
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+

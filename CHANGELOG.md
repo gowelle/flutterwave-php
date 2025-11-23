@@ -4,6 +4,18 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [1.0.2] - 2025-01-27
+
+### Changed
+
+- Refactored `FlutterwaveServiceProvider` to extend `PackageServiceProvider` from `spatie/laravel-package-tools`
+- Updated config, migration, and command registration to use package tools fluent API
+- Improved service provider structure and maintainability
+
+### Added
+
+- Added `spatie/laravel-package-tools` as a dependency for better package management
+
 ## [1.0.1] - 2025-01-27
 
 ### Added

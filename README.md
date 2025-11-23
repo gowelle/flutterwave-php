@@ -81,7 +81,14 @@ The package will automatically register its service provider and facade.
 1. **Publish the configuration file:**
 
 ```bash
-php artisan vendor:publish --provider="Gowelle\Flutterwave\Providers\FlutterwaveServiceProvider" --tag="config"
+php artisan vendor:publish --tag="flutterwave-config"
+```
+
+Or publish all package assets:
+
+```bash
+php artisan vendor:publish --tag="flutterwave-config"
+php artisan vendor:publish --tag="flutterwave-migrations"
 ```
 
 2. **Configure your Flutterwave credentials in `.env`:**
@@ -710,9 +717,10 @@ Charge Sessions provide database-backed tracking of direct charge transactions. 
 
 ### Enabling Charge Sessions
 
-1. **Run the migration:**
+1. **Publish and run the migration:**
 
 ```bash
+php artisan vendor:publish --tag="flutterwave-migrations"
 php artisan migrate
 ```
 

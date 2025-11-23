@@ -29,16 +29,35 @@ use Gowelle\Flutterwave\Support\RateLimiter;
 use Gowelle\Flutterwave\Support\RetryHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\ServiceProvider;
+use Spatie\LaravelPackageTools\Package;
+use Spatie\LaravelPackageTools\PackageServiceProvider;
 
-final class FlutterwaveServiceProvider extends ServiceProvider
+final class FlutterwaveServiceProvider extends PackageServiceProvider
 {
+    /**
+     * Configure the package
+     */
+    public function configurePackage(Package $package): void
+    {
+        $package
+            ->name('flutterwave')
+            ->hasConfigFile('flutterwave')
+            ->hasMigration('create_flutterwave_charge_sessions_table')
+            ->hasCommand(CleanupChargeSessionsCommand::class);
+
+        // Register webhook route if enabled
+        // Note: We handle this conditionally here since package tools doesn't support conditional route loading
+        if (config('flutterwave.webhook.route_path')) {
+            $package->hasRoutes('webhook');
+        }
+    }
+
     /**
      * Register package services
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/flutterwave.php', 'flutterwave');
+        parent::register();
 
         // Bind configuration
         $this->app->singleton(FlutterwaveConfig::class, fn() => FlutterwaveConfig::fromConfig());
@@ -68,26 +87,12 @@ final class FlutterwaveServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->publishes([
-            __DIR__ . '/../config/flutterwave.php' => config_path('flutterwave.php'),
-        ], 'flutterwave-config');
+        parent::boot();
 
-        $this->publishes([
-            __DIR__ . '/../database/migrations' => database_path('migrations'),
-        ], 'flutterwave-migrations');
-
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-
-        // Register webhook route if enabled
-        if (config('flutterwave.webhook.route_path')) {
-            $this->loadRoutesFrom(__DIR__ . '/../routes/webhook.php');
-        }
+        
 
         // Register charge session listeners
         $this->registerChargeSessionListeners();
-
-        // Register console commands
-        $this->registerCommands();
     }
 
     /**
@@ -304,15 +309,4 @@ final class FlutterwaveServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register console commands
-     */
-    private function registerCommands(): void
-    {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                CleanupChargeSessionsCommand::class,
-            ]);
-        }
-    }
 }

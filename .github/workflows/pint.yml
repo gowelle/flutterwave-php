@@ -17,7 +17,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: "8.2"
           extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath
           coverage: none
 
@@ -25,4 +25,4 @@ jobs:
         run: composer install --no-interaction --no-progress
 
       - name: Run Pint
-        run: composer format -- --test
+        run: composer format

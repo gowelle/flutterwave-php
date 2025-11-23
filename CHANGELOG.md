@@ -4,6 +4,13 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [1.0.4] - 2025-01-27
+
+### Fixed
+
+- Fixed migration publishing error by adding missing `.stub` file for `create_flutterwave_charge_sessions_table` migration
+- Migration publishing now works correctly when using `php artisan vendor:publish --tag="flutterwave-migrations"`
+
 ## [1.0.3] - 2025-01-27
 
 ### Fixed

@@ -1,0 +1,55 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create(config('flutterwave.charge_sessions.table_name', 'flutterwave_charge_sessions'), function (Blueprint $table) {
+            $table->ulid('id')->primary();
+            $table->foreignUlid('user_id')
+                ->references('id')
+                ->on(config('flutterwave.users_table', 'users'))
+                ->cascadeOnDelete();
+            $table->foreignUlid('payment_id')
+                ->references('id')
+                ->on(config('flutterwave.payments_table', 'payments'))
+                ->cascadeOnDelete();
+            $table->string('remote_charge_id')->index();
+            $table->string('remote_customer_id')->nullable()->index();
+            $table->string('status')->index();
+            $table->string('next_action_type')->nullable()->index();
+            $table->json('next_action_data')->nullable();
+            $table->string('payment_method_type')->nullable();
+            $table->json('payment_method_details')->nullable();
+            $table->json('meta')->nullable();
+            $table->timestamps();
+
+            // Composite indexes
+            $table->index(['user_id', 'status'], 'idx_user_status');
+            $table->index(['payment_id', 'status'], 'idx_payment_status');
+            $table->index(['remote_charge_id', 'status'], 'idx_remote_status');
+            $table->index(['status', 'created_at'], 'idx_status_created');
+
+            // Unique constraint
+            $table->unique(['payment_id', 'remote_charge_id'], 'unq_payment_remote_charge');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists(config('flutterwave.charge_sessions.table_name', 'flutterwave_charge_sessions'));
+    }
+};
+

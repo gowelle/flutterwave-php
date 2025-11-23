@@ -7,11 +7,6 @@ parameters:
     ignoreErrors:
         # Nullsafe operator on non-nullable types (intentional for defensive coding)
         - '#Using nullsafe method call on non-nullable type#'
-        # External dependencies not available in test environment
-        - '#Class App\\Domain#'
-        - '#Call to static method .+ on an unknown class App\\Domain#'
-        - '#Access to constant .+ on an unknown class App\\Domain#'
-        - '#Method .+ has invalid return type App\\Domain#'
         # PHPDoc vs native type mismatches (existing code patterns)
         - '#PHPDoc tag @(return|param|throws) with type#'
         - '#with type .+ is not subtype of native type#'
@@ -29,8 +24,6 @@ parameters:
         - '#Expression on left side of \?\? is not nullable#'
         # Access to undefined property (trait usage)
         - '#Access to an undefined property#'
-        # Service provider constructor invocation (runtime binding)
-        - '#Class .+ constructor invoked with .+ parameters#'
         # Property never read warnings (intentional patterns)
         - '#Property .+ is never read, only written#'
         # Method parameter count mismatches (overloaded patterns)

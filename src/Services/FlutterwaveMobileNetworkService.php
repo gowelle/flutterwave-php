@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Services;
 
+use Gowelle\Flutterwave\Api\Banks\MobileNetworksApi;
 use Gowelle\Flutterwave\Data\MobileNetworkData;
 use Gowelle\Flutterwave\FlutterwaveApiProvider;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;

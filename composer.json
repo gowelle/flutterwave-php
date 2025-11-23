@@ -47,7 +47,7 @@
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
         "format": "vendor/bin/pint",
-        "analyse": "vendor/bin/phpstan analyse"
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=512M"
     },
     "config": {
         "sort-packages": true,

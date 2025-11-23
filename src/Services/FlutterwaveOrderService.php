@@ -45,8 +45,6 @@ final class FlutterwaveOrderService
 
     /**
      * Get a specific order
-     *
-     * @param  array{id: string, idempotency_key?: string, trace_id?: string, scenario_key?: string}  $data
      */
     public function get(string $id): OrderData
     {

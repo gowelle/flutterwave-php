@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Services;
 
+use Gowelle\Flutterwave\Api\Banks\BankAccountResolveApi;
+use Gowelle\Flutterwave\Api\Banks\BankBranchesApi;
+use Gowelle\Flutterwave\Api\Banks\BanksApi;
 use Gowelle\Flutterwave\Data\BankAccountResolveData;
 use Gowelle\Flutterwave\Data\BankBranchData;
 use Gowelle\Flutterwave\Data\BankData;

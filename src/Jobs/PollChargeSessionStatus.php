@@ -58,6 +58,7 @@ final class PollChargeSessionStatus implements ShouldQueue
 
         // Update session status
         $session->updateStatus($status);
+        $session->refresh();
 
         // If still pending, schedule another poll
         // Applications can customize the delay and max retries

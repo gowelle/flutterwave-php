@@ -1,9 +1,7 @@
 # Flutterwave - Laravel Wrapper
 
 [![Tests](https://github.com/gowelle/flutterwave-php/actions/workflows/tests.yml/badge.svg)](https://github.com/gowelle/flutterwave-php/actions/workflows/tests.yml)
-
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/gowelle/flutterwave-php.svg)](https://packagist.org/packages/gowelle/flutterwave-php)
-
 [![Total Downloads](https://img.shields.io/packagist/dt/gowelle/flutterwave-php.svg)](https://packagist.org/packages/gowelle/flutterwave-php)
 
 A comprehensive Laravel wrapper for Flutterwave Services API v4. This package provides a type-safe, feature-rich integration for Flutterwave payment processing with automatic retry logic, rate limiting, webhook verification, and comprehensive error handling.

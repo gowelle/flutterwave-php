@@ -62,7 +62,7 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
 ## Requirements
 
 - PHP 8.2 or higher
-- Laravel 11.0 or higher
+- Laravel 11.0 or 12.0
 - Composer
 - Flutterwave account with API credentials
 

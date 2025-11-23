@@ -1,6 +1,6 @@
 {
     "name": "gowelle/flutterwave-php",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Modern Laravel package for Flutterwave v4 API integration",
     "keywords": [
         "flutterwave",
@@ -20,16 +20,16 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/support": "^11.0",
-        "illuminate/http": "^11.0",
-        "illuminate/database": "^11.0",
-        "illuminate/contracts": "^11.0",
-        "illuminate/validation": "^11.0"
+        "illuminate/support": "^11.0|^12.0",
+        "illuminate/http": "^11.0|^12.0",
+        "illuminate/database": "^11.0|^12.0",
+        "illuminate/contracts": "^11.0|^12.0",
+        "illuminate/validation": "^11.0|^12.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.0",
+        "orchestra/testbench": "^9.0|^10.0",
         "pestphp/pest": "^2.0",
-        "pestphp/pest-plugin-laravel": "^2.0",
+        "pestphp/pest-plugin-laravel": "^2.0|^4.0",
         "phpstan/phpstan": "^1.10",
         "laravel/pint": "^1.13"
     },

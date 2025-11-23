@@ -4,6 +4,12 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [1.0.1] - 2025-01-27
+
+### Added
+
+- Laravel 12 support alongside Laravel 11
+
 ## [1.0.0] - 2025-11-23
 
 ### Added

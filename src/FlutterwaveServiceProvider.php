@@ -43,13 +43,8 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
             ->name('flutterwave')
             ->hasConfigFile('flutterwave')
             ->hasMigration('create_flutterwave_charge_sessions_table')
-            ->hasCommand(CleanupChargeSessionsCommand::class);
-
-        // Register webhook route if enabled
-        // Note: We handle this conditionally here since package tools doesn't support conditional route loading
-        if (config('flutterwave.webhook.route_path')) {
-            $package->hasRoutes('webhook');
-        }
+            ->hasCommand(CleanupChargeSessionsCommand::class)
+            ->hasRoutes('webhook');
     }
 
     /**

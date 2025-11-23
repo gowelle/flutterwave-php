@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Gowelle\Flutterwave\Events\FlutterwaveWebhookReceived;
+use Gowelle\Flutterwave\Exceptions\WebhookVerificationException;
 use Gowelle\Flutterwave\Services\FlutterwaveWebhookService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -12,7 +13,11 @@ Route::post(
     function (Request $request, FlutterwaveWebhookService $webhookService) {
         // Verify signature if enabled
         if (config('flutterwave.webhook.verify_signature', true)) {
-            $webhookService->verifyRequest($request);
+            try {
+                $webhookService->verifyRequest($request);
+            } catch (WebhookVerificationException $e) {
+                return response()->json(['error' => $e->getMessage()], 500);
+            }
         }
 
         // Extract payload from request

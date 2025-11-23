@@ -4,6 +4,14 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [1.0.3] - 2025-01-27
+
+### Fixed
+
+- Fixed webhook route registration issue that caused 404 errors in tests
+- Added proper exception handling in webhook route to return 500 status codes for verification failures
+- Webhook route now always registers regardless of config state (config has default value)
+
 ## [1.0.2] - 2025-01-27
 
 ### Changed

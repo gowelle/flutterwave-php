@@ -4,7 +4,10 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [1.0.0] - 2025-11-23
+
 ### Added
+
 - Initial release of gowelle/flutterwave-php
 - Support for Flutterwave v4 API
 - Payment processing and direct charge flow
@@ -23,6 +26,7 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 - Code style enforcement with Laravel Pint
 
 ### Technical Features
+
 - Strict PHP 8.2+ typing
 - PSR-12 compliant code style
 - Database migrations for charge session tracking
@@ -34,4 +38,5 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 - Support for both staging and production environments
 
 ### Breaking Changes
+
 None - initial release.

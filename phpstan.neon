@@ -2,9 +2,9 @@ parameters:
     level: 5
     paths:
         - src
-    excludePaths:
-        - src/Models/ChargeSession.php
     ignoreErrors:
+        # Laravel Eloquent mixin (convention, not a real class)
+        - '#PHPDoc tag @mixin contains unknown class Eloquent#'
         # Nullsafe operator on non-nullable types (intentional for defensive coding)
         - '#Using nullsafe method call on non-nullable type#'
         # PHPDoc vs native type mismatches (existing code patterns)

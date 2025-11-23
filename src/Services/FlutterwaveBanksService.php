@@ -31,7 +31,7 @@ final class FlutterwaveBanksService
         $api = app(FlutterwaveApiProvider::class)
                 ->useApi(FlutterwaveApi::BANKS, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
 
-        /** @var BanksApi $api */
+        /** @var \Gowelle\Flutterwave\Api\Banks\BanksApi $api */
         $response = $api->retrieveByCountry($country);
 
         if (! $response->isSuccessful()) {
@@ -53,7 +53,7 @@ final class FlutterwaveBanksService
          $api = app(FlutterwaveApiProvider::class)
             ->useApi(FlutterwaveApi::BANK_BRANCHES, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
 
-        /** @var BankBranchesApi $api */
+        /** @var \Gowelle\Flutterwave\Api\Banks\BankBranchesApi $api */
         $response = $api->retrieveByBankId($bankId);
 
         if (! $response->isSuccessful()) {
@@ -77,7 +77,7 @@ final class FlutterwaveBanksService
         $api = app(FlutterwaveApiProvider::class)
             ->useApi(FlutterwaveApi::BANK_ACCOUNT_RESOLVE, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
 
-        /** @var BankAccountResolveApi $api */
+        /** @var \Gowelle\Flutterwave\Api\Banks\BankAccountResolveApi $api */
         $response = $api->resolve($bankCode, $accountNumber, $currency);
 
         if (! $response->isSuccessful()) {

@@ -27,7 +27,7 @@ final class FlutterwaveMobileNetworkService
         $api = app(FlutterwaveApiProvider::class)
             ->useApi(FlutterwaveApi::MOBILE_NETWORKS, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
 
-        /** @var MobileNetworksApi $api */  
+        /** @var \Gowelle\Flutterwave\Api\Banks\MobileNetworksApi $api */  
         $response = $api->retrieveByCountry($country);
 
         return MobileNetworkData::collection($response->data)->toArray();

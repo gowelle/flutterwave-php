@@ -54,7 +54,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static Builder<static>|ChargeSession wherePaymentMethodType($value)
  * @method static Builder<static>|ChargeSession whereRemoteCustomerId($value)
  * @method static Builder<static>|ChargeSession whereUpdatedAt($value)
- * @method static Builder<static>|ChargeSession withStatus(\App\Domain\Flutterwave\Enums\DirectChargeStatus|string $status)
+ * @method static Builder<static>|ChargeSession withStatus(\Gowelle\Flutterwave\Enums\DirectChargeStatus|string $status)
  * @method static Builder<static>|ChargeSession where(string $column, mixed $operator = null, mixed $value = null)
  * @method static ChargeSession|null find(string|int $id, array $columns = ['*'])
  * @method static ChargeSession create(array $attributes = [])

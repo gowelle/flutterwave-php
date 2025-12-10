@@ -27,6 +27,7 @@ class FlutterwaveBaseService
         private readonly FlutterwaveAuthService $authService,
         private readonly FlutterwaveWebhookService $webhookService,
         private readonly HeaderBuilder $headerBuilder,
+        private readonly FlutterwaveApiProvider $apiProvider,
     ) {}
 
     /**
@@ -62,7 +63,7 @@ class FlutterwaveBaseService
     {
         $headers = $this->headerBuilder->build($wavable);
 
-        return app(FlutterwaveApiProvider::class)
+        return $this->apiProvider
             ->useApi($api, $this->getAccessToken(), $headers)
             ->list();
     }
@@ -70,13 +71,15 @@ class FlutterwaveBaseService
     /**
      * Update the item
      *
+     * @param  array<string, mixed>  $data
+     *
      * @throws Exception
      */
     public function update(FlutterwaveApi $api, Wavable $wavable, string $id, array $data): ApiResponse
     {
         $headers = $this->headerBuilder->build($wavable);
 
-        return app(FlutterwaveApiProvider::class)
+        return $this->apiProvider
             ->useApi($api, $this->getAccessToken(), $headers)
             ->update($id, $data);
     }
@@ -84,13 +87,15 @@ class FlutterwaveBaseService
     /**
      * Create the item
      *
+     * @param  array<string, mixed>  $data
+     *
      * @throws Exception
      */
     public function create(FlutterwaveApi $api, Wavable $wavable, array $data): ApiResponse
     {
         $headers = $this->headerBuilder->build($wavable);
 
-        return app(FlutterwaveApiProvider::class)
+        return $this->apiProvider
             ->useApi($api, $this->getAccessToken(), $headers)
             ->create($data);
     }
@@ -104,7 +109,7 @@ class FlutterwaveBaseService
     {
         $headers = $this->headerBuilder->build($wavable);
 
-        return app(FlutterwaveApiProvider::class)
+        return $this->apiProvider
             ->useApi($api, $this->getAccessToken(), $headers)
             ->retrieve($id);
     }
@@ -112,13 +117,15 @@ class FlutterwaveBaseService
     /**
      * Search the items
      *
+     * @param  array<string, mixed>  $data
+     *
      * @throws Exception
      */
     public function search(FlutterwaveApi $api, Wavable $wavable, array $data): ApiResponse
     {
         $headers = $this->headerBuilder->build($wavable);
 
-        return app(FlutterwaveApiProvider::class)
+        return $this->apiProvider
             ->useApi($api, $this->getAccessToken(), $headers)
             ->search($data);
     }

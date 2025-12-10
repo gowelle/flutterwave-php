@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Gowelle\Flutterwave\Services;
 
 use Gowelle\Flutterwave\Concerns\BuildsWavable;
+use Gowelle\Flutterwave\Contracts\DirectChargeServiceInterface;
 use Gowelle\Flutterwave\Data\AuthorizationData;
 use Gowelle\Flutterwave\Data\DirectChargeData;
 use Gowelle\Flutterwave\Enums\DirectChargeStatus;
-use Gowelle\Flutterwave\Events\DirectChargeCreated;
-use Gowelle\Flutterwave\Events\DirectChargeUpdated;
+use Gowelle\Flutterwave\Events\FlutterwaveChargeCreated;
+use Gowelle\Flutterwave\Events\FlutterwaveChargeUpdated;
 use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 
@@ -20,7 +21,7 @@ use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
  * This service manages the /orchestration/direct-charges endpoint which combines
  * customer, payment method, and charge creation in a single request.
  */
-final class FlutterwaveDirectChargeService
+final class FlutterwaveDirectChargeService implements DirectChargeServiceInterface
 {
     use BuildsWavable;
 
@@ -37,6 +38,25 @@ final class FlutterwaveDirectChargeService
      * @param  array<string, mixed>  $data  Charge data including amount, currency, reference, customer, payment_method, redirect_url
      *
      * @throws FlutterwaveApiException
+     *
+     * @example
+     * $chargeData = $directChargeService->create([
+     *     'amount' => 10000,
+     *     'currency' => 'TZS',
+     *     'reference' => 'ORDER-' . uniqid(),
+     *     'customer' => [
+     *         'email' => 'customer@example.com',
+     *         'name' => 'John Doe',
+     *     ],
+     *     'payment_method' => [
+     *         'type' => 'card',
+     *         'card_number' => '5531886652142950',
+     *         'cvv' => '564',
+     *         'expiry_month' => '09',
+     *         'expiry_year' => '32',
+     *     ],
+     *     'redirect_url' => route('payment.callback'),
+     * ]);
      */
     public function create(array $data): DirectChargeData
     {
@@ -49,7 +69,7 @@ final class FlutterwaveDirectChargeService
         $chargeData = DirectChargeData::fromApi($this->flutterwaveBaseService->create(FlutterwaveApi::DIRECT_CHARGE, $wavable, $data)->data);
 
         // Dispatch event for applications to listen to
-        event(new DirectChargeCreated($chargeData, $data));
+        event(new FlutterwaveChargeCreated($chargeData, $data));
 
         return $chargeData;
     }
@@ -63,6 +83,15 @@ final class FlutterwaveDirectChargeService
      * @param  AuthorizationData  $authorizationData  Authorization payload
      *
      * @throws FlutterwaveApiException
+     *
+     * @example
+     * // For PIN authorization
+     * $authorization = AuthorizationData::createPin($nonce, $encryptedPin);
+     * $chargeData = $directChargeService->updateChargeAuthorization($chargeId, $authorization);
+     *
+     * // For OTP authorization
+     * $authorization = AuthorizationData::createOtp($otpCode);
+     * $chargeData = $directChargeService->updateChargeAuthorization($chargeId, $authorization);
      */
     public function updateChargeAuthorization(string $chargeId, AuthorizationData $authorizationData): DirectChargeData
     {
@@ -75,7 +104,7 @@ final class FlutterwaveDirectChargeService
         $chargeData = DirectChargeData::fromApi($this->flutterwaveBaseService->update(FlutterwaveApi::DIRECT_CHARGE, $wavable, $chargeId, $authorizationData->toApiPayload())->data);
 
         // Dispatch event for applications to listen to
-        event(new DirectChargeUpdated($chargeData, $authorizationData));
+        event(new FlutterwaveChargeUpdated($chargeData, $authorizationData));
 
         return $chargeData;
     }

@@ -97,20 +97,27 @@ php artisan vendor:publish --tag="flutterwave-migrations"
 FLUTTERWAVE_CLIENT_ID=your_client_id
 FLUTTERWAVE_CLIENT_SECRET=your_client_secret
 FLUTTERWAVE_SECRET_HASH=your_secret_hash
+FLUTTERWAVE_ENCRYPTION_KEY=your_encryption_key
 FLUTTERWAVE_ENVIRONMENT=staging  # or production
 ```
 
-3. **Retrieve your encryption key:**
+3. **Verify your credentials:**
+
+```bash
+php artisan flutterwave:verify
+```
+
+4. **Retrieve your encryption key:**
 
 Get your encryption key from your Flutterwave dashboard under **API Settings**. You'll need this to encrypt card data before sending requests.
 
-4. **Run migrations (if using charge sessions):**
+5. **Run migrations (if using charge sessions):**
 
 ```bash
 php artisan migrate
 ```
 
-5. **Start using the package:**
+6. **Start using the package:**
 
 > **Important:** When making card charge requests, card data must be encrypted using AES-256-GCM encryption. See the [Flutterwave Encryption Documentation](https://developer.flutterwave.com/docs/encryption) for encryption requirements and PHP examples.
 
@@ -274,7 +281,9 @@ Configure the model classes used by the ChargeSession model for relationships. T
 | `FLUTTERWAVE_CLIENT_ID`            | Your Flutterwave client ID             | -                                   |
 | `FLUTTERWAVE_CLIENT_SECRET`        | Your Flutterwave client secret         | -                                   |
 | `FLUTTERWAVE_SECRET_HASH`          | Your webhook secret hash               | -                                   |
+| `FLUTTERWAVE_ENCRYPTION_KEY`       | Encryption key for card data           | -                                   |
 | `FLUTTERWAVE_ENVIRONMENT`          | Environment: `staging` or `production` | `staging`                           |
+| `FLUTTERWAVE_DEBUG`                | Enable debug logging (dev only)        | `false`                             |
 | `FLUTTERWAVE_TIMEOUT`              | Request timeout in seconds             | `30`                                |
 | `FLUTTERWAVE_MAX_RETRIES`          | Maximum retry attempts                 | `3`                                 |
 | `FLUTTERWAVE_RETRY_DELAY`          | Retry delay in milliseconds            | `1000`                              |
@@ -295,6 +304,7 @@ Configure the model classes used by the ChargeSession model for relationships. T
 | `FLUTTERWAVE_CACHE_ENABLED`        | Enable caching                         | `true`                              |
 | `FLUTTERWAVE_USER_MODEL`           | User model class                       | `App\Models\User`                   |
 | `FLUTTERWAVE_PAYMENT_MODEL`        | Payment model class                    | `App\Domain\Payment\Models\Payment` |
+
 
 ## Usage
 
@@ -835,14 +845,14 @@ The package dispatches Laravel events for important actions, allowing you to hoo
 
 ### Available Events
 
-#### DirectChargeCreated
+#### FlutterwaveChargeCreated
 
 Dispatched when a direct charge is created:
 
 ```php
-use Gowelle\Flutterwave\Events\DirectChargeCreated;
+use Gowelle\Flutterwave\Events\FlutterwaveChargeCreated;
 
-Event::listen(DirectChargeCreated::class, function (DirectChargeCreated $event) {
+Event::listen(FlutterwaveChargeCreated::class, function (FlutterwaveChargeCreated $event) {
     $chargeData = $event->chargeData;
     $requestData = $event->requestData;
 
@@ -850,14 +860,14 @@ Event::listen(DirectChargeCreated::class, function (DirectChargeCreated $event) 
 });
 ```
 
-#### DirectChargeUpdated
+#### FlutterwaveChargeUpdated
 
 Dispatched when charge authorization is submitted:
 
 ```php
-use Gowelle\Flutterwave\Events\DirectChargeUpdated;
+use Gowelle\Flutterwave\Events\FlutterwaveChargeUpdated;
 
-Event::listen(DirectChargeUpdated::class, function (DirectChargeUpdated $event) {
+Event::listen(FlutterwaveChargeUpdated::class, function (FlutterwaveChargeUpdated $event) {
     $chargeData = $event->chargeData;
     $authorizationData = $event->authorizationData;
 

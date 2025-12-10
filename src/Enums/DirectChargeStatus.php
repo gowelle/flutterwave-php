@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Enums;
 
-use App\Domain\Payment\Enums\PaymentStatus;
-
 /**
  * Direct charge status for Flutterwave orchestrator flow.
  *

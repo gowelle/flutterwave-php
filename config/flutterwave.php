@@ -34,6 +34,30 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Encryption Key
+    |--------------------------------------------------------------------------
+    |
+    | The encryption key used to encrypt sensitive card data before sending
+    | to Flutterwave. This is required for card transactions.
+    |
+    */
+
+    'encryption_key' => env('FLUTTERWAVE_ENCRYPTION_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Debug Mode
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, logs all API requests and responses for debugging.
+    | WARNING: This will log sensitive data. Only enable in development.
+    |
+    */
+
+    'debug' => env('FLUTTERWAVE_DEBUG', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | API Settings
     |--------------------------------------------------------------------------
     |

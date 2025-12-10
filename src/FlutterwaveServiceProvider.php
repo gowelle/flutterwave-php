@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave;
 
+use Gowelle\Flutterwave\Contracts\CustomerServiceInterface;
+use Gowelle\Flutterwave\Contracts\DirectChargeServiceInterface;
+use Gowelle\Flutterwave\Contracts\PaymentsServiceInterface;
 use Gowelle\Flutterwave\Data\FlutterwaveConfig;
 use Gowelle\Flutterwave\Services\FlutterwaveAuthService;
 use Gowelle\Flutterwave\Services\FlutterwaveBanksService;
@@ -17,8 +20,8 @@ use Gowelle\Flutterwave\Services\FlutterwaveRefundService;
 use Gowelle\Flutterwave\Services\FlutterwaveSettlementService;
 use Gowelle\Flutterwave\Services\FlutterwaveTransferService;
 use Gowelle\Flutterwave\Services\FlutterwaveWebhookService;
-use Gowelle\Flutterwave\Events\DirectChargeCreated;
-use Gowelle\Flutterwave\Events\DirectChargeUpdated;
+use Gowelle\Flutterwave\Events\FlutterwaveChargeCreated;
+use Gowelle\Flutterwave\Events\FlutterwaveChargeUpdated;
 use Gowelle\Flutterwave\Events\FlutterwaveWebhookReceived;
 use Gowelle\Flutterwave\Listeners\CreateChargeSession;
 use Gowelle\Flutterwave\Listeners\UpdateChargeSession;
@@ -43,7 +46,10 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
             ->name('flutterwave')
             ->hasConfigFile('flutterwave')
             ->hasMigration('create_flutterwave_charge_sessions_table')
-            ->hasCommand(CleanupChargeSessionsCommand::class)
+            ->hasCommands([
+                CleanupChargeSessionsCommand::class,
+                \Gowelle\Flutterwave\Console\Commands\VerifyCredentialsCommand::class,
+            ])
             ->hasRoutes('webhook');
     }
 
@@ -108,6 +114,12 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
             maxRequests: config('flutterwave.rate_limit.max_requests', 100),
             perSeconds: config('flutterwave.rate_limit.per_seconds', 60),
         ));
+
+        // API Provider
+        $this->app->singleton(FlutterwaveApiProvider::class, fn(Application $app) => new FlutterwaveApiProvider(
+            $app->make(RetryHandler::class),
+            $app->make(RateLimiter::class),
+        ));
     }
 
     /**
@@ -144,6 +156,7 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
             $app->make(FlutterwaveAuthService::class),
             $app->make(FlutterwaveWebhookService::class),
             $app->make(HeaderBuilder::class),
+            $app->make(FlutterwaveApiProvider::class),
         ));
 
         $this->app->alias(FlutterwaveBaseService::class, 'flutterwave.base');
@@ -159,12 +172,14 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwavePaymentsService::class, 'flutterwave.payments');
+        $this->app->bind(PaymentsServiceInterface::class, FlutterwavePaymentsService::class);
 
         // Direct charge service
         $this->app->singleton(FlutterwaveDirectChargeService::class, fn(Application $app) => new FlutterwaveDirectChargeService(
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwaveDirectChargeService::class, 'flutterwave.direct_charge');
+        $this->app->bind(DirectChargeServiceInterface::class, FlutterwaveDirectChargeService::class);
 
         // Banks service
         $this->app->singleton(FlutterwaveBanksService::class, fn(Application $app) => new FlutterwaveBanksService(
@@ -177,6 +192,7 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwaveCustomerService::class, 'flutterwave.customers');
+        $this->app->bind(CustomerServiceInterface::class, FlutterwaveCustomerService::class);
 
         // Mobile networks service
         $this->app->singleton(FlutterwaveMobileNetworkService::class, fn(Application $app) => new FlutterwaveMobileNetworkService(
@@ -293,12 +309,12 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
         // Register service listeners only if auto_create is enabled
         if (config('flutterwave.charge_sessions.auto_create', false)) {
             Event::listen(
-                DirectChargeCreated::class,
+                FlutterwaveChargeCreated::class,
                 CreateChargeSession::class
             );
 
             Event::listen(
-                DirectChargeUpdated::class,
+                FlutterwaveChargeUpdated::class,
                 UpdateChargeSession::class
             );
         }

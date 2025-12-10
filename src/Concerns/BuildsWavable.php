@@ -13,9 +13,11 @@ trait BuildsWavable
     /**
      * Build a wavable object
      *
+     * @param  array<string, mixed>  $data  Request data
      * @param  FlutterwaveApi|null  $apiType  Optional API type to determine if this is a charge request
+     * @param  bool  $isProductEnvironment  Whether this is a production environment
      */
-    private function buildWavable(array $data, ?FlutterwaveApi $apiType = null, $isProductEnvironment = false): Wavable
+    private function buildWavable(array $data, ?FlutterwaveApi $apiType = null, bool $isProductEnvironment = false): Wavable
     {
         // Generate UUID for idempotency key and trace id
         // If request is for charge, use order_id as idempotency key for idempotency

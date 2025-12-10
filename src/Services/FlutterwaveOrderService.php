@@ -29,6 +29,7 @@ final class FlutterwaveOrderService
     /**
      * Get all orders
      *
+     * @param  array<string, mixed>  $data  Query parameters
      * @return OrderData[]
      */
     public function list(array $data = []): array

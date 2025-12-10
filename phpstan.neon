@@ -1,5 +1,5 @@
 parameters:
-    level: 5
+    level: 6
     paths:
         - src
     ignoreErrors:
@@ -30,3 +30,15 @@ parameters:
         - '#Method .+ invoked with .+ parameters, .+ required#'
         # Status code comparisons (type narrowing)
         - '#Strict comparison using === between#'
+        # Level 6: Generic array value types - defer detailed typing for now
+        - '#no value type specified in iterable type array#'
+        # Level 6: Generic Eloquent Builder types
+        - '#generic class Illuminate\\Database\\Eloquent\\Builder but does not specify its types#'
+        # Level 6: Dynamic model relationship types (config-based models)
+        - '#Unable to resolve the template type TRelatedModel in call to method Illuminate\\Database\\Eloquent\\Model::belongsTo#'
+        # Level 6: Generic Laravel HasFactory trait
+        - '#uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types#'
+        # Level 6: Generic BelongsTo return types
+        - '#return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types#'
+        # Level 6: Generic Collection return types
+        - '#return type with generic class Illuminate\\Support\\Collection does not specify its types#'

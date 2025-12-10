@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Gowelle\Flutterwave\Services;
 
 use Gowelle\Flutterwave\Concerns\BuildsWavable;
+use Gowelle\Flutterwave\Contracts\CustomerServiceInterface;
 use Gowelle\Flutterwave\Data\CustomerData;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 
-final class FlutterwaveCustomerService
+final class FlutterwaveCustomerService implements CustomerServiceInterface
 {
     use BuildsWavable;
 
@@ -16,6 +17,15 @@ final class FlutterwaveCustomerService
 
     /**
      * Create a customer
+     *
+     * @param  array<string, mixed>  $data  Customer data
+     *
+     * @example
+     * $customer = $customerService->create([
+     *     'email' => 'customer@example.com',
+     *     'name' => 'John Doe',
+     *     'phone_number' => '+255712345678',
+     * ]);
      */
     public function create(array $data): CustomerData
     {
@@ -27,6 +37,7 @@ final class FlutterwaveCustomerService
     /**
      * Get customers
      *
+     * @param  array<string, mixed>  $data  Query parameters
      * @return CustomerData[]
      */
     public function list(array $data): array
@@ -60,8 +71,7 @@ final class FlutterwaveCustomerService
      * Update a customer
      *
      * @param  string  $id  customer ID
-     * @param  array  $data  customer data
-     * @return CustomerData
+     * @param  array<string, mixed>  $data  customer data
      *
      * @throws FlutterwaveApiException
      */

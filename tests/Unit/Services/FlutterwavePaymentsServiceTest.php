@@ -5,12 +5,13 @@ declare(strict_types=1);
 use Gowelle\Flutterwave\Data\ApiResponse;
 use Gowelle\Flutterwave\Data\ChargeData;
 use Gowelle\Flutterwave\Data\FlutterwaveConfig;
+use Gowelle\Flutterwave\Data\PaymentMethodData;
+use Gowelle\Flutterwave\Data\PaymentMethods\CardPaymentMethod;
 use Gowelle\Flutterwave\Enums\DirectChargeStatus;
 use Gowelle\Flutterwave\Enums\FlutterwaveEnvironment;
 use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwavePaymentsService;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
-use Illuminate\Support\Facades\Event;
 
 beforeEach(function () {
     $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);
@@ -22,8 +23,8 @@ it('can get payment methods', function () {
         status: 'success',
         message: 'Payment methods retrieved',
         data: [
-            ['id' => '1', 'type' => 'card'],
-            ['id' => '2', 'type' => 'bank_transfer'],
+            ['id' => '1', 'type' => 'card', 'customer_id' => 'cust_1', 'last4' => '2950', 'brand' => 'mastercard'],
+            ['id' => '2', 'type' => 'card', 'customer_id' => 'cust_1', 'last4' => '1234', 'brand' => 'visa'],
         ],
     );
 
@@ -38,15 +39,18 @@ it('can get payment methods', function () {
 
     $result = $this->service->methods([]);
 
-    expect($result)->toBeInstanceOf(ApiResponse::class);
-    expect($result->isSuccessful())->toBeTrue();
+    expect($result)->toBeArray();
+    expect($result)->toHaveCount(2);
+    expect($result[0])->toBeInstanceOf(PaymentMethodData::class);
+    expect($result[0]->id)->toBe('1');
+    expect($result[0]->type)->toBe('card');
 });
 
 it('can create a payment method', function () {
     $response = new ApiResponse(
         status: 'success',
         message: 'Payment method created',
-        data: ['id' => 'pm_123', 'type' => 'card'],
+        data: ['id' => 'pm_123', 'type' => 'card', 'customer_id' => 'cust_123', 'last4' => '2950', 'brand' => 'mastercard'],
     );
 
     $this->baseService
@@ -63,15 +67,17 @@ it('can create a payment method', function () {
         'type' => 'card',
     ]);
 
-    expect($result)->toBeInstanceOf(ApiResponse::class);
-    expect($result->isSuccessful())->toBeTrue();
+    expect($result)->toBeInstanceOf(CardPaymentMethod::class);
+    expect($result->id)->toBe('pm_123');
+    expect($result->type)->toBe('card');
+    expect($result->customerId)->toBe('cust_123');
 });
 
 it('can get a payment method by id', function () {
     $response = new ApiResponse(
         status: 'success',
         message: 'Payment method retrieved',
-        data: ['id' => 'pm_123', 'type' => 'card'],
+        data: ['id' => 'pm_123', 'type' => 'card', 'customer_id' => 'cust_123', 'last4' => '2950', 'brand' => 'mastercard'],
     );
 
     $this->baseService
@@ -86,15 +92,22 @@ it('can get a payment method by id', function () {
 
     $result = $this->service->getMethod('pm_123');
 
-    expect($result)->toBeInstanceOf(ApiResponse::class);
-    expect($result->isSuccessful())->toBeTrue();
+    expect($result)->toBeInstanceOf(CardPaymentMethod::class);
+    expect($result->id)->toBe('pm_123');
+    expect($result->type)->toBe('card');
 });
 
 it('can process a charge', function () {
     $response = new ApiResponse(
         status: 'success',
         message: 'Charge created',
-        data: ['id' => 'ch_123', 'status' => 'pending'],
+        data: [
+            'id' => 'ch_123',
+            'reference' => 'ref_123',
+            'amount' => 1000,
+            'currency' => 'TZS',
+            'status' => 'pending',
+        ],
     );
 
     $callbackCalled = false;
@@ -125,7 +138,9 @@ it('can process a charge', function () {
         }
     );
 
-    expect($result)->toBeInstanceOf(ApiResponse::class);
+    expect($result)->toBeInstanceOf(ChargeData::class);
+    expect($result->id)->toBe('ch_123');
+    expect($result->status)->toBe('pending');
     expect($callbackCalled)->toBeTrue();
     expect($callbackTraceId)->not->toBeNull();
 });
@@ -136,6 +151,9 @@ it('can get charge status', function () {
         message: 'Charge retrieved',
         data: [
             'id' => 'ch_123',
+            'reference' => 'ref_123',
+            'amount' => 1000,
+            'currency' => 'TZS',
             'status' => 'successful',
         ],
     );
@@ -153,5 +171,5 @@ it('can get charge status', function () {
     $result = $this->service->status('ch_123');
 
     expect($result)->toBeInstanceOf(DirectChargeStatus::class);
+    expect($result)->toBe(DirectChargeStatus::SUCCEEDED);
 });
-

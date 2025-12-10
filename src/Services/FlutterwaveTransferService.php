@@ -16,6 +16,8 @@ final class FlutterwaveTransferService
 
     /**
      * Create a transfer
+     *
+     * @param  array<string, mixed>  $data  Transfer data
      */
     public function create(array $data): TransferData
     {

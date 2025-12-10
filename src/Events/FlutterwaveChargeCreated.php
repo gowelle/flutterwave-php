@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Events;
 
-use Gowelle\Flutterwave\Data\AuthorizationData;
 use Gowelle\Flutterwave\Data\DirectChargeData;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * Direct Charge Updated Event
+ * Flutterwave Charge Created Event
  *
- * Dispatched when a direct charge authorization is submitted via the
+ * Dispatched when a direct charge is successfully created via the
  * FlutterwaveDirectChargeService. Applications can listen to this event
- * to update ChargeSession records or perform other business logic.
+ * to create ChargeSession records or perform other business logic.
  */
-class DirectChargeUpdated
+class FlutterwaveChargeCreated
 {
     use Dispatchable;
     use InteractsWithSockets;
@@ -28,7 +27,7 @@ class DirectChargeUpdated
      */
     public function __construct(
         public readonly DirectChargeData $chargeData,
-        public readonly AuthorizationData $authorizationData,
+        public readonly array $requestData,
     ) {}
 }
 

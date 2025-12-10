@@ -16,6 +16,8 @@ final class FlutterwaveRefundService
 
     /**
      * Create a refund
+     *
+     * @param  array<string, mixed>  $data  Refund data
      */
     public function create(array $data): RefundData
     {

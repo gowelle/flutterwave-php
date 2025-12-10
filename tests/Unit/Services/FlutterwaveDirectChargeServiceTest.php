@@ -8,8 +8,8 @@ use Gowelle\Flutterwave\Data\DirectChargeData;
 use Gowelle\Flutterwave\Data\FlutterwaveConfig;
 use Gowelle\Flutterwave\Enums\DirectChargeStatus;
 use Gowelle\Flutterwave\Enums\FlutterwaveEnvironment;
-use Gowelle\Flutterwave\Events\DirectChargeCreated;
-use Gowelle\Flutterwave\Events\DirectChargeUpdated;
+use Gowelle\Flutterwave\Events\FlutterwaveChargeCreated;
+use Gowelle\Flutterwave\Events\FlutterwaveChargeUpdated;
 use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwaveDirectChargeService;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
@@ -57,7 +57,7 @@ it('can create a direct charge', function () {
     ]);
 
     expect($result)->toBeInstanceOf(DirectChargeData::class);
-    Event::assertDispatched(DirectChargeCreated::class);
+    Event::assertDispatched(FlutterwaveChargeCreated::class);
 });
 
 it('can update charge authorization', function () {
@@ -84,7 +84,7 @@ it('can update charge authorization', function () {
     $result = $this->service->updateChargeAuthorization('dc_123', $authorizationData);
 
     expect($result)->toBeInstanceOf(DirectChargeData::class);
-    Event::assertDispatched(DirectChargeUpdated::class);
+    Event::assertDispatched(FlutterwaveChargeUpdated::class);
 });
 
 it('can get charge status', function () {

@@ -4,6 +4,44 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.0.0] - 2025-12-11
+
+### Breaking Changes
+
+- **Event Renaming**: Events renamed for consistency with package naming convention:
+  - `DirectChargeCreated` → `FlutterwaveChargeCreated`
+  - `DirectChargeUpdated` → `FlutterwaveChargeUpdated`
+  - See [UPGRADE.md](UPGRADE.md) for migration guide
+
+- **PaymentsService Return Types**: Methods now return proper DTOs instead of `ApiResponse`:
+  - `methods()` → `PaymentMethodData[]`
+  - `createMethod()` → `PaymentMethodData`
+  - `getMethod()` → `?PaymentMethodData`
+  - `process()` → `ChargeData`
+
+### Added
+
+- **Service Interfaces**: New contracts for better dependency injection and testing:
+  - `DirectChargeServiceInterface`
+  - `CustomerServiceInterface`
+  - `PaymentsServiceInterface`
+
+- **Artisan Command**: `php artisan flutterwave:verify` to test API credentials
+
+- **Configuration Options**:
+  - `encryption_key` - For encrypting sensitive card data
+  - `debug` - Enable detailed API request/response logging (development only)
+
+- **Developer Experience**:
+  - `@example` annotations added to key service methods
+  - Comprehensive UPGRADE.md migration guide
+
+### Improved
+
+- **Dependency Injection**: `FlutterwaveBaseService` now receives `FlutterwaveApiProvider` via constructor injection (no more `app()` helper calls)
+- **Static Analysis**: PHPStan upgraded from level 5 to level 6 with 0 errors
+- **Test Coverage**: Added 30+ new tests covering DTOs, exceptions, models, and integration flows
+
 ## [1.0.6] - 2025-12-10
 
 ### Added

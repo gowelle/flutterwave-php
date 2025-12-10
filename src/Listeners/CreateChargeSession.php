@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Listeners;
 
-use Gowelle\Flutterwave\Events\DirectChargeCreated;
+use Gowelle\Flutterwave\Events\FlutterwaveChargeCreated;
 use Gowelle\Flutterwave\Models\ChargeSession;
 
 /**
@@ -19,7 +19,7 @@ final class CreateChargeSession
     /**
      * Handle the event.
      */
-    public function handle(DirectChargeCreated $event): void
+    public function handle(FlutterwaveChargeCreated $event): void
     {
         // Only create if auto_create is enabled
         if (!config('flutterwave.charge_sessions.auto_create', false)) {

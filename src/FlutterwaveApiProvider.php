@@ -19,7 +19,6 @@ use Gowelle\Flutterwave\Api\Transfer\TransferApi;
 use Gowelle\Flutterwave\Api\Settlement\SettlementApi;
 use Gowelle\Flutterwave\Concerns\RecognizesEnvironment;
 use Gowelle\Flutterwave\Credentials\AbstractHeadersConfig;
-use Gowelle\Flutterwave\Exceptions\InvalidApiException;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApiContract;
 use Gowelle\Flutterwave\Support\RateLimiter;
@@ -67,7 +66,6 @@ class FlutterwaveApiProvider
                 FlutterwaveApi::REFUND => new RefundApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::TRANSFER => new TransferApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::SETTLEMENT => new SettlementApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
-                default => throw new InvalidApiException("Invalid or unsupported API: '{$api->value}'. Please use a valid FlutterwaveApi enum value."),
             };
 
         } catch (ValidationException $e) {

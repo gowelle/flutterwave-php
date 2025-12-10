@@ -10,6 +10,7 @@ use Gowelle\Flutterwave\Api\Banks\BankBranchesApi;
 use Gowelle\Flutterwave\Api\Banks\BanksApi;
 use Gowelle\Flutterwave\Api\Banks\MobileNetworksApi;
 use Gowelle\Flutterwave\Api\Charge\ChargeApi;
+use Gowelle\Flutterwave\Api\Charge\DirectChargeApi;
 use Gowelle\Flutterwave\Api\Customer\CustomerApi;
 use Gowelle\Flutterwave\Api\Order\OrderApi;
 use Gowelle\Flutterwave\Api\PaymentMethods\PaymentMethodsApi;
@@ -24,6 +25,7 @@ use Gowelle\Flutterwave\Infrastructure\FlutterwaveApiContract;
 use Gowelle\Flutterwave\Support\RateLimiter;
 use Gowelle\Flutterwave\Support\RetryHandler;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class FlutterwaveApiProvider
 {
@@ -55,6 +57,7 @@ class FlutterwaveApiProvider
             return match ($api) {
                 FlutterwaveApi::CUSTOMER => new CustomerApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::CHARGE => new ChargeApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::DIRECT_CHARGE => new DirectChargeApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::PAYMENT_METHODS => new PaymentMethodsApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::BANKS => new BanksApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::BANK_BRANCHES => new BankBranchesApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
@@ -64,11 +67,13 @@ class FlutterwaveApiProvider
                 FlutterwaveApi::REFUND => new RefundApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::TRANSFER => new TransferApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::SETTLEMENT => new SettlementApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
-                default => throw new InvalidApiException('Invalid API'),
+                default => throw new InvalidApiException("Invalid or unsupported API: '{$api->value}'. Please use a valid FlutterwaveApi enum value."),
             };
 
+        } catch (ValidationException $e) {
+            throw new Exception("Invalid API headers configuration: {$e->getMessage()}", 0, $e);
         } catch (Exception $e) {
-            throw new Exception('Invalid headers: '.$e->getMessage());
+            throw new Exception("Failed to initialize Flutterwave API: {$e->getMessage()}", 0, $e);
         }
 
     }

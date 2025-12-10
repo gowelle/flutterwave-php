@@ -4,6 +4,21 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [1.0.5] - 2025-12-10
+
+### Added
+
+- Added `DirectChargeApi` to `FlutterwaveApiProvider` for direct charge orchestrator support
+- Direct charge API can now be instantiated via the provider using `FlutterwaveApi::DIRECT_CHARGE`
+
+### Improved
+
+- Enhanced exception messages in `FlutterwaveApiProvider` for better debugging
+  - Invalid API errors now include the attempted API value
+  - Separated `ValidationException` handling for header configuration issues
+  - More descriptive messages for API initialization failures
+  - Exception chaining preserved for full debugging context
+
 ## [1.0.4] - 2025-01-27
 
 ### Fixed

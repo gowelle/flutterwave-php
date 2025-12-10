@@ -4,7 +4,7 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
-## [1.0.5] - 2025-12-10
+## [1.0.6] - 2025-12-10
 
 ### Added
 
@@ -18,6 +18,11 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
   - Separated `ValidationException` handling for header configuration issues
   - More descriptive messages for API initialization failures
   - Exception chaining preserved for full debugging context
+
+### Fixed
+
+- Fixed PHPStan error: Removed unreachable `default` case in match statement
+- Removed unused `InvalidApiException` import
 
 ## [1.0.4] - 2025-01-27
 

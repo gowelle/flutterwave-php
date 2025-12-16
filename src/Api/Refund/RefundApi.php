@@ -48,7 +48,7 @@ class RefundApi extends FlutterwaveBaseApi
     /**
      * List refunds with query parameters (pagination and filtering)
      *
-     * @param array<string, mixed> $params Query parameters (page, size, from, to)
+     * @param  array<string, mixed>  $params  Query parameters (page, size, from, to)
      */
     public function listWithParams(array $params): ApiResponse
     {
@@ -120,7 +120,7 @@ class RefundApi extends FlutterwaveBaseApi
     /**
      * Create API exception from request exception
      */
-    protected function createApiException(RequestException $e)
+    protected function createApiException(RequestException $e): \Gowelle\Flutterwave\Exceptions\FlutterwaveApiException
     {
         return \Gowelle\Flutterwave\Exceptions\FlutterwaveApiException::fromResponseBody(
             responseBody: $e->response?->body(),

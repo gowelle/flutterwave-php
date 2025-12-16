@@ -6,12 +6,12 @@ use Gowelle\Flutterwave\Data\ApiResponse;
 use Gowelle\Flutterwave\Data\BankAccountResolveData;
 use Gowelle\Flutterwave\Data\BankBranchData;
 use Gowelle\Flutterwave\Data\BankData;
+use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 use Gowelle\Flutterwave\FlutterwaveApiProvider;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApiContract;
-use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwaveBanksService;
-use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
+use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Support\HeaderBuilder;
 
 beforeEach(function () {
@@ -61,7 +61,7 @@ it('can get banks by country', function () {
     $result = $this->service->get('NG');
 
     expect($result)->toBeArray();
-    expect(count($result))->toBe(2);
+    expect(\count($result))->toBe(2);
     expect($result[0])->toBeInstanceOf(BankData::class);
 });
 
@@ -145,7 +145,7 @@ it('can get bank branches by bank id', function () {
     $result = $this->service->branches('bank_123');
 
     expect($result)->toBeArray();
-    expect(count($result))->toBe(2);
+    expect(\count($result))->toBe(2);
     expect($result[0])->toBeInstanceOf(BankBranchData::class);
 });
 
@@ -192,4 +192,3 @@ it('can resolve bank account', function () {
 
     expect($result)->toBeInstanceOf(BankAccountResolveData::class);
 });
-

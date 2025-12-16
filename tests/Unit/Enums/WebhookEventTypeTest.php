@@ -55,4 +55,3 @@ it('identifies successful events correctly', function () {
     expect(WebhookEventType::PAYMENT_FAILED->isSuccessful())->toBeFalse();
     expect(WebhookEventType::TRANSFER_COMPLETED->isSuccessful())->toBeFalse();
 });
-

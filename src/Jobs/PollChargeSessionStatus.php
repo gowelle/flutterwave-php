@@ -43,7 +43,7 @@ final class PollChargeSessionStatus implements ShouldQueue
     {
         $session = ChargeSession::find($this->sessionId);
 
-        if (!$session) {
+        if (! $session) {
             // Session not found, stop polling
             return;
         }
@@ -62,7 +62,7 @@ final class PollChargeSessionStatus implements ShouldQueue
 
         // If still pending, schedule another poll
         // Applications can customize the delay and max retries
-        if (!$session->isTerminal()) {
+        if (! $session->isTerminal()) {
             $maxPolls = config('flutterwave.charge_sessions.max_polls', 60);
             $pollCount = $session->getMeta('poll_count', 0) + 1;
 
@@ -80,4 +80,3 @@ final class PollChargeSessionStatus implements ShouldQueue
         }
     }
 }
-

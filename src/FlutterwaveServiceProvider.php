@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave;
 
+use Gowelle\Flutterwave\Console\Commands\CleanupChargeSessionsCommand;
 use Gowelle\Flutterwave\Contracts\CustomerServiceInterface;
 use Gowelle\Flutterwave\Contracts\DirectChargeServiceInterface;
 use Gowelle\Flutterwave\Contracts\PaymentsServiceInterface;
 use Gowelle\Flutterwave\Contracts\TransferServiceInterface;
 use Gowelle\Flutterwave\Data\FlutterwaveConfig;
+use Gowelle\Flutterwave\Events\FlutterwaveChargeCreated;
+use Gowelle\Flutterwave\Events\FlutterwaveChargeUpdated;
+use Gowelle\Flutterwave\Events\FlutterwaveWebhookReceived;
+use Gowelle\Flutterwave\Listeners\CreateChargeSession;
+use Gowelle\Flutterwave\Listeners\UpdateChargeSession;
+use Gowelle\Flutterwave\Listeners\UpdateChargeSessionFromWebhook;
 use Gowelle\Flutterwave\Services\FlutterwaveAuthService;
 use Gowelle\Flutterwave\Services\FlutterwaveBanksService;
 use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
@@ -21,13 +28,6 @@ use Gowelle\Flutterwave\Services\FlutterwaveRefundService;
 use Gowelle\Flutterwave\Services\FlutterwaveSettlementService;
 use Gowelle\Flutterwave\Services\FlutterwaveTransferService;
 use Gowelle\Flutterwave\Services\FlutterwaveWebhookService;
-use Gowelle\Flutterwave\Events\FlutterwaveChargeCreated;
-use Gowelle\Flutterwave\Events\FlutterwaveChargeUpdated;
-use Gowelle\Flutterwave\Events\FlutterwaveWebhookReceived;
-use Gowelle\Flutterwave\Listeners\CreateChargeSession;
-use Gowelle\Flutterwave\Listeners\UpdateChargeSession;
-use Gowelle\Flutterwave\Listeners\UpdateChargeSessionFromWebhook;
-use Gowelle\Flutterwave\Console\Commands\CleanupChargeSessionsCommand;
 use Gowelle\Flutterwave\Support\HeaderBuilder;
 use Gowelle\Flutterwave\Support\RateLimiter;
 use Gowelle\Flutterwave\Support\RetryHandler;
@@ -62,7 +62,7 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
         parent::register();
 
         // Bind configuration
-        $this->app->singleton(FlutterwaveConfig::class, fn() => FlutterwaveConfig::fromConfig());
+        $this->app->singleton(FlutterwaveConfig::class, fn () => FlutterwaveConfig::fromConfig());
         $this->app->alias(FlutterwaveConfig::class, 'flutterwave.config');
 
         // Bind support classes
@@ -91,8 +91,6 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
     {
         parent::boot();
 
-        
-
         // Register charge session listeners
         $this->registerChargeSessionListeners();
     }
@@ -102,22 +100,22 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
      */
     private function registerSupportClasses(): void
     {
-        $this->app->singleton(HeaderBuilder::class, fn(Application $app) => new HeaderBuilder(
+        $this->app->singleton(HeaderBuilder::class, fn (Application $app) => new HeaderBuilder(
             $app->make(FlutterwaveConfig::class)
         ));
 
-        $this->app->singleton(RetryHandler::class, fn() => new RetryHandler(
+        $this->app->singleton(RetryHandler::class, fn () => new RetryHandler(
             maxRetries: config('flutterwave.max_retries', 3),
             retryDelay: config('flutterwave.retry_delay', 1000),
         ));
 
-        $this->app->singleton(RateLimiter::class, fn() => new RateLimiter(
+        $this->app->singleton(RateLimiter::class, fn () => new RateLimiter(
             maxRequests: config('flutterwave.rate_limit.max_requests', 100),
             perSeconds: config('flutterwave.rate_limit.per_seconds', 60),
         ));
 
         // API Provider
-        $this->app->singleton(FlutterwaveApiProvider::class, fn(Application $app) => new FlutterwaveApiProvider(
+        $this->app->singleton(FlutterwaveApiProvider::class, fn (Application $app) => new FlutterwaveApiProvider(
             $app->make(RetryHandler::class),
             $app->make(RateLimiter::class),
         ));
@@ -128,7 +126,7 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
      */
     private function registerAuthService(): void
     {
-        $this->app->singleton(FlutterwaveAuthService::class, fn(Application $app) => new FlutterwaveAuthService(
+        $this->app->singleton(FlutterwaveAuthService::class, fn (Application $app) => new FlutterwaveAuthService(
             $app->make(FlutterwaveConfig::class)
         ));
 
@@ -140,7 +138,7 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
      */
     private function registerWebhookService(): void
     {
-        $this->app->singleton(FlutterwaveWebhookService::class, fn() => new FlutterwaveWebhookService(
+        $this->app->singleton(FlutterwaveWebhookService::class, fn () => new FlutterwaveWebhookService(
             config('flutterwave.secret_hash')
         ));
 
@@ -152,7 +150,7 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
      */
     private function registerBaseService(): void
     {
-        $this->app->singleton(FlutterwaveBaseService::class, fn(Application $app) => new FlutterwaveBaseService(
+        $this->app->singleton(FlutterwaveBaseService::class, fn (Application $app) => new FlutterwaveBaseService(
             $app->make(FlutterwaveConfig::class),
             $app->make(FlutterwaveAuthService::class),
             $app->make(FlutterwaveWebhookService::class),
@@ -169,59 +167,59 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
     private function registerDomainServices(): void
     {
         // Payments service
-        $this->app->singleton(FlutterwavePaymentsService::class, fn(Application $app) => new FlutterwavePaymentsService(
+        $this->app->singleton(FlutterwavePaymentsService::class, fn (Application $app) => new FlutterwavePaymentsService(
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwavePaymentsService::class, 'flutterwave.payments');
         $this->app->bind(PaymentsServiceInterface::class, FlutterwavePaymentsService::class);
 
         // Direct charge service
-        $this->app->singleton(FlutterwaveDirectChargeService::class, fn(Application $app) => new FlutterwaveDirectChargeService(
+        $this->app->singleton(FlutterwaveDirectChargeService::class, fn (Application $app) => new FlutterwaveDirectChargeService(
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwaveDirectChargeService::class, 'flutterwave.direct_charge');
         $this->app->bind(DirectChargeServiceInterface::class, FlutterwaveDirectChargeService::class);
 
         // Banks service
-        $this->app->singleton(FlutterwaveBanksService::class, fn(Application $app) => new FlutterwaveBanksService(
+        $this->app->singleton(FlutterwaveBanksService::class, fn (Application $app) => new FlutterwaveBanksService(
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwaveBanksService::class, 'flutterwave.banks');
 
         // Customer service
-        $this->app->singleton(FlutterwaveCustomerService::class, fn(Application $app) => new FlutterwaveCustomerService(
+        $this->app->singleton(FlutterwaveCustomerService::class, fn (Application $app) => new FlutterwaveCustomerService(
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwaveCustomerService::class, 'flutterwave.customers');
         $this->app->bind(CustomerServiceInterface::class, FlutterwaveCustomerService::class);
 
         // Mobile networks service
-        $this->app->singleton(FlutterwaveMobileNetworkService::class, fn(Application $app) => new FlutterwaveMobileNetworkService(
+        $this->app->singleton(FlutterwaveMobileNetworkService::class, fn (Application $app) => new FlutterwaveMobileNetworkService(
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwaveMobileNetworkService::class, 'flutterwave.mobile_networks');
 
         // Order service
-        $this->app->singleton(FlutterwaveOrderService::class, fn(Application $app) => new FlutterwaveOrderService(
+        $this->app->singleton(FlutterwaveOrderService::class, fn (Application $app) => new FlutterwaveOrderService(
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwaveOrderService::class, 'flutterwave.orders');
 
         // Refund service
-        $this->app->singleton(FlutterwaveRefundService::class, fn(Application $app) => new FlutterwaveRefundService(
+        $this->app->singleton(FlutterwaveRefundService::class, fn (Application $app) => new FlutterwaveRefundService(
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwaveRefundService::class, 'flutterwave.refunds');
 
         // Transfer service
-        $this->app->singleton(FlutterwaveTransferService::class, fn(Application $app) => new FlutterwaveTransferService(
+        $this->app->singleton(FlutterwaveTransferService::class, fn (Application $app) => new FlutterwaveTransferService(
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwaveTransferService::class, 'flutterwave.transfers');
         $this->app->bind(TransferServiceInterface::class, FlutterwaveTransferService::class);
 
         // Settlement service
-        $this->app->singleton(FlutterwaveSettlementService::class, fn(Application $app) => new FlutterwaveSettlementService(
+        $this->app->singleton(FlutterwaveSettlementService::class, fn (Application $app) => new FlutterwaveSettlementService(
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwaveSettlementService::class, 'flutterwave.settlements');
@@ -321,5 +319,4 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
             );
         }
     }
-
 }

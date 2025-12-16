@@ -162,4 +162,3 @@ it('can get event data from request', function () {
     expect($data['id'])->toBe('ch_123');
     expect($data['amount'])->toBe(1000);
 });
-

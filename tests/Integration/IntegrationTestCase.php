@@ -22,8 +22,8 @@ abstract class IntegrationTestCase extends Orchestra
     protected function setUp(): void
     {
         // Load .env file if it exists
-        $envPath = dirname(__DIR__, 2);
-        if (file_exists($envPath . '/.env')) {
+        $envPath = \dirname(__DIR__, 2);
+        if (file_exists($envPath.'/.env')) {
             $dotenv = Dotenv::createImmutable($envPath);
             $dotenv->safeLoad();
         }
@@ -80,7 +80,7 @@ abstract class IntegrationTestCase extends Orchestra
      */
     protected function generateReference(string $prefix = 'TEST'): string
     {
-        return sprintf('%s-%s-%s', $prefix, date('YmdHis'), bin2hex(random_bytes(4)));
+        return \sprintf('%s-%s-%s', $prefix, date('YmdHis'), bin2hex(random_bytes(4)));
     }
 
     /**
@@ -88,7 +88,7 @@ abstract class IntegrationTestCase extends Orchestra
      */
     protected function generateTestEmail(): string
     {
-        return sprintf('test-%s@example.com', bin2hex(random_bytes(4)));
+        return \sprintf('test-%s@example.com', bin2hex(random_bytes(4)));
     }
 
     /**

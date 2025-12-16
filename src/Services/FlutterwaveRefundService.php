@@ -59,7 +59,7 @@ final class FlutterwaveRefundService
      */
     public function list(?ListRefundsRequest $request = null): array
     {
-        $request = $request ?? new ListRefundsRequest();
+        $request = $request ?? new ListRefundsRequest;
 
         $wavable = $this->buildWavable(
             $request->toQueryParams(),

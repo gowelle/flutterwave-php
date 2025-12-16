@@ -31,4 +31,3 @@ class FlutterwaveChargeUpdated
         public readonly AuthorizationData $authorizationData,
     ) {}
 }
-

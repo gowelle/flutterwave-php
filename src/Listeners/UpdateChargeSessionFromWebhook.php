@@ -23,26 +23,26 @@ final class UpdateChargeSessionFromWebhook
     public function handle(FlutterwaveWebhookReceived $event): void
     {
         // Only process if charge sessions are enabled
-        if (!config('flutterwave.charge_sessions.enabled', true)) {
+        if (! config('flutterwave.charge_sessions.enabled', true)) {
             return;
         }
 
         // Only process charge-related events
-        if (!$event->isPaymentEvent()) {
+        if (! $event->isPaymentEvent()) {
             return;
         }
 
         $data = $event->getTransactionData();
         $chargeId = $data['id'] ?? null;
 
-        if (!$chargeId) {
+        if (! $chargeId) {
             return;
         }
 
         // Find existing session by remote charge ID
         $session = ChargeSession::byRemoteChargeId((string) $chargeId)->first();
 
-        if (!$session) {
+        if (! $session) {
             return;
         }
 
@@ -62,4 +62,3 @@ final class UpdateChargeSessionFromWebhook
         $session->save();
     }
 }
-

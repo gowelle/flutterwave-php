@@ -30,7 +30,7 @@ describe('EncryptionService', function () use ($testEncryptionKey) {
                 range(1, 100)
             ));
 
-            expect(count($nonces))->toBe(100);
+            expect(\count($nonces))->toBe(100);
         });
     });
 
@@ -268,7 +268,7 @@ describe('EncryptionService', function () use ($testEncryptionKey) {
             $encrypted = $service->encrypt($plaintext, $nonce);
 
             expect($encrypted)->toBeString();
-            expect(strlen($encrypted))->toBeGreaterThan(0);
+            expect(\strlen($encrypted))->toBeGreaterThan(0);
         });
     });
 });

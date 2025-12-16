@@ -9,9 +9,9 @@ use Gowelle\Flutterwave\Data\PaymentMethodData;
 use Gowelle\Flutterwave\Data\PaymentMethods\CardPaymentMethod;
 use Gowelle\Flutterwave\Enums\DirectChargeStatus;
 use Gowelle\Flutterwave\Enums\FlutterwaveEnvironment;
+use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwavePaymentsService;
-use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 
 beforeEach(function () {
     $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);

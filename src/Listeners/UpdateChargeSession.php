@@ -22,12 +22,12 @@ final class UpdateChargeSession
     public function handle(FlutterwaveChargeUpdated $event): void
     {
         // Only update if auto_create is enabled
-        if (!config('flutterwave.charge_sessions.auto_create', false)) {
+        if (! config('flutterwave.charge_sessions.auto_create', false)) {
             return;
         }
 
         // Only update if charge sessions are enabled
-        if (!config('flutterwave.charge_sessions.enabled', true)) {
+        if (! config('flutterwave.charge_sessions.enabled', true)) {
             return;
         }
 
@@ -37,7 +37,7 @@ final class UpdateChargeSession
         // Find existing session by remote charge ID
         $session = ChargeSession::byRemoteChargeId($chargeData->id)->first();
 
-        if (!$session) {
+        if (! $session) {
             // Session doesn't exist - this is expected if auto_create is disabled
             // Applications can create sessions manually if needed
             return;
@@ -55,4 +55,3 @@ final class UpdateChargeSession
         $session->save();
     }
 }
-

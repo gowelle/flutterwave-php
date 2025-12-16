@@ -21,7 +21,7 @@ final readonly class RateData
     /**
      * Create from Flutterwave API response
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public static function fromApi(array $data): self
     {

@@ -51,4 +51,3 @@ final class EncryptionException extends FlutterwaveException
         return new self("Invalid card data: {$message}");
     }
 }
-

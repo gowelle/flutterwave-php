@@ -152,4 +152,3 @@ enum TransferScenario: string
         return $this->value;
     }
 }
-

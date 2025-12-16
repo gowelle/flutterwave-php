@@ -12,10 +12,10 @@ namespace Gowelle\Flutterwave\Data\Transfer;
 final readonly class RecipientData
 {
     /**
-     * @param string $id Recipient ID
-     * @param string $type Recipient type (e.g., "bank", "mobile_money")
-     * @param string $currency Currency code (e.g., "NGN", "USD")
-     * @param array<string, mixed> $raw Raw API response data for accessing all fields
+     * @param  string  $id  Recipient ID
+     * @param  string  $type  Recipient type (e.g., "bank", "mobile_money")
+     * @param  string  $currency  Currency code (e.g., "NGN", "USD")
+     * @param  array<string, mixed>  $raw  Raw API response data for accessing all fields
      */
     public function __construct(
         public string $id,
@@ -27,7 +27,7 @@ final readonly class RecipientData
     /**
      * Create from Flutterwave API response.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public static function fromApi(array $data): self
     {

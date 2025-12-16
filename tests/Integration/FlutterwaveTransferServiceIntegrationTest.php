@@ -19,7 +19,7 @@ describe('FlutterwaveTransferService Integration', function () {
             /** @var FlutterwaveTransferService $transferService */
             $transferService = app(FlutterwaveTransferService::class);
 
-            $accountNumber = '069000' . str_pad((string) rand(1000, 9999), 4, '0', STR_PAD_LEFT);
+            $accountNumber = '069000'.str_pad((string) rand(1000, 9999), 4, '0', STR_PAD_LEFT);
 
             $request = CreateRecipientRequest::bankNgn(
                 accountNumber: $accountNumber,
@@ -48,7 +48,7 @@ describe('FlutterwaveTransferService Integration', function () {
             /** @var FlutterwaveTransferService $transferService */
             $transferService = app(FlutterwaveTransferService::class);
 
-            $accountNumber = '110' . str_pad((string) rand(10000000, 99999999), 8, '0', STR_PAD_LEFT);
+            $accountNumber = '110'.str_pad((string) rand(10000000, 99999999), 8, '0', STR_PAD_LEFT);
 
             $request = CreateRecipientRequest::bankKes(
                 accountNumber: $accountNumber,
@@ -65,7 +65,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 }
                 // Some currencies may not be enabled in staging
                 if (str_contains($e->getMessage(), 'not supported') || str_contains($e->getMessage(), 'not enabled')) {
-                    $this->markTestSkipped('KES recipients not enabled in staging: ' . $e->getMessage());
+                    $this->markTestSkipped('KES recipients not enabled in staging: '.$e->getMessage());
                 }
                 throw $e;
             }
@@ -79,7 +79,7 @@ describe('FlutterwaveTransferService Integration', function () {
             /** @var FlutterwaveTransferService $transferService */
             $transferService = app(FlutterwaveTransferService::class);
 
-            $accountNumber = '100' . str_pad((string) rand(10000000, 99999999), 8, '0', STR_PAD_LEFT);
+            $accountNumber = '100'.str_pad((string) rand(10000000, 99999999), 8, '0', STR_PAD_LEFT);
 
             $request = CreateRecipientRequest::bankUgx(
                 accountNumber: $accountNumber,
@@ -98,7 +98,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 if (str_contains($e->getMessage(), 'invalid') || str_contains($e->getMessage(), 'Invalid') ||
                     str_contains($e->getMessage(), 'not supported') || str_contains($e->getMessage(), 'not enabled') ||
                     str_contains($e->getMessage(), 'must not be null')) {
-                    $this->markTestSkipped('UGX recipients test skipped due to staging validation: ' . $e->getMessage());
+                    $this->markTestSkipped('UGX recipients test skipped due to staging validation: '.$e->getMessage());
                 }
                 throw $e;
             }
@@ -114,7 +114,7 @@ describe('FlutterwaveTransferService Integration', function () {
             /** @var FlutterwaveTransferService $transferService */
             $transferService = app(FlutterwaveTransferService::class);
 
-            $accountNumber = '200' . str_pad((string) rand(10000000, 99999999), 8, '0', STR_PAD_LEFT);
+            $accountNumber = '200'.str_pad((string) rand(10000000, 99999999), 8, '0', STR_PAD_LEFT);
 
             $request = CreateRecipientRequest::bankGhs(
                 accountNumber: $accountNumber,
@@ -133,7 +133,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 // Handle staging API validation errors (invalid test data)
                 if (str_contains($e->getMessage(), 'invalid') || str_contains($e->getMessage(), 'Invalid') ||
                     str_contains($e->getMessage(), 'not supported') || str_contains($e->getMessage(), 'not enabled')) {
-                    $this->markTestSkipped('GHS recipients test skipped due to staging validation: ' . $e->getMessage());
+                    $this->markTestSkipped('GHS recipients test skipped due to staging validation: '.$e->getMessage());
                 }
                 throw $e;
             }
@@ -149,7 +149,7 @@ describe('FlutterwaveTransferService Integration', function () {
             /** @var FlutterwaveTransferService $transferService */
             $transferService = app(FlutterwaveTransferService::class);
 
-            $phoneNumber = '25571' . str_pad((string) rand(1000000, 9999999), 7, '0', STR_PAD_LEFT);
+            $phoneNumber = '25571'.str_pad((string) rand(1000000, 9999999), 7, '0', STR_PAD_LEFT);
 
             $request = CreateRecipientRequest::mobileMoney(
                 currency: 'TZS',
@@ -168,7 +168,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 // Handle staging API validation errors (invalid test data/network)
                 if (str_contains($e->getMessage(), 'invalid') || str_contains($e->getMessage(), 'Invalid') ||
                     str_contains($e->getMessage(), 'not supported') || str_contains($e->getMessage(), 'not enabled')) {
-                    $this->markTestSkipped('Mobile money test skipped due to staging validation: ' . $e->getMessage());
+                    $this->markTestSkipped('Mobile money test skipped due to staging validation: '.$e->getMessage());
                 }
                 throw $e;
             }
@@ -188,7 +188,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 $recipients = $transferService->listRecipients();
                 expect($recipients)->toBeArray();
             } catch (\Exception $e) {
-                $this->markTestSkipped('Staging API does not support listing recipients: ' . $e->getMessage());
+                $this->markTestSkipped('Staging API does not support listing recipients: '.$e->getMessage());
             }
         });
 
@@ -197,7 +197,7 @@ describe('FlutterwaveTransferService Integration', function () {
             $transferService = app(FlutterwaveTransferService::class);
 
             try {
-                $accountNumber = '069000' . str_pad((string) rand(5000, 9999), 4, '0', STR_PAD_LEFT);
+                $accountNumber = '069000'.str_pad((string) rand(5000, 9999), 4, '0', STR_PAD_LEFT);
 
                 $request = CreateRecipientRequest::bankNgn(
                     accountNumber: $accountNumber,
@@ -420,7 +420,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 $senders = $transferService->listSenders();
                 expect($senders)->toBeArray();
             } catch (\Exception $e) {
-                $this->markTestSkipped('Staging API does not support listing senders: ' . $e->getMessage());
+                $this->markTestSkipped('Staging API does not support listing senders: '.$e->getMessage());
             }
         });
 
@@ -563,7 +563,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 $rates = $transferService->listRates();
                 expect($rates)->toBeArray();
             } catch (\Exception $e) {
-                $this->markTestSkipped('Staging API does not support transfer rates: ' . $e->getMessage());
+                $this->markTestSkipped('Staging API does not support transfer rates: '.$e->getMessage());
             }
         });
     });
@@ -592,7 +592,7 @@ describe('FlutterwaveTransferService Integration', function () {
             } catch (\Gowelle\Flutterwave\Exceptions\FlutterwaveApiException $e) {
                 // Skip if staging doesn't support the scenario
                 if (str_contains($e->getMessage(), 'invalid') || str_contains($e->getMessage(), 'Invalid')) {
-                    $this->markTestSkipped('Bank transfer test skipped due to staging validation: ' . $e->getMessage());
+                    $this->markTestSkipped('Bank transfer test skipped due to staging validation: '.$e->getMessage());
                 }
                 throw $e;
             }
@@ -654,7 +654,7 @@ describe('FlutterwaveTransferService Integration', function () {
             /** @var FlutterwaveTransferService $transferService */
             $transferService = app(FlutterwaveTransferService::class);
 
-            $phoneNumber = '25571' . str_pad((string) rand(1000000, 9999999), 7, '0', STR_PAD_LEFT);
+            $phoneNumber = '25571'.str_pad((string) rand(1000000, 9999999), 7, '0', STR_PAD_LEFT);
 
             $request = new \Gowelle\Flutterwave\Data\Transfer\MobileMoneyTransferRequest(
                 amount: 1000,
@@ -678,7 +678,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 // Skip if staging doesn't support the scenario
                 if (str_contains($e->getMessage(), 'invalid') || str_contains($e->getMessage(), 'Invalid') ||
                     str_contains($e->getMessage(), 'not supported')) {
-                    $this->markTestSkipped('Mobile money transfer test skipped due to staging validation: ' . $e->getMessage());
+                    $this->markTestSkipped('Mobile money transfer test skipped due to staging validation: '.$e->getMessage());
                 }
                 throw $e;
             }
@@ -694,7 +694,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 $transfers = $transferService->list();
                 expect($transfers)->toBeArray();
             } catch (\Exception $e) {
-                $this->markTestSkipped('Staging API does not support listing transfers: ' . $e->getMessage());
+                $this->markTestSkipped('Staging API does not support listing transfers: '.$e->getMessage());
             }
         });
 
@@ -718,7 +718,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 $transfer = $transferService->bankTransfer($request);
                 expect($transfer)->toBeInstanceOf(\Gowelle\Flutterwave\Data\Transfer\TransferData::class);
             } catch (\Gowelle\Flutterwave\Exceptions\FlutterwaveApiException $e) {
-                $this->markTestSkipped('Day limit error scenario handled: ' . $e->getMessage());
+                $this->markTestSkipped('Day limit error scenario handled: '.$e->getMessage());
             }
         });
 
@@ -727,7 +727,7 @@ describe('FlutterwaveTransferService Integration', function () {
             $transferService = app(FlutterwaveTransferService::class);
 
             // Use a fixed reference to trigger duplicate detection
-            $reference = 'DUPLICATE_TEST_' . date('Y-m-d');
+            $reference = 'DUPLICATE_TEST_'.date('Y-m-d');
 
             $request = new \Gowelle\Flutterwave\Data\Transfer\BankTransferRequest(
                 amount: 1000,
@@ -743,7 +743,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 $transfer = $transferService->bankTransfer($request);
                 expect($transfer)->toBeInstanceOf(\Gowelle\Flutterwave\Data\Transfer\TransferData::class);
             } catch (\Gowelle\Flutterwave\Exceptions\FlutterwaveApiException $e) {
-                $this->markTestSkipped('Duplicate reference scenario handled: ' . $e->getMessage());
+                $this->markTestSkipped('Duplicate reference scenario handled: '.$e->getMessage());
             }
         });
 
@@ -765,7 +765,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 $transfer = $transferService->bankTransfer($request);
                 expect($transfer)->toBeInstanceOf(\Gowelle\Flutterwave\Data\Transfer\TransferData::class);
             } catch (\Gowelle\Flutterwave\Exceptions\FlutterwaveApiException $e) {
-                $this->markTestSkipped('No account found scenario handled: ' . $e->getMessage());
+                $this->markTestSkipped('No account found scenario handled: '.$e->getMessage());
             }
         });
 
@@ -787,7 +787,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 $transfer = $transferService->bankTransfer($request);
                 expect($transfer)->toBeInstanceOf(\Gowelle\Flutterwave\Data\Transfer\TransferData::class);
             } catch (\Gowelle\Flutterwave\Exceptions\FlutterwaveApiException $e) {
-                $this->markTestSkipped('Account resolved failed scenario handled: ' . $e->getMessage());
+                $this->markTestSkipped('Account resolved failed scenario handled: '.$e->getMessage());
             }
         });
 
@@ -809,7 +809,7 @@ describe('FlutterwaveTransferService Integration', function () {
                 $transfer = $transferService->bankTransfer($request);
                 expect($transfer)->toBeInstanceOf(\Gowelle\Flutterwave\Data\Transfer\TransferData::class);
             } catch (\Gowelle\Flutterwave\Exceptions\FlutterwaveApiException $e) {
-                $this->markTestSkipped('Blocked bank scenario handled: ' . $e->getMessage());
+                $this->markTestSkipped('Blocked bank scenario handled: '.$e->getMessage());
             }
         });
     });

@@ -36,7 +36,7 @@ class TransferApi extends FlutterwaveBaseApi
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->post($this->getBaseApiUrl() . '/direct-transfers', $data)
+                    ->post($this->getBaseApiUrl().'/direct-transfers', $data)
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());
@@ -80,7 +80,7 @@ class TransferApi extends FlutterwaveBaseApi
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->post($this->getBaseApiUrl() . "/transfers/{$id}/retries", [])
+                    ->post($this->getBaseApiUrl()."/transfers/{$id}/retries", [])
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());
@@ -102,7 +102,7 @@ class TransferApi extends FlutterwaveBaseApi
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->post($this->getBaseApiUrl() . '/transfers/recipients', $data)
+                    ->post($this->getBaseApiUrl().'/transfers/recipients', $data)
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());
@@ -122,7 +122,7 @@ class TransferApi extends FlutterwaveBaseApi
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->get($this->getBaseApiUrl() . "/transfers/recipients/{$id}")
+                    ->get($this->getBaseApiUrl()."/transfers/recipients/{$id}")
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());
@@ -142,7 +142,7 @@ class TransferApi extends FlutterwaveBaseApi
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->get($this->getBaseApiUrl() . '/transfers/recipients')
+                    ->get($this->getBaseApiUrl().'/transfers/recipients')
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());
@@ -162,7 +162,7 @@ class TransferApi extends FlutterwaveBaseApi
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->delete($this->getBaseApiUrl() . "/transfers/recipients/{$id}")
+                    ->delete($this->getBaseApiUrl()."/transfers/recipients/{$id}")
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());
@@ -184,7 +184,7 @@ class TransferApi extends FlutterwaveBaseApi
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->post($this->getBaseApiUrl() . '/transfers/senders', $data)
+                    ->post($this->getBaseApiUrl().'/transfers/senders', $data)
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());
@@ -204,7 +204,7 @@ class TransferApi extends FlutterwaveBaseApi
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->get($this->getBaseApiUrl() . "/transfers/senders/{$id}")
+                    ->get($this->getBaseApiUrl()."/transfers/senders/{$id}")
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());
@@ -224,7 +224,7 @@ class TransferApi extends FlutterwaveBaseApi
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->get($this->getBaseApiUrl() . '/transfers/senders')
+                    ->get($this->getBaseApiUrl().'/transfers/senders')
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());
@@ -246,7 +246,7 @@ class TransferApi extends FlutterwaveBaseApi
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->post($this->getBaseApiUrl() . '/transfers/rates', $data)
+                    ->post($this->getBaseApiUrl().'/transfers/rates', $data)
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());
@@ -266,7 +266,7 @@ class TransferApi extends FlutterwaveBaseApi
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->get($this->getBaseApiUrl() . '/transfers/rates')
+                    ->get($this->getBaseApiUrl().'/transfers/rates')
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());

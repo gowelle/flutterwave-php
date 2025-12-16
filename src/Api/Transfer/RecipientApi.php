@@ -52,7 +52,7 @@ class RecipientApi extends FlutterwaveBaseApi
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->delete($this->buildApiSpecificBaseUrl() . '/' . $id)
+                    ->delete($this->buildApiSpecificBaseUrl().'/'.$id)
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());

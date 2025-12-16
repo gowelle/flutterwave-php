@@ -186,15 +186,14 @@ final class ChargeRequestBuilder
     /**
      * Set card payment method with automatic encryption
      *
-     * @param  string  $cardNumber     Card number (13-19 digits)
-     * @param  string  $expiryMonth    Card expiry month (MM format: 01-12)
-     * @param  string  $expiryYear     Card expiry year (YY or YYYY format)
-     * @param  string  $cvv            Card CVV (3-4 digits)
+     * @param  string  $cardNumber  Card number (13-19 digits)
+     * @param  string  $expiryMonth  Card expiry month (MM format: 01-12)
+     * @param  string  $expiryYear  Card expiry year (YY or YYYY format)
+     * @param  string  $cvv  Card CVV (3-4 digits)
      * @param  array|null  $billingAddress  Optional billing address
+     * @return $this
      *
      * @throws \Gowelle\Flutterwave\Exceptions\EncryptionException
-     *
-     * @return $this
      */
     public function card(
         string $cardNumber,
@@ -236,7 +235,6 @@ final class ChargeRequestBuilder
      *
      * @param  string  $network  Mobile network (e.g., VODACOM, AIRTEL, M-PESA)
      * @param  string  $phoneNumber  Phone number for the payment
-     *
      * @return $this
      */
     public function mobileMoney(string $network, string $phoneNumber): self
@@ -257,7 +255,6 @@ final class ChargeRequestBuilder
      *
      * @param  string  $accountNumber  Bank account number
      * @param  string  $bankCode  Bank code
-     *
      * @return $this
      */
     public function bankAccount(string $accountNumber, string $bankCode): self

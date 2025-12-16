@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Gowelle\Flutterwave\Events\FlutterwaveWebhookReceived;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Route;
 
 beforeEach(function () {
     config(['flutterwave.secret_hash' => 'test_secret_hash']);
@@ -186,4 +185,3 @@ it('returns null for invalid event type enum', function () {
 
     expect($enum)->toBeNull();
 });
-

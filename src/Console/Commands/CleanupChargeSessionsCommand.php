@@ -37,7 +37,7 @@ final class CleanupChargeSessionsCommand extends Command
     public function handle(): int
     {
         // Check if charge sessions are enabled
-        if (!config('flutterwave.charge_sessions.enabled', true)) {
+        if (! config('flutterwave.charge_sessions.enabled', true)) {
             $this->warn('Charge sessions are disabled. Skipping cleanup.');
 
             return self::SUCCESS;
@@ -65,7 +65,7 @@ final class CleanupChargeSessionsCommand extends Command
         $count = $oldSessions->count();
 
         if ($count === 0) {
-            $this->info('No charge sessions found older than ' . $days . ' days.');
+            $this->info('No charge sessions found older than '.$days.' days.');
 
             return self::SUCCESS;
         }
@@ -84,4 +84,3 @@ final class CleanupChargeSessionsCommand extends Command
         return self::SUCCESS;
     }
 }
-

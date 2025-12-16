@@ -37,7 +37,7 @@ final class FlutterwavePaymentsService implements PaymentsServiceInterface
 
         $response = $this->flutterwaveBaseService->list(FlutterwaveApi::PAYMENT_METHODS, $wavable);
 
-        if ($response->data === null || !\is_array($response->data)) {
+        if ($response->data === null || ! \is_array($response->data)) {
             return [];
         }
 

@@ -7,22 +7,18 @@ use Gowelle\Flutterwave\Data\FlutterwaveConfig;
 use Gowelle\Flutterwave\Data\Transfer\BankTransferRequest;
 use Gowelle\Flutterwave\Data\Transfer\CreateRecipientRequest;
 use Gowelle\Flutterwave\Data\Transfer\CreateSenderRequest;
-use Gowelle\Flutterwave\Data\Transfer\CreateTransferRequest;
 use Gowelle\Flutterwave\Data\Transfer\GetRateRequest;
 use Gowelle\Flutterwave\Data\Transfer\MobileMoneyTransferRequest;
 use Gowelle\Flutterwave\Data\Transfer\RateData;
 use Gowelle\Flutterwave\Data\Transfer\RecipientData;
 use Gowelle\Flutterwave\Data\Transfer\SenderData;
 use Gowelle\Flutterwave\Data\Transfer\TransferData;
-use Gowelle\Flutterwave\Data\Transfer\WalletTransferRequest;
 use Gowelle\Flutterwave\Enums\FlutterwaveEnvironment;
-use Gowelle\Flutterwave\Enums\TransferAction;
 use Gowelle\Flutterwave\Enums\TransferStatus;
 use Gowelle\Flutterwave\Enums\TransferType;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwaveTransferService;
-use Gowelle\Flutterwave\Support\HeaderBuilder;
 
 beforeEach(function () {
     $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);
@@ -167,7 +163,7 @@ it('can list transfers', function () {
     $result = $this->service->list();
 
     expect($result)->toBeArray();
-    expect(count($result))->toBe(2);
+    expect(\count($result))->toBe(2);
     expect($result[0])->toBeInstanceOf(TransferData::class);
 });
 

@@ -12,9 +12,9 @@ namespace Gowelle\Flutterwave\Data\Transfer;
 final readonly class SenderData
 {
     /**
-     * @param string $id Sender ID
-     * @param string $type Sender type (generic_sender, bank_gbp, bank_eur)
-     * @param array<string, mixed> $raw Raw API response data for accessing all fields
+     * @param  string  $id  Sender ID
+     * @param  string  $type  Sender type (generic_sender, bank_gbp, bank_eur)
+     * @param  array<string, mixed>  $raw  Raw API response data for accessing all fields
      */
     public function __construct(
         public string $id,
@@ -25,7 +25,7 @@ final readonly class SenderData
     /**
      * Create from Flutterwave API response.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public static function fromApi(array $data): self
     {

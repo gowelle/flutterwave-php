@@ -76,4 +76,3 @@ enum RefundStatus: string
         return \in_array($this, [self::NEW, self::PENDING], true);
     }
 }
-

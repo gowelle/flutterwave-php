@@ -10,9 +10,9 @@ use Gowelle\Flutterwave\Enums\DirectChargeStatus;
 use Gowelle\Flutterwave\Enums\FlutterwaveEnvironment;
 use Gowelle\Flutterwave\Events\FlutterwaveChargeCreated;
 use Gowelle\Flutterwave\Events\FlutterwaveChargeUpdated;
+use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwaveDirectChargeService;
-use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 use Illuminate\Support\Facades\Event;
 
 beforeEach(function () {
@@ -111,4 +111,3 @@ it('can get charge status', function () {
 
     expect($result)->toBeInstanceOf(DirectChargeStatus::class);
 });
-

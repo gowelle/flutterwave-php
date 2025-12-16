@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-use Gowelle\Flutterwave\Data\DirectChargeData;
-use Gowelle\Flutterwave\Enums\DirectChargeStatus;
-use Gowelle\Flutterwave\Services\FlutterwaveDirectChargeService;
 use Gowelle\Flutterwave\Tests\Integration\IntegrationTestCase;
 
 uses(IntegrationTestCase::class);

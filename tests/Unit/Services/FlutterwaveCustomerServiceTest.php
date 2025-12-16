@@ -6,9 +6,9 @@ use Gowelle\Flutterwave\Data\ApiResponse;
 use Gowelle\Flutterwave\Data\CustomerData;
 use Gowelle\Flutterwave\Data\FlutterwaveConfig;
 use Gowelle\Flutterwave\Enums\FlutterwaveEnvironment;
+use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwaveCustomerService;
-use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 
 beforeEach(function () {
     $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);
@@ -66,7 +66,7 @@ it('can list customers', function () {
     $result = $this->service->list([]);
 
     expect($result)->toBeArray();
-    expect(count($result))->toBe(2);
+    expect(\count($result))->toBe(2);
     expect($result[0])->toBeInstanceOf(CustomerData::class);
 });
 
@@ -174,4 +174,3 @@ it('returns empty array when list response has no data', function () {
     expect($result)->toBeArray();
     expect($result)->toBeEmpty();
 });
-

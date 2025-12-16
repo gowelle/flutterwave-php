@@ -33,4 +33,3 @@ enum RefundReason: string
      */
     case EXPIRED_UNCAPTURED_CHARGE = 'expired_uncaptured_charge';
 }
-

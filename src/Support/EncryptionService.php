@@ -17,7 +17,9 @@ use Gowelle\Flutterwave\Exceptions\EncryptionException;
 final class EncryptionService
 {
     private const string CIPHER = 'aes-256-gcm';
+
     private const int NONCE_LENGTH = 12;
+
     private const int TAG_LENGTH = 16; // 128 bits
 
     /**
@@ -36,16 +38,15 @@ final class EncryptionService
     /**
      * Encrypt sensitive data using AES-256-GCM
      *
-     * @param  string  $data   The plaintext data to encrypt
+     * @param  string  $data  The plaintext data to encrypt
      * @param  string  $nonce  12-character nonce (initialization vector)
+     * @return string Base64-encoded ciphertext with authentication tag
      *
      * @throws EncryptionException If encryption fails
-     *
-     * @return string Base64-encoded ciphertext with authentication tag
      */
     public function encrypt(string $data, string $nonce): string
     {
-        if (strlen($nonce) !== self::NONCE_LENGTH) {
+        if (\strlen($nonce) !== self::NONCE_LENGTH) {
             throw EncryptionException::invalidNonce(
                 "Nonce must be exactly 12 characters long, got {$this->nonce_length($nonce)}",
             );
@@ -75,7 +76,7 @@ final class EncryptionService
             }
 
             // Append the authentication tag to the ciphertext and base64-encode
-            $ciphertext = $encrypted . $tag;
+            $ciphertext = $encrypted.$tag;
 
             return base64_encode($ciphertext);
         } catch (\Exception $e) {
@@ -95,9 +96,6 @@ final class EncryptionService
      *     expiry_year: string,
      *     cvv?: string,
      * }  $card  Card details with raw (unencrypted) values
-     *
-     * @throws EncryptionException If encryption fails or card data is invalid
-     *
      * @return array{
      *     nonce: string,
      *     encrypted_card_number: string,
@@ -105,6 +103,8 @@ final class EncryptionService
      *     encrypted_expiry_year: string,
      *     encrypted_cvv?: string,
      * } Encrypted card data with shared nonce
+     *
+     * @throws EncryptionException If encryption fails or card data is invalid
      */
     public function encryptCardData(array $card): array
     {
@@ -138,7 +138,7 @@ final class EncryptionService
         $nonce = '';
 
         for ($i = 0; $i < self::NONCE_LENGTH; $i++) {
-            $nonce .= $characters[random_int(0, strlen($characters) - 1)];
+            $nonce .= $characters[random_int(0, \strlen($characters) - 1)];
         }
 
         return $nonce;
@@ -160,7 +160,7 @@ final class EncryptionService
 
         // Try to decode the key to validate it's valid base64
         $decoded = base64_decode($key, true);
-        if ($decoded === false || strlen($decoded) !== 32) {
+        if ($decoded === false || \strlen($decoded) !== 32) {
             throw EncryptionException::invalidEncryptionKey(
                 'Encryption key must be a valid base64-encoded 256-bit (32 bytes) key.',
             );
@@ -212,7 +212,6 @@ final class EncryptionService
      */
     private function nonce_length(string $nonce): int
     {
-        return strlen($nonce);
+        return \strlen($nonce);
     }
 }
-

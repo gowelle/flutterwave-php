@@ -14,10 +14,10 @@ use Gowelle\Flutterwave\Enums\RefundReason;
 final readonly class CreateRefundRequest
 {
     /**
-     * @param float $amount The amount to be refunded (must be >= 0.01)
-     * @param string $chargeId ID of the charge to refund
-     * @param RefundReason $reason Reason for the refund
-     * @param array<string, mixed>|null $meta Optional metadata
+     * @param  float  $amount  The amount to be refunded (must be >= 0.01)
+     * @param  string  $chargeId  ID of the charge to refund
+     * @param  RefundReason  $reason  Reason for the refund
+     * @param  array<string, mixed>|null  $meta  Optional metadata
      */
     public function __construct(
         public float $amount,
@@ -43,4 +43,3 @@ final readonly class CreateRefundRequest
         return $payload;
     }
 }
-

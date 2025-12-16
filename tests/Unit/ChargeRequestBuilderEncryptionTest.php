@@ -196,7 +196,7 @@ describe('ChargeRequestBuilder with Encryption', function () use ($testEncryptio
     describe('Complete Charge Request', function () use ($testEncryptionKey) {
         it('builds a complete card charge request', function () use ($testEncryptionKey) {
             config(['flutterwave.encryption_key' => $testEncryptionKey]);
-            
+
             $dto = ChargeRequestBuilder::for('ORDER-2024-001')
                 ->amount(15000, 'NGN')
                 ->customer('john.doe@example.com', 'John Doe', '+234812345678')

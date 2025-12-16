@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Services;
 
-use Gowelle\Flutterwave\Api\Banks\BankAccountResolveApi;
-use Gowelle\Flutterwave\Api\Banks\BankBranchesApi;
-use Gowelle\Flutterwave\Api\Banks\BanksApi;
 use Gowelle\Flutterwave\Data\BankAccountResolveData;
 use Gowelle\Flutterwave\Data\BankBranchData;
 use Gowelle\Flutterwave\Data\BankData;
+use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 use Gowelle\Flutterwave\FlutterwaveApiProvider;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
-use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 
 final class FlutterwaveBanksService
 {
@@ -29,7 +26,7 @@ final class FlutterwaveBanksService
     public function get(string $country): array
     {
         $api = app(FlutterwaveApiProvider::class)
-                ->useApi(FlutterwaveApi::BANKS, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
+            ->useApi(FlutterwaveApi::BANKS, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
 
         /** @var \Gowelle\Flutterwave\Api\Banks\BanksApi $api */
         $response = $api->retrieveByCountry($country);
@@ -50,7 +47,7 @@ final class FlutterwaveBanksService
      */
     public function branches(string $bankId): array
     {
-         $api = app(FlutterwaveApiProvider::class)
+        $api = app(FlutterwaveApiProvider::class)
             ->useApi(FlutterwaveApi::BANK_BRANCHES, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
 
         /** @var \Gowelle\Flutterwave\Api\Banks\BankBranchesApi $api */
@@ -66,7 +63,6 @@ final class FlutterwaveBanksService
     /**
      * Resolve bank account details
      *
-     * @return BankAccountResolveData
      *
      * @throws FlutterwaveApiException
      */

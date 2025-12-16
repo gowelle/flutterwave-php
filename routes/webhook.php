@@ -32,4 +32,3 @@ Route::post(
 )
     ->name(config('flutterwave.webhook.route_name', 'flutterwave.webhook'))
     ->middleware(config('flutterwave.webhook.middleware', ['api']));
-

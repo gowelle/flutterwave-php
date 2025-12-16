@@ -57,8 +57,6 @@ final class FlutterwaveCustomerService implements CustomerServiceInterface
      * Get a customer
      *
      * @param  string  $id  customer ID
-     * @return CustomerData
-     *
      */
     public function get(string $id): CustomerData
     {
@@ -97,7 +95,7 @@ final class FlutterwaveCustomerService implements CustomerServiceInterface
 
         // API returns data as array of customers
         if ($response->data === null || ! \is_array($response->data) || empty($response->data)) {
-            throw new \RuntimeException('No customer found with email: ' . $email);
+            throw new \RuntimeException('No customer found with email: '.$email);
         }
 
         // Return first matching customer

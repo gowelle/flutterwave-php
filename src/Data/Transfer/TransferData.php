@@ -14,9 +14,9 @@ use Gowelle\Flutterwave\Enums\TransferType;
 final readonly class TransferData
 {
     /**
-     * @param array<string, mixed>|null $recipient
-     * @param array<string, mixed>|null $amount
-     * @param array<string, mixed>|null $meta
+     * @param  array<string, mixed>|null  $recipient
+     * @param  array<string, mixed>|null  $amount
+     * @param  array<string, mixed>|null  $meta
      */
     public function __construct(
         public string $id,
@@ -36,7 +36,7 @@ final readonly class TransferData
     /**
      * Create from Flutterwave API response
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public static function fromApi(array $data): self
     {

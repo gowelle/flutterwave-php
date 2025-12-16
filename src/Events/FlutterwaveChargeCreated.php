@@ -30,4 +30,3 @@ class FlutterwaveChargeCreated
         public readonly array $requestData,
     ) {}
 }
-

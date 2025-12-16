@@ -66,10 +66,10 @@ final class VerifyCredentialsCommand extends Command
         try {
             $accessToken = $authService->getAccessToken();
 
-            if (!empty($accessToken)) {
+            if (! empty($accessToken)) {
                 $this->newLine();
                 $this->info('✅ Authentication successful!');
-                $this->line('Access token retrieved: ' . substr($accessToken, 0, 20) . '...');
+                $this->line('Access token retrieved: '.substr($accessToken, 0, 20).'...');
                 $this->newLine();
                 $this->line('<fg=green>Your Flutterwave API credentials are correctly configured.</>');
 
@@ -83,7 +83,7 @@ final class VerifyCredentialsCommand extends Command
             $this->newLine();
             $this->error('❌ Authentication failed!');
             $this->newLine();
-            $this->line('<fg=red>Error:</> ' . $e->getMessage());
+            $this->line('<fg=red>Error:</> '.$e->getMessage());
             $this->newLine();
             $this->line('Please verify:');
             $this->line('  1. Your credentials are correct');

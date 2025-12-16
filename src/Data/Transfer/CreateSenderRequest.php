@@ -17,11 +17,11 @@ namespace Gowelle\Flutterwave\Data\Transfer;
 final readonly class CreateSenderRequest
 {
     /**
-     * @param string $type Sender type (generic_sender, bank_gbp, bank_eur)
-     * @param array<string, mixed> $name Name object (first, middle?, last)
-     * @param array<string, mixed>|null $phone Phone object (country_code, number)
-     * @param string|null $email Customer email
-     * @param array<string, mixed>|null $address Address object (city, country, line1, line2?, postal_code, state)
+     * @param  string  $type  Sender type (generic_sender, bank_gbp, bank_eur)
+     * @param  array<string, mixed>  $name  Name object (first, middle?, last)
+     * @param  array<string, mixed>|null  $phone  Phone object (country_code, number)
+     * @param  string|null  $email  Customer email
+     * @param  array<string, mixed>|null  $address  Address object (city, country, line1, line2?, postal_code, state)
      */
     public function __construct(
         public string $type,
@@ -64,8 +64,8 @@ final readonly class CreateSenderRequest
      *
      * Requires full KYC: name, phone, email, and address.
      *
-     * @param array{country_code: string, number: string} $phone
-     * @param array{city: string, country: string, line1: string, postal_code: string, state: string, line2?: string} $address
+     * @param  array{country_code: string, number: string}  $phone
+     * @param  array{city: string, country: string, line1: string, postal_code: string, state: string, line2?: string}  $address
      */
     public static function bankGbp(
         string $firstName,
@@ -95,8 +95,8 @@ final readonly class CreateSenderRequest
      *
      * Requires full KYC: name, phone, email, and address.
      *
-     * @param array{country_code: string, number: string} $phone
-     * @param array{city: string, country: string, line1: string, postal_code: string, state: string, line2?: string} $address
+     * @param  array{country_code: string, number: string}  $phone
+     * @param  array{city: string, country: string, line1: string, postal_code: string, state: string, line2?: string}  $address
      */
     public static function bankEur(
         string $firstName,

@@ -9,7 +9,7 @@ use Gowelle\Flutterwave\Enums\RefundStatus;
 final readonly class RefundData
 {
     /**
-     * @param array<string, mixed>|null $meta
+     * @param  array<string, mixed>|null  $meta
      */
     public function __construct(
         public string $id,

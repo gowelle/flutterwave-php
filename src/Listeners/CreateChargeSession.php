@@ -22,12 +22,12 @@ final class CreateChargeSession
     public function handle(FlutterwaveChargeCreated $event): void
     {
         // Only create if auto_create is enabled
-        if (!config('flutterwave.charge_sessions.auto_create', false)) {
+        if (! config('flutterwave.charge_sessions.auto_create', false)) {
             return;
         }
 
         // Only create if charge sessions are enabled
-        if (!config('flutterwave.charge_sessions.enabled', true)) {
+        if (! config('flutterwave.charge_sessions.enabled', true)) {
             return;
         }
 
@@ -39,7 +39,7 @@ final class CreateChargeSession
         $userId = $requestData['user_id'] ?? null;
         $paymentId = $requestData['payment_id'] ?? null;
 
-        if (!$userId || !$paymentId) {
+        if (! $userId || ! $paymentId) {
             // Cannot create session without required IDs
             return;
         }
@@ -70,4 +70,3 @@ final class CreateChargeSession
         ]);
     }
 }
-

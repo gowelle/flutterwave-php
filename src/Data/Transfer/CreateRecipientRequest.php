@@ -16,13 +16,13 @@ namespace Gowelle\Flutterwave\Data\Transfer;
 final readonly class CreateRecipientRequest
 {
     /**
-     * @param string $type Recipient type (e.g., "bank_ngn", "bank_usd", "mobile_money_tzs")
-     * @param array<string, mixed>|null $bank Bank details (for bank_* types)
-     * @param array<string, mixed>|null $mobileMoney Mobile money details (for mobile_money_* types)
-     * @param array<string, mixed>|null $name Customer name (first, middle, last)
-     * @param array<string, mixed>|null $phone Customer phone (country_code, number)
-     * @param array<string, mixed>|null $address Customer address
-     * @param string|null $email Customer email
+     * @param  string  $type  Recipient type (e.g., "bank_ngn", "bank_usd", "mobile_money_tzs")
+     * @param  array<string, mixed>|null  $bank  Bank details (for bank_* types)
+     * @param  array<string, mixed>|null  $mobileMoney  Mobile money details (for mobile_money_* types)
+     * @param  array<string, mixed>|null  $name  Customer name (first, middle, last)
+     * @param  array<string, mixed>|null  $phone  Customer phone (country_code, number)
+     * @param  array<string, mixed>|null  $address  Customer address
+     * @param  string|null  $email  Customer email
      */
     public function __construct(
         public string $type,
@@ -240,8 +240,8 @@ final readonly class CreateRecipientRequest
     /**
      * Create a European (EUR) bank recipient.
      *
-     * @param array{city: string, country: string, line1: string, postal_code: string, state?: string, line2?: string} $address
-     * @param array{country_code: string, number: string} $phone
+     * @param  array{city: string, country: string, line1: string, postal_code: string, state?: string, line2?: string}  $address
+     * @param  array{country_code: string, number: string}  $phone
      */
     public static function bankEur(
         string $accountNumber,
@@ -270,9 +270,9 @@ final readonly class CreateRecipientRequest
     /**
      * Create a UK (GBP) bank recipient.
      *
-     * @param string $accountType "individual" or "corporate"
-     * @param array{city: string, country: string, line1: string, postal_code: string, state?: string, line2?: string} $address
-     * @param array{country_code: string, number: string} $phone
+     * @param  string  $accountType  "individual" or "corporate"
+     * @param  array{city: string, country: string, line1: string, postal_code: string, state?: string, line2?: string}  $address
+     * @param  array{country_code: string, number: string}  $phone
      */
     public static function bankGbp(
         string $accountNumber,
@@ -303,9 +303,9 @@ final readonly class CreateRecipientRequest
     /**
      * Create a US (USD) bank recipient.
      *
-     * @param string $accountType "checking" or "savings"
-     * @param array{city: string, country: string, line1: string, postal_code: string, state?: string, line2?: string} $address
-     * @param array{country_code: string, number: string} $phone
+     * @param  string  $accountType  "checking" or "savings"
+     * @param  array{city: string, country: string, line1: string, postal_code: string, state?: string, line2?: string}  $address
+     * @param  array{country_code: string, number: string}  $phone
      */
     public static function bankUsd(
         string $accountNumber,
@@ -338,8 +338,8 @@ final readonly class CreateRecipientRequest
     /**
      * Create a South African (ZAR) bank recipient.
      *
-     * @param array{city: string, country: string, line1: string, postal_code: string, state?: string, line2?: string} $address
-     * @param array{country_code: string, number: string} $phone
+     * @param  array{city: string, country: string, line1: string, postal_code: string, state?: string, line2?: string}  $address
+     * @param  array{country_code: string, number: string}  $phone
      */
     public static function bankZar(
         string $accountNumber,
@@ -370,7 +370,7 @@ final readonly class CreateRecipientRequest
      *
      * Supported currencies: ETB, GHS, KES, RWF, TZS, UGX, XAF, XOF, ZMW
      *
-     * @param string $currency Currency code (e.g., "TZS", "GHS", "KES")
+     * @param  string  $currency  Currency code (e.g., "TZS", "GHS", "KES")
      */
     public static function mobileMoney(
         string $currency,
@@ -380,7 +380,7 @@ final readonly class CreateRecipientRequest
         string $lastName,
     ): self {
         return new self(
-            type: 'mobile_money_' . strtolower($currency),
+            type: 'mobile_money_'.strtolower($currency),
             mobileMoney: [
                 'network' => $network,
                 'msisdn' => $phoneNumber,

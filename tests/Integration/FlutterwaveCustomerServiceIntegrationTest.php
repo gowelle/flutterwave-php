@@ -96,7 +96,7 @@ describe('FlutterwaveCustomerService Integration', function () {
                 ->email->toBe($customerData['email']);
         } catch (\Exception $e) {
             // Staging API search may not find newly created customers immediately
-            $this->markTestSkipped('Staging API search may have delay: ' . $e->getMessage());
+            $this->markTestSkipped('Staging API search may have delay: '.$e->getMessage());
         }
     });
 });

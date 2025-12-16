@@ -22,6 +22,7 @@ enum FlutterwaveApi: string
     case TRANSFER_SENDERS = 'transfer-senders';
     case TRANSFER_RATES = 'transfer-rates';
     case SETTLEMENT = 'settlement';
+    case VIRTUAL_ACCOUNT = 'virtual-account';
 
     public function getEndpoint(): string
     {
@@ -42,6 +43,7 @@ enum FlutterwaveApi: string
             self::TRANSFER_SENDERS => '/transfers/senders',
             self::TRANSFER_RATES => '/transfers/rates',
             self::SETTLEMENT => '/settlements',
+            self::VIRTUAL_ACCOUNT => '/virtual-accounts',
         };
     }
 }

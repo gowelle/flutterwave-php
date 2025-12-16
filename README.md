@@ -24,6 +24,7 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
   - [Settlements](#settlements)
   - [Banks](#banks)
   - [Mobile Networks](#mobile-networks)
+  - [Virtual Accounts](#virtual-accounts)
 - [Charge Sessions](#charge-sessions)
 - [Events & Listeners](#events--listeners)
 - [Webhooks](#webhooks)
@@ -43,12 +44,13 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
 
 ## Features
 
-- **Complete Flutterwave v4 API Support** - Full coverage of Flutterwave's v4 API including payments, refunds, transfers, settlements, and more
+- **Complete Flutterwave v4 API Support** - Full coverage of Flutterwave's v4 API including payments, refunds, transfers, settlements, virtual accounts, and more
 - **Direct Charge Orchestrator** - Simplified payment flow that combines customer, payment method, and charge creation in a single request
 - **Payment Methods Management** - Create, list, and manage payment methods for customers
 - **Orders API** - Complete order management with create, read, update, and list operations
 - **Bank Operations** - Get banks by country, resolve bank accounts, and retrieve bank branches
 - **Mobile Networks Support** - List mobile money networks by country for mobile payments
+- **Virtual Accounts** - Create and manage virtual bank accounts for receiving payments with multi-currency support
 - **Charge Session Tracking** - Database-backed tracking of charge sessions with automatic status updates via webhooks
 - **Event System** - Laravel events for direct charge lifecycle and webhook processing
 - **Automatic Retry Logic** - Exponential backoff for transient failures (5xx errors, rate limits, timeouts)
@@ -1072,6 +1074,145 @@ foreach ($networks as $network) {
     echo $network->name;
     echo $network->code;
 }
+```
+
+### Virtual Accounts
+
+Create and manage virtual bank accounts for receiving payments.
+
+#### Create Virtual Account
+
+Create a virtual account for a specific customer:
+
+```php
+use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
+
+$api = app(\Gowelle\Flutterwave\FlutterwaveApiProvider::class)->useApi(
+    FlutterwaveApi::VIRTUAL_ACCOUNT,
+    $accessToken,
+    $headers
+);
+
+$account = $api->create([
+    'reference' => 'unique-ref-' . time(),
+    'customer_id' => 'cus_123',
+    'amount' => 0,  // 0 for static accounts
+    'currency' => 'NGN',
+    'account_type' => 'static',
+    'narration' => 'Payment for Order #123',
+    'meta' => ['order_id' => '123'],
+]);
+```
+
+#### List Virtual Accounts
+
+List all virtual accounts with optional pagination and filtering:
+
+```php
+// List all accounts
+$response = $api->list();
+
+// List with pagination and filters
+$response = $api->listWithParams([
+    'page' => 1,
+    'size' => 20,
+    'from' => '2024-01-01T00:00:00Z',
+    'to' => '2024-12-31T23:59:59Z',
+    'reference' => 'unique-ref-123',
+]);
+
+foreach ($response->data as $account) {
+    echo $account['account_number'];
+    echo $account['status'];
+    echo $account['currency'];
+}
+```
+
+#### Retrieve Virtual Account
+
+Get details of a specific virtual account:
+
+```php
+$account = $api->retrieve('va_123');
+
+echo $account['account_number'];
+echo $account['account_bank_name'];  // e.g., "WEMA BANK"
+echo $account['status'];              // "active" or "inactive"
+```
+
+#### Update Virtual Account
+
+Update account status or BVN:
+
+```php
+// Deactivate an account
+$updated = $api->update('va_123', [
+    'action_type' => 'update_status',
+    'status' => 'inactive',
+]);
+
+// Update BVN
+$updated = $api->update('va_123', [
+    'action_type' => 'update_bvn',
+    'bvn' => '12345678901',
+]);
+```
+
+#### Supported Currencies
+
+Virtual accounts support the following currencies:
+
+- **NGN** - Nigerian Naira
+- **GHS** - Ghanaian Cedi
+- **EGP** - Egyptian Pound (requires `customer_account_number`)
+- **KES** - Kenyan Shilling (requires `customer_account_number`)
+
+#### Account Types
+
+- **static** - Permanent account that can be reused (amount should be 0)
+- **dynamic** - Temporary account for specific transaction (expires after configured duration)
+
+#### Example: Complete Virtual Account Flow
+
+```php
+use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
+
+$provider = app(\Gowelle\Flutterwave\FlutterwaveApiProvider::class);
+$api = $provider->useApi(
+    FlutterwaveApi::VIRTUAL_ACCOUNT,
+    $accessToken,
+    $headers
+);
+
+// Create a static account for a customer
+$account = $api->create([
+    'reference' => 'order-' . $order->id,
+    'customer_id' => 'cus_' . $customer->id,
+    'amount' => 0,
+    'currency' => 'NGN',
+    'account_type' => 'static',
+    'narration' => "Payment for Order #{$order->id}",
+    'meta' => [
+        'order_id' => $order->id,
+        'customer_id' => $customer->id,
+    ],
+]);
+
+// Store the account number for the customer to pay into
+$bankAccount = $account['data']['account_number'];
+$bankName = $account['data']['account_bank_name'];
+
+// Later, retrieve to check status
+$current = $api->retrieve($account['data']['id']);
+if ($current['data']['status'] === 'active') {
+    // Account is still active
+}
+
+// When no longer needed, deactivate
+$api->update($account['data']['id'], [
+    'action_type' => 'update_status',
+    'status' => 'inactive',
+]);
 ```
 
 ## Charge Sessions

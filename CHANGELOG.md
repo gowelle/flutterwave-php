@@ -4,6 +4,51 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.3.0] - 2025-12-16
+
+### Added
+
+- **Virtual Accounts API**: Complete support for Flutterwave v4 Virtual Accounts API:
+
+  - `list()` - List all virtual accounts with pagination and date filtering
+  - `listWithParams(array $params)` - Advanced listing with custom parameters (page, size, from, to, reference)
+  - `create(array $data)` - Create static or dynamic virtual accounts
+  - `retrieve(string $id)` - Get virtual account details
+  - `update(string $id, array $data)` - Update account status or BVN
+
+- **Virtual Account Enums**:
+
+  - `VirtualAccountStatus` - Account status (active, inactive) with helper methods
+  - `VirtualAccountType` - Account type (static, dynamic) with helper methods
+  - `VirtualAccountCurrency` - Supported currencies (NGN, GHS, EGP, KES) with conversion methods
+  - `VirtualAccountUpdateAction` - Update actions (update_bvn, update_status) with helper methods
+
+- **Virtual Account DTOs**:
+
+  - `VirtualAccountData` - Response DTO with helper methods (`isActive()`, `isStatic()`, `isExpired()`)
+  - `CreateVirtualAccountRequestDTO` - Type-safe request DTO for account creation with validation
+  - `UpdateVirtualAccountRequestDTO` - Type-safe request DTO for account updates with validation
+
+- **Comprehensive Tests**:
+
+  - 12 unit tests for VirtualAccountApi (listing, creation, validation, error handling)
+  - 16 unit tests for Virtual Account DTOs and data transformation
+  - 28 total passing tests validating complete Virtual Accounts workflow
+
+### Improved
+
+- **API Provider**: Updated `FlutterwaveApi` enum and `FlutterwaveApiProvider` to support virtual accounts
+- **Type Safety**: Full PHP 8.2 readonly properties and strict typing for virtual account operations
+
+### Features
+
+- **Multi-Currency Support**: NGN, GHS, EGP (with customer account number), KES (with customer account number)
+- **Account Types**: Static accounts (permanent, reusable) and Dynamic accounts (temporary, expiring)
+- **Advanced Filtering**: List accounts by date range, reference, pagination
+- **Validation**: Built-in validation for all request parameters (reference length, currency-specific requirements, expiry ranges)
+- **Status Management**: Activate/deactivate accounts with BVN updates
+- **Metadata Storage**: Custom metadata support on all operations
+
 ## [2.2.0] - 2025-12-16
 
 ### Breaking Changes

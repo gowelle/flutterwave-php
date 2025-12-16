@@ -21,6 +21,7 @@ use Gowelle\Flutterwave\Api\Transfer\RateApi;
 use Gowelle\Flutterwave\Api\Transfer\RecipientApi;
 use Gowelle\Flutterwave\Api\Transfer\SenderApi;
 use Gowelle\Flutterwave\Api\Transfer\TransferApi;
+use Gowelle\Flutterwave\Api\VirtualAccount\VirtualAccountApi;
 use Gowelle\Flutterwave\Concerns\RecognizesEnvironment;
 use Gowelle\Flutterwave\Credentials\AbstractHeadersConfig;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
@@ -74,6 +75,7 @@ class FlutterwaveApiProvider
                 FlutterwaveApi::TRANSFER_SENDERS => new SenderApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::TRANSFER_RATES => new RateApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::SETTLEMENT => new SettlementApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::VIRTUAL_ACCOUNT => new VirtualAccountApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
             };
 
         } catch (ValidationException $e) {

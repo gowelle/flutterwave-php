@@ -25,6 +25,7 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
   - [Banks](#banks)
   - [Mobile Networks](#mobile-networks)
   - [Virtual Accounts](#virtual-accounts)
+  - [Wallets](#wallets)
 - [Charge Sessions](#charge-sessions)
 - [Events & Listeners](#events--listeners)
 - [Webhooks](#webhooks)
@@ -44,7 +45,7 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
 
 ## Features
 
-- **Complete Flutterwave v4 API Support** - Full coverage of Flutterwave's v4 API including payments, refunds, transfers, settlements, virtual accounts, and more
+- **Complete Flutterwave v4 API Support** - Full coverage of Flutterwave's v4 API including payments, refunds, transfers, settlements, virtual accounts, wallets, and more
 - **Direct Charge Orchestrator** - Simplified payment flow that combines customer, payment method, and charge creation in a single request
 - **Payment Methods Management** - Create, list, and manage payment methods for customers
 - **Orders API** - Complete order management with create, read, update, and list operations
@@ -1073,6 +1074,81 @@ $networks = Flutterwave::mobileNetworks()->list('TZ'); // Country code
 foreach ($networks as $network) {
     echo $network->name;
     echo $network->code;
+}
+```
+
+### Wallets
+
+Manage Flutterwave wallet operations including account lookup, statement retrieval, and balance queries.
+
+#### Resolve Wallet Account
+
+Verify wallet account information for a customer:
+
+```php
+$account = Flutterwave::wallets()->resolveAccount(
+    provider: 'flutterwave',
+    identifier: 'wallet_123'
+);
+
+// Access resolved account details
+echo $account->provider;      // 'flutterwave'
+echo $account->identifier;    // 'wallet_123'
+echo $account->name;          // Account holder name
+```
+
+#### Get Wallet Statement
+
+Retrieve wallet transaction statement with pagination and filtering:
+
+```php
+$statement = Flutterwave::wallets()->getStatement([
+    'currency' => 'NGN',           // Required: 3-letter currency code
+    'size' => 20,                  // Optional: Page size (10-50, default 10)
+    'from' => '2024-01-01T00:00:00Z', // Optional: Start date (ISO 8601)
+    'to' => '2024-12-31T23:59:59Z',   // Optional: End date (ISO 8601)
+    'next' => 'next_cursor',       // Optional: Next page cursor
+    'previous' => 'prev_cursor',   // Optional: Previous page cursor
+]);
+
+// Access statement data
+echo $statement->cursor->total;        // Total transactions
+echo $statement->cursor->limit;       // Page limit
+echo $statement->cursor->hasMoreItems; // Whether more items exist
+echo $statement->cursor->next;         // Next page cursor
+echo $statement->cursor->previous;      // Previous page cursor
+
+// Access transactions
+foreach ($statement->transactions as $transaction) {
+    echo $transaction['transaction_direction']; // 'credit' or 'debit'
+    echo $transaction['amount']['value'];
+    echo $transaction['amount']['currency'];
+    echo $transaction['balance']['before'];
+    echo $transaction['balance']['after'];
+}
+```
+
+#### Get Wallet Balance (Single Currency)
+
+Fetch the available balance for a specific currency:
+
+```php
+$balance = Flutterwave::wallets()->getBalance('NGN');
+
+echo $balance->currency;           // 'NGN'
+echo $balance->availableBalance;   // 1200.09
+```
+
+#### Get Wallet Balances (Multiple Currencies)
+
+Fetch available balances for all currencies:
+
+```php
+$balances = Flutterwave::wallets()->getBalances();
+
+foreach ($balances as $balance) {
+    echo $balance->currency;           // 'NGN', 'USD', etc.
+    echo $balance->availableBalance;   // Available balance
 }
 ```
 

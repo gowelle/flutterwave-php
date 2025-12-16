@@ -51,4 +51,3 @@ enum VirtualAccountType: string
         return $this === self::DYNAMIC;
     }
 }
-

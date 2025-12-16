@@ -49,4 +49,3 @@ enum VirtualAccountStatus: string
         return $this === self::INACTIVE;
     }
 }
-

@@ -49,4 +49,3 @@ enum VirtualAccountUpdateAction: string
         return $this === self::UPDATE_STATUS;
     }
 }
-

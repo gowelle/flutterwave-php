@@ -21,8 +21,8 @@ beforeEach(function () {
         'X-Trace-Id' => 'test-trace-id',
     ]);
 
-    $this->retryHandler = new RetryHandler();
-    $this->rateLimiter = new RateLimiter();
+    $this->retryHandler = new RetryHandler;
+    $this->rateLimiter = new RateLimiter;
 
     $this->api = new VirtualAccountApi(
         $this->headers,
@@ -226,4 +226,3 @@ it('accepts valid currency enum values', function () {
 
     expect($response->status)->toBe('success');
 });
-

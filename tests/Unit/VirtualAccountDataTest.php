@@ -332,4 +332,3 @@ describe('UpdateVirtualAccountRequestDTO', function () {
         expect($array['action_type'])->toBe('update_bvn');
     });
 });
-

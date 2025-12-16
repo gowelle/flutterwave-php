@@ -4,6 +4,65 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.4.0] - 2025-01-XX
+
+### Added
+
+- **Wallets API**: Complete support for Flutterwave v4 Wallets API:
+
+  - `resolveAccount(string $provider, string $identifier)` - Verify wallet account information
+  - `getStatement(array $params)` - Retrieve wallet transaction statement with pagination
+  - `getBalance(string $currency)` - Fetch available balance for a specific currency
+  - `getBalances()` - Fetch available balances for all currencies
+
+- **Wallet API Classes**:
+
+  - `WalletAccountResolveApi` - POST endpoint for wallet account lookup
+  - `WalletStatementApi` - GET endpoint for wallet statement retrieval with query parameters
+  - `WalletBalanceApi` - GET endpoint for single currency balance (path parameter)
+  - `WalletBalancesApi` - GET endpoint for multiple currency balances
+
+- **Wallet Data Transfer Objects**:
+
+  - `WalletAccountResolveData` - Response DTO with provider, identifier, and name
+  - `WalletStatementData` - Response DTO with cursor pagination and transactions array
+  - `WalletStatementCursor` - Pagination cursor DTO with next, previous, limit, total, and hasMoreItems
+  - `WalletBalanceData` - Response DTO with currency and available balance
+  - `WalletStatementRequest` - Request DTO for statement query parameters (optional)
+
+- **Wallet Service**:
+
+  - `FlutterwaveWalletService` - High-level service for all wallet operations
+  - Registered in service provider with `wallets()` facade method
+  - Full error handling and type-safe DTOs
+
+- **Comprehensive Tests**:
+
+  - 4 API test files covering all wallet endpoints (25 tests)
+  - 1 service test file with 8 tests for FlutterwaveWalletService
+  - 4 data test files for all wallet DTOs (18 tests)
+  - 43 total passing tests with 169 assertions
+
+### Improved
+
+- **API Provider**: Updated `FlutterwaveApi` enum with 4 new wallet API cases:
+  - `WALLET_ACCOUNT_RESOLVE` - `/wallets/account-resolve`
+  - `WALLET_STATEMENT` - `/wallets/statement`
+  - `WALLET_BALANCE` - `/wallets/balances/{currency}`
+  - `WALLET_BALANCES` - `/wallets/balances`
+- **Type Safety**: Full PHP 8.2 readonly properties and strict typing for wallet operations
+- **Error Handling**: Comprehensive exception handling with user-friendly error messages
+- **Validation**: Built-in validation for all request parameters (currency format, size limits, date formats)
+
+### Features
+
+- **Wallet Account Resolution**: Verify wallet account details by provider and identifier
+- **Transaction Statements**: Retrieve paginated wallet statements with date range filtering
+- **Balance Queries**: Fetch single or multiple currency balances
+- **Cursor Pagination**: Full support for cursor-based pagination in statements
+- **Query Parameters**: Support for size, from, to, next, and previous parameters
+- **Type-Safe DTOs**: All responses wrapped in type-safe data transfer objects
+
 ## [2.3.0] - 2025-12-16
 
 ### Added

@@ -131,10 +131,10 @@ final readonly class VirtualAccountData
 
         try {
             $expirationDate = new \DateTime($this->accountExpirationDatetime);
-            return new \DateTime() > $expirationDate;
+
+            return new \DateTime > $expirationDate;
         } catch (\Exception) {
             return false;
         }
     }
 }
-

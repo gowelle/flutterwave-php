@@ -22,6 +22,10 @@ use Gowelle\Flutterwave\Api\Transfer\RecipientApi;
 use Gowelle\Flutterwave\Api\Transfer\SenderApi;
 use Gowelle\Flutterwave\Api\Transfer\TransferApi;
 use Gowelle\Flutterwave\Api\VirtualAccount\VirtualAccountApi;
+use Gowelle\Flutterwave\Api\Wallets\WalletAccountResolveApi;
+use Gowelle\Flutterwave\Api\Wallets\WalletBalanceApi;
+use Gowelle\Flutterwave\Api\Wallets\WalletBalancesApi;
+use Gowelle\Flutterwave\Api\Wallets\WalletStatementApi;
 use Gowelle\Flutterwave\Concerns\RecognizesEnvironment;
 use Gowelle\Flutterwave\Credentials\AbstractHeadersConfig;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
@@ -76,6 +80,10 @@ class FlutterwaveApiProvider
                 FlutterwaveApi::TRANSFER_RATES => new RateApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::SETTLEMENT => new SettlementApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::VIRTUAL_ACCOUNT => new VirtualAccountApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::WALLET_ACCOUNT_RESOLVE => new WalletAccountResolveApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::WALLET_STATEMENT => new WalletStatementApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::WALLET_BALANCE => new WalletBalanceApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::WALLET_BALANCES => new WalletBalancesApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
             };
 
         } catch (ValidationException $e) {

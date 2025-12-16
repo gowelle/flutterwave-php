@@ -27,6 +27,7 @@ use Gowelle\Flutterwave\Services\FlutterwavePaymentsService;
 use Gowelle\Flutterwave\Services\FlutterwaveRefundService;
 use Gowelle\Flutterwave\Services\FlutterwaveSettlementService;
 use Gowelle\Flutterwave\Services\FlutterwaveTransferService;
+use Gowelle\Flutterwave\Services\FlutterwaveWalletService;
 use Gowelle\Flutterwave\Services\FlutterwaveWebhookService;
 use Gowelle\Flutterwave\Support\HeaderBuilder;
 use Gowelle\Flutterwave\Support\RateLimiter;
@@ -223,6 +224,12 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwaveSettlementService::class, 'flutterwave.settlements');
+
+        // Wallet service
+        $this->app->singleton(FlutterwaveWalletService::class, fn (Application $app) => new FlutterwaveWalletService(
+            $app->make(FlutterwaveBaseService::class)
+        ));
+        $this->app->alias(FlutterwaveWalletService::class, 'flutterwave.wallets');
     }
 
     /**
@@ -278,6 +285,11 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
                 public function settlements(): FlutterwaveSettlementService
                 {
                     return $this->app->make(FlutterwaveSettlementService::class);
+                }
+
+                public function wallets(): FlutterwaveWalletService
+                {
+                    return $this->app->make(FlutterwaveWalletService::class);
                 }
 
                 public function webhook(): FlutterwaveWebhookService

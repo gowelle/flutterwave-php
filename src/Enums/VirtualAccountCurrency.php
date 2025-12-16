@@ -64,4 +64,3 @@ enum VirtualAccountCurrency: string
         return \in_array($this, [self::EGP, self::KES], true);
     }
 }
-

@@ -6,9 +6,6 @@ namespace Gowelle\Flutterwave\Api\VirtualAccount;
 
 use Exception;
 use Gowelle\Flutterwave\Data\ApiResponse;
-use Gowelle\Flutterwave\Data\VirtualAccount\CreateVirtualAccountRequestDTO;
-use Gowelle\Flutterwave\Data\VirtualAccount\UpdateVirtualAccountRequestDTO;
-use Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData;
 use Gowelle\Flutterwave\Enums\VirtualAccountCurrency;
 use Gowelle\Flutterwave\FlutterwaveBaseApi;
 use Illuminate\Http\Client\RequestException;
@@ -186,4 +183,3 @@ class VirtualAccountApi extends FlutterwaveBaseApi
         return $validator->validate();
     }
 }
-

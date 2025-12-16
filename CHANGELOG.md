@@ -97,7 +97,7 @@ $refund = Flutterwave::refunds()->create(
 ```php
 $request = ChargeRequestBuilder::create('ref-123')
     ->amount(1000, 'NGN')
-    ->customer('user@example.com', 'John Doe')
+    ->customer('user@example.com', 'John', 'Doe')
     ->redirectUrl('https://example.com/callback')
     ->build(); // Returns array
 
@@ -109,7 +109,7 @@ $request = ChargeRequestBuilder::create('ref-123')
 ```php
 $request = ChargeRequestBuilder::create('ref-123')
     ->amount(1000, 'NGN')
-    ->customer('user@example.com', 'John Doe')
+    ->customer('user@example.com', 'John', 'Doe')
     ->redirectUrl('https://example.com/callback')
     ->card('4111111111111111', '12', '25', '123') // Auto-encrypted
     ->build(); // Returns DirectChargeRequestDTO

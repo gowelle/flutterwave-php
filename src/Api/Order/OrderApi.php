@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Gowelle\Flutterwave\Api\Order;
 
 use Gowelle\Flutterwave\Data\ApiResponse;
+use Gowelle\Flutterwave\Data\Order\CreateOrderRequest;
+use Gowelle\Flutterwave\Data\Order\UpdateOrderRequest;
 use Gowelle\Flutterwave\FlutterwaveBaseApi;
 use Illuminate\Support\Facades\Validator;
 
@@ -26,6 +28,14 @@ class OrderApi extends FlutterwaveBaseApi
     }
 
     /**
+     * Create an order from DTO
+     */
+    public function createFromDto(CreateOrderRequest $request): ApiResponse
+    {
+        return parent::create($request->toApiPayload());
+    }
+
+    /**
      * Update an order with validation
      */
     public function update(string $id, array $data): ApiResponse
@@ -33,6 +43,14 @@ class OrderApi extends FlutterwaveBaseApi
         $validatedData = $this->validateUpdateData($data);
 
         return parent::update($id, $validatedData);
+    }
+
+    /**
+     * Update an order from DTO
+     */
+    public function updateFromDto(string $id, UpdateOrderRequest $request): ApiResponse
+    {
+        return parent::update($id, $request->toApiPayload());
     }
 
     /**

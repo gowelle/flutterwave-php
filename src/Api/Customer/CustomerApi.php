@@ -6,6 +6,9 @@ namespace Gowelle\Flutterwave\Api\Customer;
 
 use Exception;
 use Gowelle\Flutterwave\Data\ApiResponse;
+use Gowelle\Flutterwave\Data\Customer\CreateCustomerRequest;
+use Gowelle\Flutterwave\Data\Customer\SearchCustomerRequest;
+use Gowelle\Flutterwave\Data\Customer\UpdateCustomerRequest;
 use Gowelle\Flutterwave\FlutterwaveBaseApi;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
@@ -28,6 +31,14 @@ class CustomerApi extends FlutterwaveBaseApi
     }
 
     /**
+     * Create a customer from DTO
+     */
+    public function createFromDto(CreateCustomerRequest $request): ApiResponse
+    {
+        return parent::create($request->toApiPayload());
+    }
+
+    /**
      * Update a customer with validation
      */
     public function update(string $id, array $data): ApiResponse
@@ -35,6 +46,14 @@ class CustomerApi extends FlutterwaveBaseApi
         $validatedData = $this->validateUpdateData($data);
 
         return parent::update($id, $validatedData);
+    }
+
+    /**
+     * Update a customer from DTO
+     */
+    public function updateFromDto(string $id, UpdateCustomerRequest $request): ApiResponse
+    {
+        return parent::update($id, $request->toApiPayload());
     }
 
     /**
@@ -52,6 +71,27 @@ class CustomerApi extends FlutterwaveBaseApi
             $response = Http::withToken($this->getAccessToken())
                 ->withHeaders($this->getHeaders()->toArray())
                 ->post($this->buildApiSpecificBaseUrl(), $normalizedData)
+                ->json();
+
+            return ApiResponse::fromArray($response);
+        } catch (Exception $exception) {
+            $this->logApiError('SEARCH', $this->buildApiSpecificBaseUrl(), $exception);
+
+            throw $this->createApiException($exception);
+        }
+    }
+
+    /**
+     * Search for a customer from DTO
+     *
+     * @throws Exception
+     */
+    public function searchFromDto(SearchCustomerRequest $request): ApiResponse
+    {
+        try {
+            $response = Http::withToken($this->getAccessToken())
+                ->withHeaders($this->getHeaders()->toArray())
+                ->post($this->buildApiSpecificBaseUrl(), $request->toApiPayload())
                 ->json();
 
             return ApiResponse::fromArray($response);

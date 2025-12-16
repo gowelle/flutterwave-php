@@ -525,6 +525,46 @@ $customer = Flutterwave::customers()->create([
 ]);
 ```
 
+**Using DTO (type-safe):**
+
+```php
+use Gowelle\Flutterwave\Data\Customer\CreateCustomerRequest;
+
+$request = new CreateCustomerRequest(
+    email: 'john@example.com',
+    firstName: 'John',
+    lastName: 'Doe',
+    phoneNumber: '+255123456789',
+    middleName: 'Michael',  // optional
+);
+
+$customer = Flutterwave::customers()->createFromDto($request);
+```
+
+#### Update Customer
+
+```php
+use Gowelle\Flutterwave\Data\Customer\UpdateCustomerRequest;
+
+$request = new UpdateCustomerRequest(
+    email: 'john.updated@example.com',
+    firstName: 'John',
+    lastName: 'Doe',
+    phoneNumber: '+255987654321',
+);
+
+$customer = Flutterwave::customers()->updateFromDto('customer-id', $request);
+```
+
+#### Search Customer
+
+```php
+use Gowelle\Flutterwave\Data\Customer\SearchCustomerRequest;
+
+$request = new SearchCustomerRequest(email: 'john@example.com');
+$customer = Flutterwave::customers()->searchFromDto($request);
+```
+
 #### Get Customer
 
 ```php
@@ -565,6 +605,27 @@ $order = Flutterwave::orders()->create([
 ]);
 ```
 
+**Using DTO (type-safe):**
+
+```php
+use Gowelle\Flutterwave\Data\Order\CreateOrderRequest;
+
+// Using static factory method
+$request = CreateOrderRequest::make(
+    orderReference: 'ORDER-123',
+    amount: 10000,
+    currency: 'TZS',
+    customerName: 'John Doe',
+    customerEmail: 'customer@example.com',
+    items: [
+        ['name' => 'Product 1', 'quantity' => 2, 'amount' => 5000],
+    ],
+    customerPhone: '+255123456789',  // optional
+);
+
+$order = Flutterwave::orders()->createFromDto($request);
+```
+
 #### Get Order
 
 ```php
@@ -583,11 +644,14 @@ $orders = Flutterwave::orders()->list([
 #### Update Order
 
 ```php
-$updatedOrder = Flutterwave::orders()->update([
-    'id' => 'order-id',
-    'amount' => 15000,
-    'status' => 'completed',
-]);
+use Gowelle\Flutterwave\Data\Order\UpdateOrderRequest;
+
+$request = new UpdateOrderRequest(
+    amount: 15000,
+    status: 'completed',
+);
+
+$updatedOrder = Flutterwave::orders()->updateFromDto('order-id', $request);
 ```
 
 ### Refunds
@@ -1061,6 +1125,20 @@ $account = Flutterwave::banks()->resolveAccount(
 // Access resolved account details
 echo $account->accountName;
 echo $account->accountNumber;
+```
+
+**Using DTO (type-safe):**
+
+```php
+use Gowelle\Flutterwave\Data\Banks\BankAccountResolveRequest;
+
+$request = new BankAccountResolveRequest(
+    bankCode: '044',
+    accountNumber: '0123456789',
+    currency: 'NGN',  // defaults to NGN if omitted
+);
+
+$account = Flutterwave::banks()->resolveFromDto($request);
 ```
 
 ### Mobile Networks

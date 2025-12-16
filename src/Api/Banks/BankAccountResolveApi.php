@@ -6,6 +6,7 @@ namespace Gowelle\Flutterwave\Api\Banks;
 
 use Exception;
 use Gowelle\Flutterwave\Data\ApiResponse;
+use Gowelle\Flutterwave\Data\Banks\BankAccountResolveRequest;
 use Gowelle\Flutterwave\FlutterwaveBaseApi;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
@@ -59,6 +60,22 @@ class BankAccountResolveApi extends FlutterwaveBaseApi
 
             throw new Exception('Failed to resolve bank account: '.$e->getMessage());
         }
+    }
+
+    /**
+     * Resolve bank account details from DTO
+     *
+     * @throws Exception
+     */
+    public function resolveFromDto(BankAccountResolveRequest $request): ApiResponse
+    {
+        $payload = $request->toApiPayload();
+
+        return $this->resolve(
+            bankCode: $payload['bank_code'],
+            accountNumber: $payload['account_number'],
+            currency: $payload['currency'],
+        );
     }
 
     /**

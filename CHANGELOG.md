@@ -4,6 +4,68 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.5.0] - 2025-12-16
+
+### Added
+
+- **Request DTOs for Customer API**: Type-safe request DTOs for customer operations:
+
+  - `CreateCustomerRequest` - Typed DTO for customer creation with `email`, `firstName`, `lastName`, `phoneNumber`, `middleName`
+  - `UpdateCustomerRequest` - Typed DTO for customer updates
+  - `SearchCustomerRequest` - Typed DTO for customer search with optional email filter
+  - New `CustomerApi` methods: `createFromDto()`, `updateFromDto()`, `searchFromDto()`
+
+- **Request DTOs for Order API**: Type-safe request DTOs for order operations:
+
+  - `CreateOrderRequest` - Typed DTO with nested customer/items support and static `make()` factory method
+  - `UpdateOrderRequest` - Typed DTO for order updates with optional fields
+  - New `OrderApi` methods: `createFromDto()`, `updateFromDto()`
+
+- **Request DTOs for Banks API**: Type-safe request DTO for bank account resolution:
+
+  - `BankAccountResolveRequest` - Typed DTO for bank account lookup with default NGN currency
+  - New `BankAccountResolveApi` method: `resolveFromDto()`
+
+- **Comprehensive Unit Tests**:
+  - `CreateCustomerRequestTest` - Tests for customer creation DTO
+  - `UpdateCustomerRequestTest` - Tests for customer update DTO
+  - `SearchCustomerRequestTest` - Tests for customer search DTO
+  - `CreateOrderRequestTest` - Tests for order creation DTO with factory method
+  - `UpdateOrderRequestTest` - Tests for order update DTO
+  - `BankAccountResolveRequestTest` - Tests for bank resolution DTO
+
+### Improved
+
+- **Backward Compatibility**: All existing array-based methods remain functional
+- **Type Safety**: Full PHP 8.2 readonly properties and strict typing for all new DTOs
+- **IDE Support**: Better autocomplete and type hints through typed properties
+
+### Usage Example
+
+**Before (raw arrays):**
+
+```php
+$api->create([
+    'email' => 'john@example.com',
+    'name' => ['first' => 'John', 'last' => 'Doe'],
+    'phone_number' => '+255123456789',
+]);
+```
+
+**After (typed DTO):**
+
+```php
+use Gowelle\Flutterwave\Data\Customer\CreateCustomerRequest;
+
+$request = new CreateCustomerRequest(
+    email: 'john@example.com',
+    firstName: 'John',
+    lastName: 'Doe',
+    phoneNumber: '+255123456789',
+);
+$api->createFromDto($request);
+```
+
 ## [2.4.0] - 2025-12-16
 
 ### Added

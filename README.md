@@ -618,20 +618,45 @@ $refunds = Flutterwave::refunds()->list([
 
 ### Transfers/Payouts
 
-Send money to bank accounts or mobile money wallets.
+Send money to bank accounts, mobile money wallets, or Flutterwave wallets.
 
-#### Create Transfer
+#### Bank Transfer (Orchestrator)
+
+The recommended approach - creates the recipient inline:
 
 ```php
-$transfer = Flutterwave::transfers()->create([
-    'account_bank' => '044',           // Bank code
-    'account_number' => '0123456789',
-    'amount' => 5000,
-    'currency' => 'NGN',
-    'reference' => 'PAYOUT-123',
-    'beneficiary_name' => 'John Doe',
-    'narration' => 'Monthly payout',
-]);
+use Gowelle\Flutterwave\Data\Transfer\BankTransferRequest;
+
+$transfer = Flutterwave::transfers()->bankTransfer(
+    new BankTransferRequest(
+        amount: 50000,
+        sourceCurrency: 'NGN',
+        destinationCurrency: 'NGN',
+        accountNumber: '0123456789',
+        bankCode: '044',
+        reference: 'PAYOUT-' . uniqid(),
+        narration: 'Monthly payout',     // optional
+    )
+);
+```
+
+#### Mobile Money Transfer (Orchestrator)
+
+```php
+use Gowelle\Flutterwave\Data\Transfer\MobileMoneyTransferRequest;
+
+$transfer = Flutterwave::transfers()->mobileMoneyTransfer(
+    new MobileMoneyTransferRequest(
+        amount: 1000,
+        sourceCurrency: 'NGN',
+        destinationCurrency: 'GHS',
+        network: 'MTN',
+        phoneNumber: '2339012345678',
+        firstName: 'John',
+        lastName: 'Doe',
+        reference: 'MOMO-' . uniqid(),
+    )
+);
 ```
 
 #### Get Transfer
@@ -643,10 +668,83 @@ $transfer = Flutterwave::transfers()->get('transfer-id');
 #### List Transfers
 
 ```php
-$transfers = Flutterwave::transfers()->list([
-    'page' => 1,
-    'limit' => 20,
-]);
+$transfers = Flutterwave::transfers()->list();
+```
+
+#### Retry Failed Transfer
+
+```php
+$transfer = Flutterwave::transfers()->retry('transfer-id');
+```
+
+#### Create Recipient
+
+For the general flow, pre-create recipients:
+
+```php
+use Gowelle\Flutterwave\Data\Transfer\CreateRecipientRequest;
+
+$recipient = Flutterwave::transfers()->createRecipient(
+    CreateRecipientRequest::bank(
+        currency: 'NGN',
+        accountNumber: '0123456789',
+        bankCode: '044',
+    )
+);
+```
+
+#### Create Sender
+
+```php
+use Gowelle\Flutterwave\Data\Transfer\CreateSenderRequest;
+
+$sender = Flutterwave::transfers()->createSender(
+    new CreateSenderRequest(
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+        phoneNumber: '+2341234567890',
+        country: 'NG',
+    )
+);
+```
+
+#### Get Transfer Rate
+
+```php
+use Gowelle\Flutterwave\Data\Transfer\GetRateRequest;
+
+$rate = Flutterwave::transfers()->getRate(
+    new GetRateRequest(
+        sourceCurrency: 'NGN',
+        destinationCurrency: 'GHS',
+        amount: 10000,
+    )
+);
+```
+
+#### General Flow Transfer
+
+For the general flow, use pre-created recipient and sender IDs:
+
+```php
+use Gowelle\Flutterwave\Data\Transfer\CreateTransferRequest;
+
+// First, create recipient and sender (see above)
+$recipient = Flutterwave::transfers()->createRecipient(...);
+$sender = Flutterwave::transfers()->createSender(...);
+
+// Then create the transfer
+$transfer = Flutterwave::transfers()->create(
+    new CreateTransferRequest(
+        amount: 50000,
+        sourceCurrency: 'NGN',
+        destinationCurrency: 'NGN',
+        recipientId: $recipient->id,
+        senderId: $sender->id,
+        reference: 'PAYOUT-' . uniqid(),
+    )
+);
 ```
 
 ### Settlements
@@ -872,6 +970,25 @@ Event::listen(FlutterwaveChargeUpdated::class, function (FlutterwaveChargeUpdate
     $authorizationData = $event->authorizationData;
 
     // Update charge session, process completion, etc.
+});
+```
+
+#### FlutterwaveTransferCreated
+
+Dispatched when a transfer is created (bank, mobile money, or wallet):
+
+```php
+use Gowelle\Flutterwave\Events\FlutterwaveTransferCreated;
+
+Event::listen(FlutterwaveTransferCreated::class, function (FlutterwaveTransferCreated $event) {
+    $transferData = $event->transferData;
+
+    // Log transfer, update records, send notification, etc.
+    logger()->info('Transfer created', [
+        'id' => $transferData->id,
+        'status' => $transferData->status->value,
+        'amount' => $transferData->amount,
+    ]);
 });
 ```
 

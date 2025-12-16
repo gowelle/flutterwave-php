@@ -176,6 +176,16 @@ abstract class FlutterwaveBaseApi implements FlutterwaveApiContract
     }
 
     /**
+     * Retry a failed operation
+     *
+     * @throws Exception
+     */
+    public function retry(string $id): ApiResponse
+    {
+        $this->notImplemented('retry');
+    }
+
+    /**
      * Validate entity ID
      */
     protected function validateId(string $id): void

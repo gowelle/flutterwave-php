@@ -15,8 +15,12 @@ use Gowelle\Flutterwave\Api\Customer\CustomerApi;
 use Gowelle\Flutterwave\Api\Order\OrderApi;
 use Gowelle\Flutterwave\Api\PaymentMethods\PaymentMethodsApi;
 use Gowelle\Flutterwave\Api\Refund\RefundApi;
-use Gowelle\Flutterwave\Api\Transfer\TransferApi;
 use Gowelle\Flutterwave\Api\Settlement\SettlementApi;
+use Gowelle\Flutterwave\Api\Transfer\DirectTransferApi;
+use Gowelle\Flutterwave\Api\Transfer\RateApi;
+use Gowelle\Flutterwave\Api\Transfer\RecipientApi;
+use Gowelle\Flutterwave\Api\Transfer\SenderApi;
+use Gowelle\Flutterwave\Api\Transfer\TransferApi;
 use Gowelle\Flutterwave\Concerns\RecognizesEnvironment;
 use Gowelle\Flutterwave\Credentials\AbstractHeadersConfig;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
@@ -65,6 +69,10 @@ class FlutterwaveApiProvider
                 FlutterwaveApi::ORDER => new OrderApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::REFUND => new RefundApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::TRANSFER => new TransferApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::DIRECT_TRANSFER => new DirectTransferApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::TRANSFER_RECIPIENTS => new RecipientApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::TRANSFER_SENDERS => new SenderApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::TRANSFER_RATES => new RateApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::SETTLEMENT => new SettlementApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
             };
 

@@ -7,6 +7,7 @@ namespace Gowelle\Flutterwave;
 use Gowelle\Flutterwave\Contracts\CustomerServiceInterface;
 use Gowelle\Flutterwave\Contracts\DirectChargeServiceInterface;
 use Gowelle\Flutterwave\Contracts\PaymentsServiceInterface;
+use Gowelle\Flutterwave\Contracts\TransferServiceInterface;
 use Gowelle\Flutterwave\Data\FlutterwaveConfig;
 use Gowelle\Flutterwave\Services\FlutterwaveAuthService;
 use Gowelle\Flutterwave\Services\FlutterwaveBanksService;
@@ -217,6 +218,7 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
             $app->make(FlutterwaveBaseService::class)
         ));
         $this->app->alias(FlutterwaveTransferService::class, 'flutterwave.transfers');
+        $this->app->bind(TransferServiceInterface::class, FlutterwaveTransferService::class);
 
         // Settlement service
         $this->app->singleton(FlutterwaveSettlementService::class, fn(Application $app) => new FlutterwaveSettlementService(

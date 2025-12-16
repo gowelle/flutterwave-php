@@ -4,26 +4,46 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Api\Transfer;
 
-use Exception;
 use Gowelle\Flutterwave\Data\ApiResponse;
 use Gowelle\Flutterwave\FlutterwaveBaseApi;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Http;
 
+/**
+ * API client for Flutterwave Transfer endpoints.
+ *
+ * Handles both general flow (/transfers) and orchestrator flow (/direct-transfers).
+ */
 class TransferApi extends FlutterwaveBaseApi
 {
-    /**
-     * The endpoint for the transfer API
-     */
     protected string $endpoint = '/transfers';
 
     /**
-     * Create a transfer with validation
+     * Create a transfer (general flow)
      */
     public function create(array $data): ApiResponse
     {
-        $validatedData = $this->validateTransferData($data);
+        return parent::create($data);
+    }
 
-        return parent::create($validatedData);
+    /**
+     * Create a direct transfer (orchestrator flow)
+     */
+    public function createDirect(array $data): ApiResponse
+    {
+        return $this->executeWithRetry(function () use ($data) {
+            try {
+                $response = Http::timeout(config('flutterwave.timeout', 30))
+                    ->withToken($this->getAccessToken())
+                    ->withHeaders($this->getHeaders()->toArray())
+                    ->post($this->getBaseApiUrl() . '/direct-transfers', $data)
+                    ->throw();
+
+                return ApiResponse::fromArray($response->json());
+            } catch (RequestException $e) {
+                throw $this->createApiException($e);
+            }
+        });
     }
 
     /**
@@ -43,40 +63,216 @@ class TransferApi extends FlutterwaveBaseApi
     }
 
     /**
-     * Update a transfer is not implemented
-     *
-     * @throws Exception
+     * Update a transfer (for deferred/scheduled)
      */
     public function update(string $id, array $data): ApiResponse
     {
-        $this->notImplemented('update');
+        return parent::update($id, $data);
     }
 
     /**
-     * Search for a transfer is not implemented
-     *
-     * @throws Exception
+     * Retry a transfer
      */
-    public function search(array $data): ApiResponse
+    public function retry(string $id): ApiResponse
     {
-        $this->notImplemented('search');
+        return $this->executeWithRetry(function () use ($id) {
+            try {
+                $response = Http::timeout(config('flutterwave.timeout', 30))
+                    ->withToken($this->getAccessToken())
+                    ->withHeaders($this->getHeaders()->toArray())
+                    ->post($this->getBaseApiUrl() . "/transfers/{$id}/retries", [])
+                    ->throw();
+
+                return ApiResponse::fromArray($response->json());
+            } catch (RequestException $e) {
+                throw $this->createApiException($e);
+            }
+        });
+    }
+
+    // Recipients
+
+    /**
+     * Create a recipient
+     */
+    public function createRecipient(array $data): ApiResponse
+    {
+        return $this->executeWithRetry(function () use ($data) {
+            try {
+                $response = Http::timeout(config('flutterwave.timeout', 30))
+                    ->withToken($this->getAccessToken())
+                    ->withHeaders($this->getHeaders()->toArray())
+                    ->post($this->getBaseApiUrl() . '/transfers/recipients', $data)
+                    ->throw();
+
+                return ApiResponse::fromArray($response->json());
+            } catch (RequestException $e) {
+                throw $this->createApiException($e);
+            }
+        });
     }
 
     /**
-     * Validate transfer data
+     * Get a recipient
      */
-    protected function validateTransferData(array $data): array
+    public function getRecipient(string $id): ApiResponse
     {
-        $validator = Validator::make($data, [
-            'account_bank' => 'required|string',
-            'account_number' => 'required|string',
-            'amount' => 'required|numeric|min:0',
-            'currency' => 'required|string|size:3',
-            'reference' => 'required|string',
-            'narration' => 'nullable|string|max:500',
-            'beneficiary_name' => 'required|string',
-        ]);
+        return $this->executeWithRetry(function () use ($id) {
+            try {
+                $response = Http::timeout(config('flutterwave.timeout', 30))
+                    ->withToken($this->getAccessToken())
+                    ->withHeaders($this->getHeaders()->toArray())
+                    ->get($this->getBaseApiUrl() . "/transfers/recipients/{$id}")
+                    ->throw();
 
-        return $validator->validate();
+                return ApiResponse::fromArray($response->json());
+            } catch (RequestException $e) {
+                throw $this->createApiException($e);
+            }
+        });
+    }
+
+    /**
+     * List recipients
+     */
+    public function listRecipients(): ApiResponse
+    {
+        return $this->executeWithRetry(function () {
+            try {
+                $response = Http::timeout(config('flutterwave.timeout', 30))
+                    ->withToken($this->getAccessToken())
+                    ->withHeaders($this->getHeaders()->toArray())
+                    ->get($this->getBaseApiUrl() . '/transfers/recipients')
+                    ->throw();
+
+                return ApiResponse::fromArray($response->json());
+            } catch (RequestException $e) {
+                throw $this->createApiException($e);
+            }
+        });
+    }
+
+    /**
+     * Delete a recipient
+     */
+    public function deleteRecipient(string $id): ApiResponse
+    {
+        return $this->executeWithRetry(function () use ($id) {
+            try {
+                $response = Http::timeout(config('flutterwave.timeout', 30))
+                    ->withToken($this->getAccessToken())
+                    ->withHeaders($this->getHeaders()->toArray())
+                    ->delete($this->getBaseApiUrl() . "/transfers/recipients/{$id}")
+                    ->throw();
+
+                return ApiResponse::fromArray($response->json());
+            } catch (RequestException $e) {
+                throw $this->createApiException($e);
+            }
+        });
+    }
+
+    // Senders
+
+    /**
+     * Create a sender
+     */
+    public function createSender(array $data): ApiResponse
+    {
+        return $this->executeWithRetry(function () use ($data) {
+            try {
+                $response = Http::timeout(config('flutterwave.timeout', 30))
+                    ->withToken($this->getAccessToken())
+                    ->withHeaders($this->getHeaders()->toArray())
+                    ->post($this->getBaseApiUrl() . '/transfers/senders', $data)
+                    ->throw();
+
+                return ApiResponse::fromArray($response->json());
+            } catch (RequestException $e) {
+                throw $this->createApiException($e);
+            }
+        });
+    }
+
+    /**
+     * Get a sender
+     */
+    public function getSender(string $id): ApiResponse
+    {
+        return $this->executeWithRetry(function () use ($id) {
+            try {
+                $response = Http::timeout(config('flutterwave.timeout', 30))
+                    ->withToken($this->getAccessToken())
+                    ->withHeaders($this->getHeaders()->toArray())
+                    ->get($this->getBaseApiUrl() . "/transfers/senders/{$id}")
+                    ->throw();
+
+                return ApiResponse::fromArray($response->json());
+            } catch (RequestException $e) {
+                throw $this->createApiException($e);
+            }
+        });
+    }
+
+    /**
+     * List senders
+     */
+    public function listSenders(): ApiResponse
+    {
+        return $this->executeWithRetry(function () {
+            try {
+                $response = Http::timeout(config('flutterwave.timeout', 30))
+                    ->withToken($this->getAccessToken())
+                    ->withHeaders($this->getHeaders()->toArray())
+                    ->get($this->getBaseApiUrl() . '/transfers/senders')
+                    ->throw();
+
+                return ApiResponse::fromArray($response->json());
+            } catch (RequestException $e) {
+                throw $this->createApiException($e);
+            }
+        });
+    }
+
+    // Rates
+
+    /**
+     * Get transfer rate
+     */
+    public function getRate(array $data): ApiResponse
+    {
+        return $this->executeWithRetry(function () use ($data) {
+            try {
+                $response = Http::timeout(config('flutterwave.timeout', 30))
+                    ->withToken($this->getAccessToken())
+                    ->withHeaders($this->getHeaders()->toArray())
+                    ->post($this->getBaseApiUrl() . '/transfers/rates', $data)
+                    ->throw();
+
+                return ApiResponse::fromArray($response->json());
+            } catch (RequestException $e) {
+                throw $this->createApiException($e);
+            }
+        });
+    }
+
+    /**
+     * List rates
+     */
+    public function listRates(): ApiResponse
+    {
+        return $this->executeWithRetry(function () {
+            try {
+                $response = Http::timeout(config('flutterwave.timeout', 30))
+                    ->withToken($this->getAccessToken())
+                    ->withHeaders($this->getHeaders()->toArray())
+                    ->get($this->getBaseApiUrl() . '/transfers/rates')
+                    ->throw();
+
+                return ApiResponse::fromArray($response->json());
+            } catch (RequestException $e) {
+                throw $this->createApiException($e);
+            }
+        });
     }
 }

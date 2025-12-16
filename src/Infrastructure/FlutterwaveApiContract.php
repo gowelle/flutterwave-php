@@ -18,5 +18,7 @@ interface FlutterwaveApiContract
 
     public function search(array $data): ApiResponse;
 
+    public function retry(string $id): ApiResponse;
+
     public function buildApiSpecificBaseUrl(): string;
 }

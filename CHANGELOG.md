@@ -4,6 +4,73 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.1.0] - 2025-12-16
+
+### Breaking Changes
+
+- **Transfer API Rewrite**: The entire Transfer API has been rewritten with correct endpoint handling:
+  - Old methods using raw arrays are replaced with typed DTOs
+  - `create()` method now requires `CreateTransferRequest` DTO
+  - Old `TransferData` DTO moved to `Gowelle\Flutterwave\Data\Transfer\TransferData`
+  - See migration examples below
+
+### Added
+
+- **Direct Transfer Orchestrator**: New methods for inline recipient creation:
+  - `bankTransfer(BankTransferRequest)` - Bank account transfers
+  - `mobileMoneyTransfer(MobileMoneyTransferRequest)` - Mobile money transfers
+  - `walletTransfer(WalletTransferRequest)` - Flutterwave wallet transfers
+
+- **Transfer Recipients**: Full CRUD support:
+  - `createRecipient(CreateRecipientRequest)` - Create recipient
+  - `getRecipient(string $id)` - Get recipient by ID
+  - `listRecipients()` - List all recipients
+  - `deleteRecipient(string $id)` - Delete recipient
+
+- **Transfer Senders**: Sender management:
+  - `createSender(CreateSenderRequest)` - Create sender
+  - `getSender(string $id)` - Get sender by ID
+  - `listSenders()` - List all senders
+
+- **Transfer Rates**: Currency conversion rates:
+  - `getRate(GetRateRequest)` - Get rate for currency pair
+  - `listRates()` - List available rates
+
+- **New Enums**:
+  - `TransferAction` - instant, deferred, scheduled
+  - `TransferType` - bank, mobile_money, wallet
+  - `TransferStatus` - NEW, PENDING, SUCCEEDED, FAILED, etc.
+
+- **New Interface**: `TransferServiceInterface` for dependency injection
+
+### Migration from v2.0.x
+
+**Before (v2.0.x - incorrect):**
+```php
+$transfer = Flutterwave::transfers()->create([
+    'account_bank' => '044',
+    'account_number' => '0123456789',
+    'amount' => 5000,
+    // ...
+]);
+```
+
+**After (v2.1.0 - correct):**
+```php
+use Gowelle\Flutterwave\Data\Transfer\BankTransferRequest;
+
+$transfer = Flutterwave::transfers()->bankTransfer(
+    new BankTransferRequest(
+        amount: 5000,
+        sourceCurrency: 'NGN',
+        destinationCurrency: 'NGN',
+        accountNumber: '0123456789',
+        bankCode: '044',
+        reference: 'PAYOUT-' . uniqid(),
+    )
+);
+```
+
 ## [2.0.0] - 2025-12-11
 
 ### Breaking Changes

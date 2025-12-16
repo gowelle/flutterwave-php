@@ -4,28 +4,87 @@ declare(strict_types=1);
 
 use Gowelle\Flutterwave\Data\ApiResponse;
 use Gowelle\Flutterwave\Data\FlutterwaveConfig;
-use Gowelle\Flutterwave\Data\TransferData;
+use Gowelle\Flutterwave\Data\Transfer\BankTransferRequest;
+use Gowelle\Flutterwave\Data\Transfer\CreateRecipientRequest;
+use Gowelle\Flutterwave\Data\Transfer\CreateSenderRequest;
+use Gowelle\Flutterwave\Data\Transfer\CreateTransferRequest;
+use Gowelle\Flutterwave\Data\Transfer\GetRateRequest;
+use Gowelle\Flutterwave\Data\Transfer\MobileMoneyTransferRequest;
+use Gowelle\Flutterwave\Data\Transfer\RateData;
+use Gowelle\Flutterwave\Data\Transfer\RecipientData;
+use Gowelle\Flutterwave\Data\Transfer\SenderData;
+use Gowelle\Flutterwave\Data\Transfer\TransferData;
+use Gowelle\Flutterwave\Data\Transfer\WalletTransferRequest;
 use Gowelle\Flutterwave\Enums\FlutterwaveEnvironment;
+use Gowelle\Flutterwave\Enums\TransferAction;
+use Gowelle\Flutterwave\Enums\TransferStatus;
+use Gowelle\Flutterwave\Enums\TransferType;
+use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwaveTransferService;
-use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
+use Gowelle\Flutterwave\Support\HeaderBuilder;
 
 beforeEach(function () {
     $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);
     $this->service = new FlutterwaveTransferService($this->baseService);
 });
 
-it('can create a transfer', function () {
+it('can create a bank transfer via orchestrator', function () {
     $response = new ApiResponse(
         status: 'success',
         message: 'Transfer created',
         data: [
             'id' => 'trf_123',
-            'account_bank' => '044',
-            'account_number' => '0123456789',
-            'amount' => 5000,
-            'currency' => 'NGN',
-            'status' => 'pending',
+            'type' => 'bank',
+            'action' => 'instant',
+            'reference' => 'PAYOUT-123',
+            'status' => 'NEW',
+            'source_currency' => 'NGN',
+            'destination_currency' => 'NGN',
+            'amount' => ['value' => 5000, 'applies_to' => 'destination_currency'],
+            'recipient' => ['bank' => ['account_number' => '0123456789', 'code' => '044']],
+        ],
+    );
+
+    $this->baseService
+        ->shouldReceive('getConfig')
+        ->andReturn(new FlutterwaveConfig('test_client_id', 'test_client_secret', 'test_secret_hash', FlutterwaveEnvironment::STAGING));
+
+    $this->baseService
+        ->shouldReceive('create')
+        ->once()
+        ->with(FlutterwaveApi::DIRECT_TRANSFER, \Mockery::any(), \Mockery::any())
+        ->andReturn($response);
+
+    $request = new BankTransferRequest(
+        amount: 5000,
+        sourceCurrency: 'NGN',
+        destinationCurrency: 'NGN',
+        accountNumber: '0123456789',
+        bankCode: '044',
+        reference: 'PAYOUT-123',
+    );
+
+    $result = $this->service->bankTransfer($request);
+
+    expect($result)->toBeInstanceOf(TransferData::class);
+    expect($result->id)->toBe('trf_123');
+    expect($result->type)->toBe(TransferType::BANK);
+    expect($result->status)->toBe(TransferStatus::NEW);
+});
+
+it('can create a mobile money transfer via orchestrator', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Transfer created',
+        data: [
+            'id' => 'trf_456',
+            'type' => 'mobile_money',
+            'action' => 'instant',
+            'reference' => 'MOMO-123',
+            'status' => 'PENDING',
+            'source_currency' => 'NGN',
+            'destination_currency' => 'GHS',
         ],
     );
 
@@ -38,17 +97,21 @@ it('can create a transfer', function () {
         ->once()
         ->andReturn($response);
 
-    $result = $this->service->create([
-        'account_bank' => '044',
-        'account_number' => '0123456789',
-        'amount' => 5000,
-        'currency' => 'NGN',
-        'reference' => 'PAYOUT-123',
-        'beneficiary_name' => 'John Doe',
-        'narration' => 'Monthly payout',
-    ]);
+    $request = new MobileMoneyTransferRequest(
+        amount: 1000,
+        sourceCurrency: 'NGN',
+        destinationCurrency: 'GHS',
+        network: 'MTN',
+        phoneNumber: '2339012345678',
+        firstName: 'John',
+        lastName: 'Doe',
+        reference: 'MOMO-123',
+    );
+
+    $result = $this->service->mobileMoneyTransfer($request);
 
     expect($result)->toBeInstanceOf(TransferData::class);
+    expect($result->type)->toBe(TransferType::MOBILE_MONEY);
 });
 
 it('can get a transfer by id', function () {
@@ -57,10 +120,12 @@ it('can get a transfer by id', function () {
         message: 'Transfer retrieved',
         data: [
             'id' => 'trf_123',
-            'account_bank' => '044',
-            'account_number' => '0123456789',
-            'amount' => 5000,
-            'status' => 'completed',
+            'type' => 'bank',
+            'action' => 'instant',
+            'reference' => 'PAYOUT-123',
+            'status' => 'SUCCEEDED',
+            'source_currency' => 'NGN',
+            'destination_currency' => 'NGN',
         ],
     );
 
@@ -77,6 +142,7 @@ it('can get a transfer by id', function () {
     $result = $this->service->get('trf_123');
 
     expect($result)->toBeInstanceOf(TransferData::class);
+    expect($result->status->isSuccessful())->toBeTrue();
 });
 
 it('can list transfers', function () {
@@ -84,8 +150,8 @@ it('can list transfers', function () {
         status: 'success',
         message: 'Transfers retrieved',
         data: [
-            ['id' => 'trf_1', 'amount' => 1000],
-            ['id' => 'trf_2', 'amount' => 2000],
+            ['id' => 'trf_1', 'type' => 'bank', 'action' => 'instant', 'status' => 'NEW', 'reference' => 'REF-1', 'source_currency' => 'NGN', 'destination_currency' => 'NGN'],
+            ['id' => 'trf_2', 'type' => 'wallet', 'action' => 'instant', 'status' => 'SUCCEEDED', 'reference' => 'REF-2', 'source_currency' => 'NGN', 'destination_currency' => 'NGN'],
         ],
     );
 
@@ -127,3 +193,108 @@ it('returns empty array when list response has no data', function () {
     expect($result)->toBeEmpty();
 });
 
+it('can create a recipient', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Recipient created',
+        data: [
+            'id' => 'rcp_123',
+            'type' => 'bank',
+            'currency' => 'NGN',
+            'bank' => ['account_number' => '0123456789', 'code' => '044'],
+        ],
+    );
+
+    $this->baseService
+        ->shouldReceive('getConfig')
+        ->andReturn(new FlutterwaveConfig('test_client_id', 'test_client_secret', 'test_secret_hash', FlutterwaveEnvironment::STAGING));
+
+    $this->baseService
+        ->shouldReceive('create')
+        ->once()
+        ->with(FlutterwaveApi::TRANSFER_RECIPIENTS, \Mockery::any(), \Mockery::any())
+        ->andReturn($response);
+
+    $request = CreateRecipientRequest::bank(
+        currency: 'NGN',
+        accountNumber: '0123456789',
+        bankCode: '044',
+    );
+
+    $result = $this->service->createRecipient($request);
+
+    expect($result)->toBeInstanceOf(RecipientData::class);
+    expect($result->id)->toBe('rcp_123');
+});
+
+it('can create a sender', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Sender created',
+        data: [
+            'id' => 'snd_123',
+            'name' => ['first' => 'John', 'last' => 'Doe'],
+            'email' => 'john@example.com',
+            'phone_number' => '+2341234567890',
+            'country' => 'NG',
+        ],
+    );
+
+    $this->baseService
+        ->shouldReceive('getConfig')
+        ->andReturn(new FlutterwaveConfig('test_client_id', 'test_client_secret', 'test_secret_hash', FlutterwaveEnvironment::STAGING));
+
+    $this->baseService
+        ->shouldReceive('create')
+        ->once()
+        ->with(FlutterwaveApi::TRANSFER_SENDERS, \Mockery::any(), \Mockery::any())
+        ->andReturn($response);
+
+    $request = new CreateSenderRequest(
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@example.com',
+        phoneNumber: '+2341234567890',
+        country: 'NG',
+    );
+
+    $result = $this->service->createSender($request);
+
+    expect($result)->toBeInstanceOf(SenderData::class);
+    expect($result->getFullName())->toBe('John Doe');
+});
+
+it('can get transfer rate', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Rate retrieved',
+        data: [
+            'source_currency' => 'NGN',
+            'destination_currency' => 'GHS',
+            'rate' => 0.013,
+            'source_amount' => 10000,
+            'destination_amount' => 130,
+        ],
+    );
+
+    $this->baseService
+        ->shouldReceive('getConfig')
+        ->andReturn(new FlutterwaveConfig('test_client_id', 'test_client_secret', 'test_secret_hash', FlutterwaveEnvironment::STAGING));
+
+    $this->baseService
+        ->shouldReceive('create')
+        ->once()
+        ->with(FlutterwaveApi::TRANSFER_RATES, \Mockery::any(), \Mockery::any())
+        ->andReturn($response);
+
+    $request = new GetRateRequest(
+        sourceCurrency: 'NGN',
+        destinationCurrency: 'GHS',
+        amount: 10000,
+    );
+
+    $result = $this->service->getRate($request);
+
+    expect($result)->toBeInstanceOf(RateData::class);
+    expect($result->rate)->toBe(0.013);
+});

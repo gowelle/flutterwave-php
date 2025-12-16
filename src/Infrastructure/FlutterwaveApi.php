@@ -17,6 +17,10 @@ enum FlutterwaveApi: string
     case ORDER = 'order';
     case REFUND = 'refund';
     case TRANSFER = 'transfer';
+    case DIRECT_TRANSFER = 'direct-transfer';
+    case TRANSFER_RECIPIENTS = 'transfer-recipients';
+    case TRANSFER_SENDERS = 'transfer-senders';
+    case TRANSFER_RATES = 'transfer-rates';
     case SETTLEMENT = 'settlement';
 
     public function getEndpoint(): string
@@ -33,6 +37,10 @@ enum FlutterwaveApi: string
             self::ORDER => '/orders',
             self::REFUND => '/refunds',
             self::TRANSFER => '/transfers',
+            self::DIRECT_TRANSFER => '/direct-transfers',
+            self::TRANSFER_RECIPIENTS => '/transfers/recipients',
+            self::TRANSFER_SENDERS => '/transfers/senders',
+            self::TRANSFER_RATES => '/transfers/rates',
             self::SETTLEMENT => '/settlements',
         };
     }

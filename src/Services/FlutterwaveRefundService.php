@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Gowelle\Flutterwave\Services;
 
 use Gowelle\Flutterwave\Concerns\BuildsWavable;
+use Gowelle\Flutterwave\Data\Refund\CreateRefundRequest;
+use Gowelle\Flutterwave\Data\Refund\ListRefundsRequest;
 use Gowelle\Flutterwave\Data\RefundData;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 
@@ -16,18 +18,20 @@ final class FlutterwaveRefundService
 
     /**
      * Create a refund
-     *
-     * @param  array<string, mixed>  $data  Refund data
      */
-    public function create(array $data): RefundData
+    public function create(CreateRefundRequest $request): RefundData
     {
         $wavable = $this->buildWavable(
-            $data,
+            $request->toApiPayload(),
             FlutterwaveApi::REFUND,
             $this->flutterwaveBaseService->getConfig()->isProduction()
         );
 
-        $response = $this->flutterwaveBaseService->create(FlutterwaveApi::REFUND, $wavable, $data);
+        $response = $this->flutterwaveBaseService->create(
+            FlutterwaveApi::REFUND,
+            $wavable,
+            $request->toApiPayload()
+        );
 
         return RefundData::fromApi($response->data);
     }
@@ -49,19 +53,29 @@ final class FlutterwaveRefundService
     }
 
     /**
-     * List all refunds
+     * List all refunds with optional pagination and filtering
      *
      * @return RefundData[]
      */
-    public function list(): array
+    public function list(?ListRefundsRequest $request = null): array
     {
+        $request = $request ?? new ListRefundsRequest();
+
         $wavable = $this->buildWavable(
-            [],
+            $request->toQueryParams(),
             FlutterwaveApi::REFUND,
             $this->flutterwaveBaseService->getConfig()->isProduction()
         );
 
-        $response = $this->flutterwaveBaseService->list(FlutterwaveApi::REFUND, $wavable);
+        $headers = $this->flutterwaveBaseService->getHeaderBuilder()->build($wavable);
+
+        $api = app(\Gowelle\Flutterwave\FlutterwaveApiProvider::class)->useApi(
+            FlutterwaveApi::REFUND,
+            $this->flutterwaveBaseService->getAccessToken(),
+            $headers
+        );
+
+        $response = $api->listWithParams($request->toQueryParams());
 
         if ($response->data === null || ! \is_array($response->data)) {
             return [];

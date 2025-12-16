@@ -7,6 +7,9 @@ namespace Gowelle\Flutterwave\Api\Refund;
 use Exception;
 use Gowelle\Flutterwave\Data\ApiResponse;
 use Gowelle\Flutterwave\FlutterwaveBaseApi;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class RefundApi extends FlutterwaveBaseApi
@@ -43,6 +46,30 @@ class RefundApi extends FlutterwaveBaseApi
     }
 
     /**
+     * List refunds with query parameters (pagination and filtering)
+     *
+     * @param array<string, mixed> $params Query parameters (page, size, from, to)
+     */
+    public function listWithParams(array $params): ApiResponse
+    {
+        return $this->executeWithRetry(function () use ($params) {
+            try {
+                $response = Http::timeout(config('flutterwave.timeout', 30))
+                    ->withToken($this->getAccessToken())
+                    ->withHeaders($this->getHeaders()->toArray())
+                    ->get($this->buildApiSpecificBaseUrl(), $params)
+                    ->throw();
+
+                return ApiResponse::fromArray($response->json());
+            } catch (RequestException $e) {
+                $this->logApiError('GET', $this->buildApiSpecificBaseUrl(), $e);
+
+                throw $this->createApiException($e);
+            }
+        });
+    }
+
+    /**
      * Update a refund is not implemented
      *
      * @throws Exception
@@ -69,10 +96,36 @@ class RefundApi extends FlutterwaveBaseApi
     {
         $validator = Validator::make($data, [
             'charge_id' => 'required|string',
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required|numeric|min:0.01',
             'reason' => 'nullable|string|max:500',
+            'meta' => 'nullable|array',
         ]);
 
         return $validator->validate();
+    }
+
+    /**
+     * Log API error
+     */
+    protected function logApiError(string $method, string $url, RequestException $e): void
+    {
+        Log::error('Flutterwave Refund API error', [
+            'method' => $method,
+            'url' => $url,
+            'status' => $e->response?->status() ?? 500,
+            'response' => $e->response?->body(),
+        ]);
+    }
+
+    /**
+     * Create API exception from request exception
+     */
+    protected function createApiException(RequestException $e)
+    {
+        return \Gowelle\Flutterwave\Exceptions\FlutterwaveApiException::fromResponseBody(
+            responseBody: $e->response?->body(),
+            statusCode: $e->response?->status() ?? 500,
+            previous: $e,
+        );
     }
 }

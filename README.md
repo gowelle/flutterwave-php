@@ -28,6 +28,7 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
 - [Events & Listeners](#events--listeners)
 - [Webhooks](#webhooks)
 - [Error Handling](#error-handling)
+- [Card Encryption](#card-encryption)
 - [Advanced Usage](#advanced-usage)
 - [Retry Logic](#retry-logic)
 - [Rate Limiting](#rate-limiting)
@@ -587,32 +588,107 @@ $updatedOrder = Flutterwave::orders()->update([
 
 ### Refunds
 
-Process refunds for completed charges.
+Process refunds for completed charges with type-safe DTOs and filtering.
 
 #### Create Refund
 
 ```php
-$refund = Flutterwave::refunds()->create([
-    'charge_id' => 'charge-123',
-    'amount' => 500,
-    'reason' => 'Customer requested refund',
-]);
+use Gowelle\Flutterwave\Data\Refund\CreateRefundRequest;
+use Gowelle\Flutterwave\Enums\RefundReason;
+
+// Create a refund with DTO (type-safe)
+$refund = Flutterwave::refunds()->create(
+    new CreateRefundRequest(
+        amount: 500.00,
+        chargeId: 'charge-123',
+        reason: RefundReason::REQUESTED_BY_CUSTOMER,
+        meta: ['note' => 'Customer requested refund'],  // optional
+    )
+);
+
+// Check refund status
+if ($refund->isSuccessful()) {
+    // Refund succeeded
+} elseif ($refund->isPending()) {
+    // Refund is processing
+}
 ```
 
 #### Get Refund
 
 ```php
 $refund = Flutterwave::refunds()->get('refund-id');
+
+// Access refund properties with type safety
+echo $refund->amountRefunded;  // Float
+echo $refund->status->value;   // String via enum
+echo $refund->status->isSuccessful();  // Boolean
 ```
 
 #### List Refunds
 
+List all refunds with optional pagination and date filtering:
+
 ```php
-$refunds = Flutterwave::refunds()->list([
-    'charge_id' => 'charge-123',
-    'page' => 1,
-    'limit' => 20,
-]);
+use Gowelle\Flutterwave\Data\Refund\ListRefundsRequest;
+
+// List all refunds (default page=1, size=10)
+$refunds = Flutterwave::refunds()->list();
+
+// List with custom pagination
+$refunds = Flutterwave::refunds()->list(
+    new ListRefundsRequest(page: 2, size: 20)
+);
+
+// List refunds within date range
+$refunds = Flutterwave::refunds()->list(
+    new ListRefundsRequest(
+        page: 1,
+        size: 50,
+        from: now()->subDays(30),
+        to: now(),
+    )
+);
+
+// Access refund data
+foreach ($refunds as $refund) {
+    echo $refund->id;
+    echo $refund->chargeId;
+    echo $refund->amountRefunded;
+    echo $refund->status->value;
+    echo $refund->reason;
+}
+```
+
+#### Refund Reasons
+
+The `RefundReason` enum provides type-safe reason values:
+
+```php
+use Gowelle\Flutterwave\Enums\RefundReason;
+
+RefundReason::DUPLICATE                  // Duplicate charge
+RefundReason::FRAUDULENT                 // Fraudulent transaction
+RefundReason::REQUESTED_BY_CUSTOMER      // Customer requested
+RefundReason::EXPIRED_UNCAPTURED_CHARGE  // Expired uncaptured charge
+```
+
+#### Refund Status
+
+The `RefundStatus` enum tracks refund state:
+
+```php
+use Gowelle\Flutterwave\Enums\RefundStatus;
+
+RefundStatus::NEW       // Refund created, not yet processed
+RefundStatus::PENDING   // Refund is being processed
+RefundStatus::SUCCEEDED // Refund completed successfully
+RefundStatus::FAILED    // Refund failed
+
+// Use helper methods for type-safe checks
+$refund->status->isSuccessful();  // true if SUCCEEDED
+$refund->status->isPending();     // true if NEW or PENDING
+$refund->status->isTerminal();    // true if SUCCEEDED or FAILED
 ```
 
 ### Transfers/Payouts
@@ -1469,9 +1545,154 @@ try {
 - **RateLimitError** - Too many requests (429)
 - **ApiError** - Other API errors (500, 502, 503, etc.)
 
+## Card Encryption
+
+**Critical:** When making card charge requests, you **must encrypt** all card data using AES-256-GCM encryption before sending to Flutterwave.
+
+### Encryption Implementation Guide
+
+For a complete encryption implementation guide with examples, security best practices, and integration patterns, see [ENCRYPTION_IMPLEMENTATION.md](ENCRYPTION_IMPLEMENTATION.md).
+
+### Quick Start - Using ChargeRequestBuilder
+
+The simplest way to handle card encryption is using the `ChargeRequestBuilder`. It returns a type-safe `DirectChargeRequestDTO`:
+
+```php
+use Gowelle\Flutterwave\Builders\ChargeRequestBuilder;
+
+$dto = ChargeRequestBuilder::for('ORDER-123')
+    ->amount(150, 'NGN')
+    ->customer('customer@example.com', 'John Doe')
+    ->card(
+        cardNumber: '5531886652142950',
+        expiryMonth: '09',
+        expiryYear: '32',
+        cvv: '564'
+    )
+    ->redirectUrl('https://example.com/callback')
+    ->build();
+
+// Convert to array for API request
+$request = $dto->toArray();
+
+// All card data is automatically encrypted and removed from plaintext
+```
+
+### Using ChargeRequestBuilder with Different Payment Methods
+
+The builder supports multiple payment methods:
+
+**Card Payments:**
+
+```php
+$dto = ChargeRequestBuilder::for('ORDER-123')
+    ->amount(150, 'NGN')
+    ->customer('customer@example.com', 'John Doe')
+    ->card('5531886652142950', '09', '32', '564')
+    ->redirectUrl('https://example.com/callback')
+    ->build();
+```
+
+**Mobile Money:**
+
+```php
+$dto = ChargeRequestBuilder::for('ORDER-123')
+    ->amount(1000, 'TZS')
+    ->customer('user@example.com', 'Jane Doe', '+255712345678')
+    ->mobileMoney('VODACOM', '255712345678')
+    ->redirectUrl('https://example.com/callback')
+    ->build();
+```
+
+**Bank Account:**
+
+```php
+$dto = ChargeRequestBuilder::for('ORDER-123')
+    ->amount(50000, 'NGN')
+    ->customer('user@example.com', 'Bank User')
+    ->bankAccount('0123456789', '044')
+    ->redirectUrl('https://example.com/callback')
+    ->build();
+```
+
+**With Additional Options:**
+
+```php
+$dto = ChargeRequestBuilder::for('ORDER-123')
+    ->amount(150, 'NGN')
+    ->customer('customer@example.com', 'John Doe', '+234812345678')
+    ->card('5531886652142950', '09', '32', '564')
+    ->redirectUrl('https://example.com/callback')
+    ->meta(['order_id' => '12345'])
+    ->customizations('My Store', 'Complete your purchase')
+    ->idempotencyKey('unique-key-' . time())
+    ->traceId('trace-' . uniqid())
+    ->userId(auth()->id())
+    ->paymentId($payment->id)
+    ->build();
+```
+
+### Manual Encryption
+
+For more control, use the `EncryptionService` directly:
+
+```php
+use Gowelle\Flutterwave\Support\EncryptionService;
+
+$encryptionService = new EncryptionService(config('flutterwave.encryption_key'));
+
+$encryptedCard = $encryptionService->encryptCardData([
+    'card_number' => '5531886652142950',
+    'expiry_month' => '09',
+    'expiry_year' => '32',
+    'cvv' => '564',
+]);
+
+// Returns: [
+//     'nonce' => 'random_12_char_nonce',
+//     'encrypted_card_number' => 'base64_encoded_ciphertext',
+//     'encrypted_expiry_month' => 'base64_encoded_ciphertext',
+//     'encrypted_expiry_year' => 'base64_encoded_ciphertext',
+//     'encrypted_cvv' => 'base64_encoded_ciphertext',
+// ]
+```
+
+### Type-Safe DTOs
+
+The `ChargeRequestBuilder` returns a `DirectChargeRequestDTO` for type safety:
+
+```php
+use Gowelle\Flutterwave\Builders\ChargeRequestBuilder;
+
+$dto = ChargeRequestBuilder::for('ORDER-123')
+    ->amount(150, 'NGN')
+    ->customer('customer@example.com', 'John Doe')
+    ->card('5531886652142950', '09', '32', '564')
+    ->redirectUrl('https://example.com/callback')
+    ->build();
+
+// Type-safe DTO with validation
+$request = $dto->toArray(); // Get array for API
+```
+
+Available DTOs:
+
+- **DirectChargeRequestDTO** - Direct charge orchestrator requests
+- **ChargeRequestDTO** - Traditional charge flow requests
+
+### Key Features
+
+- **AES-256-GCM Encryption** - Industry-standard authenticated encryption
+- **Automatic Nonce Generation** - Cryptographically secure 12-character nonces
+- **Input Validation** - Validates card data before encryption
+- **Base64 Encoding** - Safe transmission of binary data
+- **Zero Plaintext** - Card data never exposed in request payloads
+
+> For detailed documentation including security best practices, error handling, and advanced usage, see [ENCRYPTION_IMPLEMENTATION.md](ENCRYPTION_IMPLEMENTATION.md).
+
 ## Advanced Usage
 
-### Card Data Encryption
+### Card Data Encryption (Advanced)
 
 **Critical:** When making card charge requests, you **must encrypt** all card data (card number, CVV, expiry month, expiry year) using AES-256-GCM encryption before sending the request to Flutterwave.
 

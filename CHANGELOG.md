@@ -4,6 +4,117 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.2.0] - 2025-12-16
+
+### Breaking Changes
+
+- **Refund Service API Rewrite**: The Refund Service now uses typed DTOs:
+  - `create()` method now requires `CreateRefundRequest` DTO instead of raw array
+  - `list()` method now accepts optional `ListRefundsRequest` DTO for pagination/filtering
+  - See migration examples below
+
+### Added
+
+- **Card Encryption Service**: New `EncryptionService` for secure card payments:
+
+  - AES-256-GCM encryption as required by Flutterwave v4 API
+  - `encrypt(string $data, string $nonce)` - Encrypt arbitrary data
+  - `encryptCardData(array $card)` - Encrypt card number, expiry, CVV with shared nonce
+  - `generateNonce()` - Generate random 12-character nonces
+  - Automatic validation of encryption keys and card data formats
+
+- **Enhanced ChargeRequestBuilder**: Fluent builder now supports direct charge with encryption:
+
+  - `card(cardNumber, expiryMonth, expiryYear, cvv, billingAddress)` - Set encrypted card payment
+  - `mobileMoney(network, phoneNumber)` - Set mobile money payment
+  - `bankAccount(accountNumber, bankCode)` - Set bank account payment
+  - `idempotencyKey(key)` - Set request deduplication key
+  - `traceId(id)` - Set request tracking ID
+  - `scenarioKey(key)` - Set test scenario key
+  - `userId(id)` / `paymentId(id)` - Set charge session tracking IDs
+  - `build()` now returns `DirectChargeRequestDTO` instead of raw array
+  - `buildArray()` available for backwards compatibility
+
+- **Refund Request DTOs**:
+
+  - `CreateRefundRequest` - Type-safe refund creation with amount, chargeId, reason, meta
+  - `ListRefundsRequest` - Pagination and date filtering for refund listings
+
+- **New Enums**:
+
+  - `RefundReason` - duplicate, fraudulent, requested_by_customer, expired_uncaptured_charge
+  - `RefundStatus` - new, pending, succeeded, failed (with helper methods)
+
+- **New Exception**: `EncryptionException` for encryption-related errors:
+
+  - `missingEncryptionKey()` - When encryption key is not configured
+  - `invalidEncryptionKey()` - When key format is invalid
+  - `invalidNonce()` - When nonce length is incorrect
+  - `encryptionFailed()` - When OpenSSL encryption fails
+  - `invalidCardData()` - When card data validation fails
+
+- **New DTO**: `DirectChargeRequestDTO` for type-safe direct charge requests
+
+### Improved
+
+- **RefundData**: Now includes `status` as `RefundStatus` enum with helper methods:
+
+  - `isSuccessful()` - Check if refund completed successfully
+  - `isPending()` - Check if refund is still processing
+  - `isTerminal()` - Check if refund reached final state
+
+- **Refund List Filtering**: `list()` now supports pagination and date range filtering via `ListRefundsRequest`
+
+### Migration from v2.1.x
+
+**Refund Creation - Before (v2.1.x):**
+
+```php
+$refund = Flutterwave::refunds()->create([
+    'charge_id' => 'charge-123',
+    'amount' => 500,
+    'reason' => 'Customer requested refund',
+]);
+```
+
+**Refund Creation - After (v2.2.0):**
+
+```php
+use Gowelle\Flutterwave\Data\Refund\CreateRefundRequest;
+use Gowelle\Flutterwave\Enums\RefundReason;
+
+$refund = Flutterwave::refunds()->create(
+    new CreateRefundRequest(
+        amount: 500.00,
+        chargeId: 'charge-123',
+        reason: RefundReason::REQUESTED_BY_CUSTOMER,
+    )
+);
+```
+
+**Card Charge - Before (v2.1.x):**
+
+```php
+$request = ChargeRequestBuilder::create('ref-123')
+    ->amount(1000, 'NGN')
+    ->customer('user@example.com', 'John Doe')
+    ->redirectUrl('https://example.com/callback')
+    ->build(); // Returns array
+
+// Manual encryption required
+```
+
+**Card Charge - After (v2.2.0):**
+
+```php
+$request = ChargeRequestBuilder::create('ref-123')
+    ->amount(1000, 'NGN')
+    ->customer('user@example.com', 'John Doe')
+    ->redirectUrl('https://example.com/callback')
+    ->card('4111111111111111', '12', '25', '123') // Auto-encrypted
+    ->build(); // Returns DirectChargeRequestDTO
+```
+
 ## [2.1.1] - 2025-12-16
 
 ### Added

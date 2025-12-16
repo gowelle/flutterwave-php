@@ -15,6 +15,7 @@ final readonly class FlutterwaveConfig
         public string $clientSecret,
         public string $secretHash,
         public FlutterwaveEnvironment $environment,
+        public ?string $encryptionKey = null,
     ) {
         $this->validate();
     }
@@ -29,6 +30,7 @@ final readonly class FlutterwaveConfig
             clientSecret: config('flutterwave.client_secret', ''),
             secretHash: config('flutterwave.secret_hash', ''),
             environment: FlutterwaveEnvironment::fromConfig(),
+            encryptionKey: config('flutterwave.encryption_key'),
         );
     }
 

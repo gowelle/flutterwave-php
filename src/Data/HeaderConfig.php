@@ -12,7 +12,7 @@ final readonly class HeaderConfig
         public string $contentType,
         public string $idempotencyKey,
         public string $traceId,
-        public string $scenarioKey,
+        public ?string $scenarioKey = null,
     ) {
         $this->validate();
     }
@@ -42,7 +42,7 @@ final readonly class HeaderConfig
             contentType: $headers['Content-Type'] ?? 'application/json',
             idempotencyKey: $headers['X-Idempotency-Key'],
             traceId: $headers['X-Trace-Id'],
-            scenarioKey: $headers['X-Scenario-Key'] ?? 'scenario:auth_redirect',
+            scenarioKey: $headers['X-Scenario-Key'] ?? null,
         );
     }
 
@@ -51,12 +51,17 @@ final readonly class HeaderConfig
      */
     public function toArray(): array
     {
-        return [
+        $headers = [
             'Content-Type' => $this->contentType,
             'X-Idempotency-Key' => $this->idempotencyKey,
             'X-Trace-Id' => $this->traceId,
-            'X-Scenario-Key' => $this->scenarioKey,
         ];
+
+        if ($this->scenarioKey !== null) {
+            $headers['X-Scenario-Key'] = $this->scenarioKey;
+        }
+
+        return $headers;
     }
 
     /**
@@ -74,10 +79,6 @@ final readonly class HeaderConfig
 
         if (empty($this->traceId)) {
             throw new InvalidArgumentException('Trace-Id cannot be empty');
-        }
-
-        if (empty($this->scenarioKey)) {
-            throw new InvalidArgumentException('Scenario-Key cannot be empty');
         }
     }
 }

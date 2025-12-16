@@ -305,7 +305,6 @@ Configure the model classes used by the ChargeSession model for relationships. T
 | `FLUTTERWAVE_USER_MODEL`           | User model class                       | `App\Models\User`                   |
 | `FLUTTERWAVE_PAYMENT_MODEL`        | Payment model class                    | `App\Domain\Payment\Models\Payment` |
 
-
 ## Usage
 
 ### Direct Charges
@@ -679,32 +678,220 @@ $transfer = Flutterwave::transfers()->retry('transfer-id');
 
 #### Create Recipient
 
-For the general flow, pre-create recipients:
+For the general flow, pre-create recipients. The SDK provides factory methods for all Flutterwave recipient types.
 
 ```php
 use Gowelle\Flutterwave\Data\Transfer\CreateRecipientRequest;
+```
 
+**Simple Bank Recipients** (account number + bank code only):
+
+```php
+// Nigerian (NGN) - simplest form
 $recipient = Flutterwave::transfers()->createRecipient(
-    CreateRecipientRequest::bank(
-        currency: 'NGN',
+    CreateRecipientRequest::bankNgn(
         accountNumber: '0123456789',
         bankCode: '044',
     )
 );
 ```
 
+**African Bank Recipients** (with name):
+
+```php
+// Ethiopian (ETB)
+CreateRecipientRequest::bankEtb($accountNumber, $bankCode, $firstName, $lastName);
+
+// Kenyan (KES)
+CreateRecipientRequest::bankKes($accountNumber, $bankCode, $firstName, $lastName);
+
+// Malawian (MWK)
+CreateRecipientRequest::bankMwk($accountNumber, $bankCode, $firstName, $lastName);
+
+// Rwandan (RWF)
+CreateRecipientRequest::bankRwf($accountNumber, $bankCode, $firstName, $lastName);
+
+// Sierra Leonean (SLL)
+CreateRecipientRequest::bankSll($accountNumber, $bankCode, $firstName, $lastName);
+
+// Ugandan (UGX)
+CreateRecipientRequest::bankUgx($accountNumber, $bankCode, $firstName, $lastName);
+```
+
+**African Bank Recipients** (with name + branch):
+
+```php
+// Ghanaian (GHS)
+CreateRecipientRequest::bankGhs($accountNumber, $bankCode, $branch, $firstName, $lastName);
+
+// Central African (XAF)
+CreateRecipientRequest::bankXaf($accountNumber, $bankCode, $branch, $firstName, $lastName);
+
+// West African (XOF)
+CreateRecipientRequest::bankXof($accountNumber, $bankCode, $branch, $firstName, $lastName);
+```
+
+**International Bank Recipients** (full KYC required):
+
+```php
+// US (USD) bank recipient
+$recipient = Flutterwave::transfers()->createRecipient(
+    CreateRecipientRequest::bankUsd(
+        accountNumber: '1234567890',
+        bankCode: '021000021',
+        accountType: 'checking', // or 'savings'
+        routingNumber: '021000021',
+        swiftCode: 'CHASUS33',
+        firstName: 'John',
+        lastName: 'Doe',
+        phone: ['country_code' => '1', 'number' => '2025551234'],
+        email: 'john@example.com',
+        address: [
+            'city' => 'New York',
+            'country' => 'US',
+            'line1' => '123 Main St',
+            'postal_code' => '10001',
+            'state' => 'NY',
+        ],
+    )
+);
+
+// UK (GBP) bank recipient
+CreateRecipientRequest::bankGbp(
+    accountNumber: 'GB82WEST12345698765432',
+    accountType: 'individual', // or 'corporate'
+    bankName: 'HSBC',
+    sortCode: '401276',
+    firstName: 'John',
+    lastName: 'Doe',
+    phone: ['country_code' => '44', 'number' => '7911123456'],
+    email: 'john@example.com',
+    address: ['city' => 'London', 'country' => 'GB', 'line1' => '123 High St', 'postal_code' => 'EC1A 1BB'],
+);
+
+// European (EUR) bank recipient
+CreateRecipientRequest::bankEur(
+    accountNumber: 'DE89370400440532013000',
+    bankName: 'Deutsche Bank',
+    swiftCode: 'DEUTDEFF',
+    firstName: 'Hans',
+    lastName: 'Mueller',
+    phone: ['country_code' => '49', 'number' => '1701234567'],
+    email: 'hans@example.com',
+    address: ['city' => 'Berlin', 'country' => 'DE', 'line1' => 'Alexanderplatz 1', 'postal_code' => '10178'],
+);
+
+// South African (ZAR) bank recipient
+CreateRecipientRequest::bankZar(
+    accountNumber: '1234567890',
+    bankCode: 'ABSAZAJJ',
+    firstName: 'John',
+    lastName: 'Doe',
+    phone: ['country_code' => '27', 'number' => '823456789'],
+    email: 'john@example.com',
+    address: ['city' => 'Cape Town', 'country' => 'ZA', 'line1' => '123 Long St', 'postal_code' => '8001'],
+);
+```
+
+**Mobile Money Recipients** (ETB, GHS, KES, RWF, TZS, UGX, XAF, XOF, ZMW):
+
+```php
+$recipient = Flutterwave::transfers()->createRecipient(
+    CreateRecipientRequest::mobileMoney(
+        currency: 'TZS',
+        network: 'VODACOM',
+        phoneNumber: '255123456789',
+        firstName: 'John',
+        lastName: 'Doe',
+    )
+);
+```
+
+**Custom/New Types** (use constructor directly):
+
+```php
+// For any type not covered by factory methods
+$recipient = Flutterwave::transfers()->createRecipient(
+    new CreateRecipientRequest(
+        type: 'bank_custom',
+        bank: ['account_number' => '...', 'code' => '...'],
+        name: ['first' => 'John', 'last' => 'Doe'],
+    )
+);
+```
+
 #### Create Sender
+
+The SDK supports all Flutterwave sender types:
 
 ```php
 use Gowelle\Flutterwave\Data\Transfer\CreateSenderRequest;
+```
 
+**Generic Sender** (for most transfers):
+
+```php
+// Basic generic sender
 $sender = Flutterwave::transfers()->createSender(
-    new CreateSenderRequest(
+    CreateSenderRequest::generic(
         firstName: 'John',
         lastName: 'Doe',
+    )
+);
+
+// Generic sender with full details
+$sender = Flutterwave::transfers()->createSender(
+    CreateSenderRequest::generic(
+        firstName: 'John',
+        lastName: 'Doe',
+        middleName: 'Michael',
+        phone: ['country_code' => '234', 'number' => '8012345678'],
         email: 'john@example.com',
-        phoneNumber: '+2341234567890',
-        country: 'NG',
+        address: [
+            'city' => 'Lagos',
+            'country' => 'NG',
+            'line1' => '123 Main Street',
+            'postal_code' => '100001',
+            'state' => 'Lagos',
+        ],
+    )
+);
+```
+
+**GBP/EUR Bank Sender** (requires full KYC for international transfers):
+
+```php
+// GBP sender for UK bank transfers
+$sender = Flutterwave::transfers()->createSender(
+    CreateSenderRequest::bankGbp(
+        firstName: 'John',
+        lastName: 'Doe',
+        phone: ['country_code' => '44', 'number' => '7911123456'],
+        email: 'john@example.com',
+        address: [
+            'city' => 'London',
+            'country' => 'GB',
+            'line1' => '123 High Street',
+            'postal_code' => 'EC1A 1BB',
+            'state' => 'Greater London',
+        ],
+    )
+);
+
+// EUR sender for European bank transfers
+$sender = Flutterwave::transfers()->createSender(
+    CreateSenderRequest::bankEur(
+        firstName: 'Hans',
+        lastName: 'Mueller',
+        phone: ['country_code' => '49', 'number' => '1701234567'],
+        email: 'hans@example.com',
+        address: [
+            'city' => 'Berlin',
+            'country' => 'DE',
+            'line1' => 'Alexanderplatz 1',
+            'postal_code' => '10178',
+            'state' => 'Berlin',
+        ],
     )
 );
 ```

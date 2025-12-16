@@ -126,12 +126,15 @@ it('can update a customer', function () {
 });
 
 it('can search for a customer by email', function () {
+    // API returns data as array of customers
     $response = new ApiResponse(
         status: 'success',
         message: 'Customer found',
         data: [
-            'id' => 'cust_123',
-            'email' => 'test@example.com',
+            [
+                'id' => 'cust_123',
+                'email' => 'test@example.com',
+            ],
         ],
     );
 

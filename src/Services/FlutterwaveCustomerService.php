@@ -83,15 +83,24 @@ final class FlutterwaveCustomerService implements CustomerServiceInterface
     }
 
     /**
-     * Search for customers
+     * Search for customers by email
      *
-     * @return CustomerData[]
+     * @return CustomerData First matching customer
      *
      * @throws FlutterwaveApiException
+     * @throws \RuntimeException If no customer found
      */
     public function search(string $email): CustomerData
     {
         $wavable = $this->buildWavable(['email' => $email], FlutterwaveApi::CUSTOMER, $this->flutterwaveBaseService->getConfig()->isProduction());
-        return CustomerData::fromApi($this->flutterwaveBaseService->search(FlutterwaveApi::CUSTOMER, $wavable, ['email' => $email])->data);
+        $response = $this->flutterwaveBaseService->search(FlutterwaveApi::CUSTOMER, $wavable, ['email' => $email]);
+
+        // API returns data as array of customers
+        if ($response->data === null || ! \is_array($response->data) || empty($response->data)) {
+            throw new \RuntimeException('No customer found with email: ' . $email);
+        }
+
+        // Return first matching customer
+        return CustomerData::fromApi($response->data[0]);
     }
 }

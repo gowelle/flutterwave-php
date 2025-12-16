@@ -22,6 +22,7 @@ final readonly class MobileMoneyTransferRequest
         public string $reference,
         public TransferAction $action = TransferAction::INSTANT,
         public ?string $narration = null,
+        public ?string $scenarioKey = null,
     ) {}
 
     /**
@@ -31,7 +32,7 @@ final readonly class MobileMoneyTransferRequest
      */
     public function toApiPayload(): array
     {
-        return [
+        $payload = [
             'action' => $this->action->value,
             'type' => 'mobile_money',
             'reference' => $this->reference,
@@ -55,5 +56,12 @@ final readonly class MobileMoneyTransferRequest
                 ],
             ],
         ];
+
+        // Include scenario_key in payload if specified for testing
+        if ($this->scenarioKey !== null) {
+            $payload['scenario_key'] = $this->scenarioKey;
+        }
+
+        return $payload;
     }
 }

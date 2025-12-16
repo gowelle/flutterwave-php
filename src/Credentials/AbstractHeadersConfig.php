@@ -14,9 +14,9 @@ final class AbstractHeadersConfig
 
     public string $traceId;
 
-    public string $scenarioKey;
+    public ?string $scenarioKey;
 
-    private function __construct(string $contentType, string $idempotencyKey, string $traceId, string $scenarioKey)
+    private function __construct(string $contentType, string $idempotencyKey, string $traceId, ?string $scenarioKey = null)
     {
         $this->contentType = $contentType;
         $this->idempotencyKey = $idempotencyKey;
@@ -30,7 +30,7 @@ final class AbstractHeadersConfig
             contentType: $headers['Content-Type'],
             idempotencyKey: $headers['X-Idempotency-Key'],
             traceId: $headers['X-Trace-Id'],
-            scenarioKey: $headers['X-Scenario-Key'],
+            scenarioKey: $headers['X-Scenario-Key'] ?? null,
         );
     }
 
@@ -46,11 +46,16 @@ final class AbstractHeadersConfig
 
     public function toArray(): array
     {
-        return [
+        $headers = [
             'Content-Type' => $this->contentType,
             'X-Idempotency-Key' => $this->idempotencyKey,
             'X-Trace-Id' => $this->traceId,
-            'X-Scenario-Key' => $this->scenarioKey,
         ];
+
+        if ($this->scenarioKey !== null) {
+            $headers['X-Scenario-Key'] = $this->scenarioKey;
+        }
+
+        return $headers;
     }
 }

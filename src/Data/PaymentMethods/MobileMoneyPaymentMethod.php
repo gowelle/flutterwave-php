@@ -33,7 +33,7 @@ final readonly class MobileMoneyPaymentMethod extends PaymentMethodData
     {
         return new self(
             id: (string) $data['id'],
-            customerId: $data['customer_id'],
+            customerId: $data['customer_id'] ?? '',
             data: $data['data'] ?? [],
             network: $data['data']['mobile_money']['network'] ?? null,
             phoneNumber: $data['data']['mobile_money']['phone_number'] ?? null,

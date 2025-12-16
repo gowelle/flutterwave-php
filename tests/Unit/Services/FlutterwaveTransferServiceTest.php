@@ -215,8 +215,7 @@ it('can create a recipient', function () {
         ->with(FlutterwaveApi::TRANSFER_RECIPIENTS, \Mockery::any(), \Mockery::any())
         ->andReturn($response);
 
-    $request = CreateRecipientRequest::bank(
-        currency: 'NGN',
+    $request = CreateRecipientRequest::bankNgn(
         accountNumber: '0123456789',
         bankCode: '044',
     );
@@ -233,10 +232,10 @@ it('can create a sender', function () {
         message: 'Sender created',
         data: [
             'id' => 'snd_123',
+            'type' => 'generic_sender',
             'name' => ['first' => 'John', 'last' => 'Doe'],
             'email' => 'john@example.com',
-            'phone_number' => '+2341234567890',
-            'country' => 'NG',
+            'phone' => ['country_code' => '234', 'number' => '1234567890'],
         ],
     );
 
@@ -250,12 +249,11 @@ it('can create a sender', function () {
         ->with(FlutterwaveApi::TRANSFER_SENDERS, \Mockery::any(), \Mockery::any())
         ->andReturn($response);
 
-    $request = new CreateSenderRequest(
+    $request = CreateSenderRequest::generic(
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
-        phoneNumber: '+2341234567890',
-        country: 'NG',
+        phone: ['country_code' => '234', 'number' => '1234567890'],
     );
 
     $result = $this->service->createSender($request);

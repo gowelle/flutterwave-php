@@ -14,7 +14,7 @@ trait BuildsWavable
      * Build a wavable object
      *
      * @param  array<string, mixed>  $data  Request data
-     * @param  FlutterwaveApi|null  $apiType  Optional API type to determine if this is a charge request
+     * @param  FlutterwaveApi|null  $apiType  Optional API type to determine scenario key
      * @param  bool  $isProductEnvironment  Whether this is a production environment
      */
     private function buildWavable(array $data, ?FlutterwaveApi $apiType = null, bool $isProductEnvironment = false): Wavable
@@ -28,10 +28,23 @@ trait BuildsWavable
 
         $traceId = $data['trace_id'] ?? Str::uuid()->toString();
 
-        // Omit scenario key if production environment (scenario keys are for testing)
-        $scenarioKey = $isProductEnvironment
-            ? null
-            : ($data['scenario_key'] ?? 'scenario:auth_redirect');
+        // Determine scenario key based on API type and environment
+        $scenarioKey = null;
+        if (! $isProductEnvironment) {
+            // Check if explicit scenario key is provided
+            if (isset($data['scenario_key'])) {
+                $scenarioKey = $data['scenario_key'];
+            } else {
+                // Use context-appropriate defaults based on API type
+                match ($apiType) {
+                    FlutterwaveApi::TRANSFER, FlutterwaveApi::DIRECT_TRANSFER => $scenarioKey = 'scenario:successful',
+                    FlutterwaveApi::CHARGE => $scenarioKey = 'scenario:auth_redirect',
+                    // Recipient/Sender endpoints don't support scenario keys
+                    FlutterwaveApi::TRANSFER_RECIPIENTS, FlutterwaveApi::TRANSFER_SENDERS => $scenarioKey = null,
+                    default => $scenarioKey = null,
+                };
+            }
+        }
 
         return new Wavable($idempotencyKey, $traceId, $scenarioKey);
     }

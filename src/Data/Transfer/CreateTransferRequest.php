@@ -17,6 +17,7 @@ final readonly class CreateTransferRequest
         public string $senderId,
         public string $reference,
         public ?string $narration = null,
+        public ?string $scenarioKey = null,
     ) {}
 
     /**
@@ -26,12 +27,19 @@ final readonly class CreateTransferRequest
      */
     public function toApiPayload(): array
     {
-        return array_filter([
+        $payload = array_filter([
             'action' => $this->action->value,
             'recipient_id' => $this->recipientId,
             'sender_id' => $this->senderId,
             'reference' => $this->reference,
             'narration' => $this->narration,
         ], fn ($value) => $value !== null);
+
+        // Include scenario_key in payload if specified for testing
+        if ($this->scenarioKey !== null) {
+            $payload['scenario_key'] = $this->scenarioKey;
+        }
+
+        return $payload;
     }
 }

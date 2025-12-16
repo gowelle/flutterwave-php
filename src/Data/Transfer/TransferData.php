@@ -45,7 +45,7 @@ final readonly class TransferData
         $status = TransferStatus::fromApiResponse($data['status'] ?? 'NEW');
 
         return new self(
-            id: (string) $data['id'],
+            id: (string) ($data['id'] ?? ''),
             type: $type,
             action: $action,
             reference: $data['reference'] ?? '',

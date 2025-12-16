@@ -52,6 +52,7 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
 - **Bank Operations** - Get banks by country, resolve bank accounts, and retrieve bank branches
 - **Mobile Networks Support** - List mobile money networks by country for mobile payments
 - **Virtual Accounts** - Create and manage virtual bank accounts for receiving payments with multi-currency support
+- **Wallets API** - Resolve wallet accounts, retrieve transaction statements with pagination, and query balances for single or multiple currencies
 - **Charge Session Tracking** - Database-backed tracking of charge sessions with automatic status updates via webhooks
 - **Event System** - Laravel events for direct charge lifecycle and webhook processing
 - **Automatic Retry Logic** - Exponential backoff for transient failures (5xx errors, rate limits, timeouts)
@@ -1086,6 +1087,8 @@ Manage Flutterwave wallet operations including account lookup, statement retriev
 Verify wallet account information for a customer:
 
 ```php
+use Gowelle\Flutterwave\Facades\Flutterwave;
+
 $account = Flutterwave::wallets()->resolveAccount(
     provider: 'flutterwave',
     identifier: 'wallet_123'
@@ -1102,6 +1105,8 @@ echo $account->name;          // Account holder name
 Retrieve wallet transaction statement with pagination and filtering:
 
 ```php
+use Gowelle\Flutterwave\Facades\Flutterwave;
+
 $statement = Flutterwave::wallets()->getStatement([
     'currency' => 'NGN',           // Required: 3-letter currency code
     'size' => 20,                  // Optional: Page size (10-50, default 10)
@@ -1133,6 +1138,8 @@ foreach ($statement->transactions as $transaction) {
 Fetch the available balance for a specific currency:
 
 ```php
+use Gowelle\Flutterwave\Facades\Flutterwave;
+
 $balance = Flutterwave::wallets()->getBalance('NGN');
 
 echo $balance->currency;           // 'NGN'
@@ -1144,6 +1151,8 @@ echo $balance->availableBalance;   // 1200.09
 Fetch available balances for all currencies:
 
 ```php
+use Gowelle\Flutterwave\Facades\Flutterwave;
+
 $balances = Flutterwave::wallets()->getBalances();
 
 foreach ($balances as $balance) {

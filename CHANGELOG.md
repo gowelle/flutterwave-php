@@ -4,7 +4,7 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
-## [2.4.0] - 2025-01-XX
+## [2.4.0] - 2025-12-16
 
 ### Added
 

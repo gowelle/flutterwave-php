@@ -16,11 +16,9 @@ use Gowelle\Flutterwave\Exceptions\EncryptionException;
  */
 final class EncryptionService
 {
-    private const string CIPHER = 'aes-256-gcm';
+    private const CIPHER = 'aes-256-gcm';
 
-    private const int NONCE_LENGTH = 12;
-
-    private const int TAG_LENGTH = 16; // 128 bits
+    private const NONCE_LENGTH = 12;
 
     /**
      * Create a new EncryptionService instance

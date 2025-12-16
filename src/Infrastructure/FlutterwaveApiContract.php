@@ -10,6 +10,8 @@ interface FlutterwaveApiContract
 {
     public function list(): ApiResponse;
 
+    public function listWithParams(array $params): ApiResponse;
+
     public function create(array $data): ApiResponse;
 
     public function retrieve(string $id): ApiResponse;

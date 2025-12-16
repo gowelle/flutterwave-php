@@ -76,12 +76,25 @@ abstract class FlutterwaveBaseApi implements FlutterwaveApiContract
      */
     public function list(): ApiResponse
     {
-        return $this->executeWithRetry(function () {
+        return $this->listWithParams([]);
+    }
+
+    /**
+     * List the items with query parameters
+     */
+    public function listWithParams(array $params): ApiResponse
+    {
+        return $this->executeWithRetry(function () use ($params) {
             try {
+                $url = $this->buildApiSpecificBaseUrl();
+                if (! empty($params)) {
+                    $url .= '?'.http_build_query($params);
+                }
+
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->get($this->buildApiSpecificBaseUrl())
+                    ->get($url)
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());

@@ -1,6 +1,5 @@
 {
     "name": "gowelle/flutterwave-php",
-    "version": "2.0.0",
     "description": "Modern Laravel package for Flutterwave v4 API integration",
     "keywords": [
         "flutterwave",

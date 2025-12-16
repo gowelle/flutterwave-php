@@ -14,7 +14,7 @@ describe('ChargeRequestBuilder with Encryption', function () use ($testEncryptio
             config(['flutterwave.encryption_key' => $testEncryptionKey]);
             $builder = ChargeRequestBuilder::for('ORD-123')
                 ->amount(150, 'NGN')
-                ->customer('customer@example.com', 'John Doe')
+                ->customer('customer@example.com', 'John', 'Doe')
                 ->card('5531886652142950', '09', '32', '564')
                 ->redirectUrl('https://example.com/callback');
 
@@ -37,7 +37,7 @@ describe('ChargeRequestBuilder with Encryption', function () use ($testEncryptio
             config(['flutterwave.encryption_key' => $testEncryptionKey]);
             $builder = ChargeRequestBuilder::for('ORD-456')
                 ->amount(100, 'TZS')
-                ->customer('user@example.com', 'Jane Doe')
+                ->customer('user@example.com', 'Jane', 'Doe')
                 ->redirectUrl('https://example.com/callback')
                 ->card('4532015112830366', '12', '25', '123');
 
@@ -52,7 +52,7 @@ describe('ChargeRequestBuilder with Encryption', function () use ($testEncryptio
             config(['flutterwave.encryption_key' => $testEncryptionKey]);
             $builder = ChargeRequestBuilder::for('ORD-789')
                 ->amount(500, 'USD')
-                ->customer('test@example.com', 'Test User')
+                ->customer('test@example.com', 'Test', 'User')
                 ->redirectUrl('https://example.com/callback')
                 ->card('5531886652142950', '09', '32', '564');
 
@@ -76,7 +76,7 @@ describe('ChargeRequestBuilder with Encryption', function () use ($testEncryptio
             config(['flutterwave.encryption_key' => $testEncryptionKey]);
             $builder = ChargeRequestBuilder::for('ORD-111')
                 ->amount(250, 'KES')
-                ->customer('customer@test.com', 'Customer')
+                ->customer('customer@test.com', 'Test', 'Customer')
                 ->redirectUrl('https://example.com/callback')
                 ->card('4532015112830366', '06', '28', '');
 
@@ -105,7 +105,7 @@ describe('ChargeRequestBuilder with Encryption', function () use ($testEncryptio
 
             $builder = ChargeRequestBuilder::for('ORD-222')
                 ->amount(1000, 'NGN')
-                ->customer('user@test.com', 'User')
+                ->customer('user@test.com', 'Test', 'User')
                 ->redirectUrl('https://example.com/callback')
                 ->card(
                     '5531886652142950',
@@ -127,7 +127,7 @@ describe('ChargeRequestBuilder with Encryption', function () use ($testEncryptio
             config(['flutterwave.encryption_key' => $testEncryptionKey]);
             $builder = ChargeRequestBuilder::for('CHAIN-TEST')
                 ->amount(750, 'ZAR')
-                ->customer('chain@test.com', 'Chain Tester')
+                ->customer('chain@test.com', 'Chain', 'Tester')
                 ->card('4532015112830366', '03', '30', '789')
                 ->redirectUrl('https://example.com/success')
                 ->meta(['order_id' => '12345'])
@@ -155,7 +155,7 @@ describe('ChargeRequestBuilder with Encryption', function () use ($testEncryptio
 
             expect(fn () => ChargeRequestBuilder::for('ORD-ERR')
                 ->amount(100, 'NGN')
-                ->customer('err@test.com', 'Error Test')
+                ->customer('err@test.com', 'Error', 'Test')
                 ->card('5531886652142950', '09', '32', '564'))
                 ->toThrow(EncryptionException::class);
         });
@@ -163,7 +163,7 @@ describe('ChargeRequestBuilder with Encryption', function () use ($testEncryptio
         it('throws exception for invalid card data', function () {
             expect(fn () => ChargeRequestBuilder::for('ORD-BAD')
                 ->amount(100, 'NGN')
-                ->customer('bad@test.com', 'Bad Card')
+                ->customer('bad@test.com', 'Bad', 'Card')
                 ->card('invalid', '09', '32', '564'))
                 ->toThrow(EncryptionException::class);
         });
@@ -175,7 +175,7 @@ describe('ChargeRequestBuilder with Encryption', function () use ($testEncryptio
 
             $builder = ChargeRequestBuilder::for('CUSTOM-ENC')
                 ->amount(200, 'GHS')
-                ->customer('custom@test.com', 'Custom')
+                ->customer('custom@test.com', 'Custom', 'User')
                 ->redirectUrl('https://example.com/callback')
                 ->withEncryptionService($customService)
                 ->card('5531886652142950', '09', '32', '564');
@@ -199,7 +199,7 @@ describe('ChargeRequestBuilder with Encryption', function () use ($testEncryptio
 
             $dto = ChargeRequestBuilder::for('ORDER-2024-001')
                 ->amount(15000, 'NGN')
-                ->customer('john.doe@example.com', 'John Doe', '+234812345678')
+                ->customer('john.doe@example.com', 'John', 'Doe', '+234812345678')
                 ->card(
                     cardNumber: '5531886652142950',
                     expiryMonth: '09',
@@ -238,7 +238,7 @@ describe('ChargeRequestBuilder with Encryption', function () use ($testEncryptio
             expect($request['reference'])->toBe('ORDER-2024-001');
             expect($request['amount'])->toBe(15000.0);
             expect($request['currency'])->toBe('NGN');
-            expect($request['customer'])->toHaveKeys(['email', 'name', 'phone_number']);
+            expect($request['customer'])->toHaveKeys(['email', 'first_name', 'last_name', 'phone_number']);
             expect($request['payment_method'])->toHaveKeys(['type', 'card']);
             expect($request['payment_method']['card'])->toHaveKeys([
                 'nonce',

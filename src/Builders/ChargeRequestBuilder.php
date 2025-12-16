@@ -68,12 +68,18 @@ final class ChargeRequestBuilder
 
     /**
      * Set customer information
+     *
+     * @param  string  $email  Customer email address (required)
+     * @param  string  $firstName  Customer first name (required)
+     * @param  string  $lastName  Customer last name (required)
+     * @param  string|null  $phoneNumber  Customer phone number (required for mobile money)
      */
-    public function customer(string $email, string $name, ?string $phoneNumber = null): self
+    public function customer(string $email, string $firstName, string $lastName, ?string $phoneNumber = null): self
     {
         $this->customer = [
             'email' => $email,
-            'name' => $name,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
         ];
 
         if ($phoneNumber) {

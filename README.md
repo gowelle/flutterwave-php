@@ -1562,7 +1562,7 @@ use Gowelle\Flutterwave\Builders\ChargeRequestBuilder;
 
 $dto = ChargeRequestBuilder::for('ORDER-123')
     ->amount(150, 'NGN')
-    ->customer('customer@example.com', 'John Doe')
+    ->customer('customer@example.com', 'John', 'Doe')
     ->card(
         cardNumber: '5531886652142950',
         expiryMonth: '09',
@@ -1587,7 +1587,7 @@ The builder supports multiple payment methods:
 ```php
 $dto = ChargeRequestBuilder::for('ORDER-123')
     ->amount(150, 'NGN')
-    ->customer('customer@example.com', 'John Doe')
+    ->customer('customer@example.com', 'John', 'Doe')
     ->card('5531886652142950', '09', '32', '564')
     ->redirectUrl('https://example.com/callback')
     ->build();
@@ -1598,7 +1598,7 @@ $dto = ChargeRequestBuilder::for('ORDER-123')
 ```php
 $dto = ChargeRequestBuilder::for('ORDER-123')
     ->amount(1000, 'TZS')
-    ->customer('user@example.com', 'Jane Doe', '+255712345678')
+    ->customer('user@example.com', 'Jane', 'Doe', '+255712345678')
     ->mobileMoney('VODACOM', '255712345678')
     ->redirectUrl('https://example.com/callback')
     ->build();
@@ -1609,7 +1609,7 @@ $dto = ChargeRequestBuilder::for('ORDER-123')
 ```php
 $dto = ChargeRequestBuilder::for('ORDER-123')
     ->amount(50000, 'NGN')
-    ->customer('user@example.com', 'Bank User')
+    ->customer('user@example.com', 'Bank', 'User')
     ->bankAccount('0123456789', '044')
     ->redirectUrl('https://example.com/callback')
     ->build();
@@ -1620,7 +1620,7 @@ $dto = ChargeRequestBuilder::for('ORDER-123')
 ```php
 $dto = ChargeRequestBuilder::for('ORDER-123')
     ->amount(150, 'NGN')
-    ->customer('customer@example.com', 'John Doe', '+234812345678')
+    ->customer('customer@example.com', 'John', 'Doe', '+234812345678')
     ->card('5531886652142950', '09', '32', '564')
     ->redirectUrl('https://example.com/callback')
     ->meta(['order_id' => '12345'])
@@ -1666,7 +1666,7 @@ use Gowelle\Flutterwave\Builders\ChargeRequestBuilder;
 
 $dto = ChargeRequestBuilder::for('ORDER-123')
     ->amount(150, 'NGN')
-    ->customer('customer@example.com', 'John Doe')
+    ->customer('customer@example.com', 'John', 'Doe')
     ->card('5531886652142950', '09', '32', '564')
     ->redirectUrl('https://example.com/callback')
     ->build();

@@ -54,7 +54,7 @@ Added convenience method for card payments with automatic encryption:
 ```php
 $request = ChargeRequestBuilder::for('ORDER-123')
     ->amount(150, 'NGN')
-    ->customer('user@example.com', 'John Doe')
+    ->customer('user@example.com', 'John', 'Doe')
     ->card(
         cardNumber: '5531886652142950',
         cvv: '564',
@@ -170,7 +170,7 @@ use Gowelle\Flutterwave\Builders\ChargeRequestBuilder;
 
 $request = ChargeRequestBuilder::for('ORDER-001')
     ->amount(150.00, 'NGN')
-    ->customer('customer@example.com', 'John Doe', '+234812345678')
+    ->customer('customer@example.com', 'John', 'Doe', '+234812345678')
     ->card(
         cardNumber: '5531886652142950',
         cvv: '564',

@@ -16,7 +16,7 @@ final readonly class DirectChargeRequestDTO
      * @param  string  $reference  Unique reference for the charge
      * @param  float  $amount  Amount in smallest currency unit
      * @param  string  $currency  Currency code (e.g., TZS, NGN, USD)
-     * @param  array{email: string, name?: string, phone_number?: string}  $customer  Customer information
+     * @param  array{email: string, first_name: string, last_name: string, phone_number?: string}  $customer  Customer information
      * @param  array{type: string, card?: array, mobile_money?: array, bank_account?: array}  $paymentMethod  Payment method details
      * @param  string  $redirectUrl  URL to redirect after payment
      * @param  array<string, mixed>|null  $meta  Optional metadata
@@ -118,6 +118,14 @@ final readonly class DirectChargeRequestDTO
 
         if (empty($this->customer['email'])) {
             throw new \InvalidArgumentException('Customer email is required');
+        }
+
+        if (empty($this->customer['first_name'])) {
+            throw new \InvalidArgumentException('Customer first name is required');
+        }
+
+        if (empty($this->customer['last_name'])) {
+            throw new \InvalidArgumentException('Customer last name is required');
         }
 
         if (empty($this->paymentMethod['type'])) {

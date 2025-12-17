@@ -76,7 +76,7 @@ $charge->isDisputed();       // Check dispute status
 
 - **Request DTOs for Customer API**: Type-safe request DTOs for customer operations:
 
-  - `CreateCustomerRequest` - Typed DTO for customer creation with `email`, `firstName`, `lastName`, `phoneNumber`, `middleName`
+  - `CreateCustomerRequest` - Typed DTO for customer creation with `email`, `firstName`, `lastName`, `phoneNumber`, `middleName` (maps to API format: `name.first`, `name.middle`, `name.last`)
   - `UpdateCustomerRequest` - Typed DTO for customer updates
   - `SearchCustomerRequest` - Typed DTO for customer search with optional email filter
   - New `CustomerApi` methods: `createFromDto()`, `updateFromDto()`, `searchFromDto()`

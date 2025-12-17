@@ -197,7 +197,10 @@ $charge = $service->create([
     'reference' => 'ORDER-' . uniqid(),
     'customer' => [
         'email' => 'customer@example.com',
-        'name' => 'John Doe',
+        'name' => [
+            'first' => 'John',
+            'last' => 'Doe',
+        ],
     ],
     'payment_method' => [
         'type' => 'card',

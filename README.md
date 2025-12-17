@@ -138,8 +138,10 @@ $charge = Flutterwave::directCharge()->create([
     'reference' => 'ORDER-123',
     'customer' => [
         'email' => 'customer@example.com',      // Required
-        'first_name' => 'John',                   // Required
-        'last_name' => 'Doe',                     // Required
+        'name' => [
+            'first' => 'John',                   // Required
+            'last' => 'Doe',                     // Required
+        ],
         'phone_number' => '+255123456789',        // Required
     ],
     'payment_method' => [
@@ -336,7 +338,10 @@ try {
         'reference' => 'ORDER-123', // Your unique reference
         'customer' => [
             'email' => 'customer@example.com',
-            'name' => 'John Doe',
+            'name' => [
+                'first' => 'John',
+                'last' => 'Doe',
+            ],
             'phone_number' => '+255123456789',
         ],
         'payment_method' => [
@@ -391,7 +396,10 @@ $request = CreateDirectChargeRequest::make(
     reference: 'ORDER-' . uniqid(),
     customer: [
         'email' => 'customer@example.com',
-        'name' => 'John Doe',
+        'name' => [
+            'first' => 'John',
+            'last' => 'Doe',
+        ],
         'phone_number' => '+2341234567890',
     ],
     paymentMethod: [
@@ -550,16 +558,17 @@ Manage customer records.
 
 #### Create Customer
 
-> **Required Fields:** When creating a customer, the following fields are required: `email`, `first_name` (or `name`), `last_name` (or `name`), and `phone_number`.
+> **Required Fields:** When creating a customer, the following fields are required: `email`, `name.first`, `name.last`, and `phone_number`. The `name.middle` field is optional.
 
 ```php
 $customer = Flutterwave::customers()->create([
     'email' => 'john@example.com',        // Required
-    'first_name' => 'John',                 // Required (or use 'name')
-    'last_name' => 'Doe',                   // Required (or use 'name')
+    'name' => [
+        'first' => 'John',                 // Required
+        'middle' => 'Michael',             // Optional
+        'last' => 'Doe',                   // Required
+    ],
     'phone_number' => '+255123456789',      // Required
-    // Alternative: use 'name' instead of 'first_name' and 'last_name'
-    // 'name' => 'John Doe',
 ]);
 ```
 
@@ -671,7 +680,10 @@ $request = CreateOrchestratorOrderRequest::make(
     reference: 'ORDER-' . uniqid(),
     customer: [
         'email' => 'customer@example.com',
-        'name' => 'John Doe',
+        'name' => [
+            'first' => 'John',
+            'last' => 'Doe',
+        ],
         'phone' => '+2341234567890',
     ],
     paymentMethod: [

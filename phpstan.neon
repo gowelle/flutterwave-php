@@ -26,8 +26,6 @@ parameters:
         - '#Access to an undefined property#'
         # Property never read warnings (intentional patterns)
         - '#Property .+ is never read, only written#'
-        # Method parameter count mismatches (overloaded patterns)
-        - '#Method .+ invoked with .+ parameters, .+ required#'
         # Status code comparisons (type narrowing)
         - '#Strict comparison using === between#'
         # Level 6: Generic array value types - defer detailed typing for now

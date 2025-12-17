@@ -72,6 +72,7 @@ class FlutterwaveApiProvider
                 FlutterwaveApi::BANK_ACCOUNT_RESOLVE => new BankAccountResolveApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::MOBILE_NETWORKS => new MobileNetworksApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::ORDER => new OrderApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::DIRECT_ORDER => new OrderApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::REFUND => new RefundApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::TRANSFER => new TransferApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::DIRECT_TRANSFER => new DirectTransferApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),

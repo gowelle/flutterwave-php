@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace Gowelle\Flutterwave\Data\Order;
 
 /**
- * Request DTO for creating orders via the Flutterwave API.
+ * Request DTO for creating orders via the Orchestrator endpoint.
  *
- * This DTO is for the simple order creation endpoint that uses
- * pre-existing customer and payment method IDs.
+ * This DTO is for the orchestrator order creation that accepts
+ * full customer and payment method objects instead of IDs.
  *
- * @see https://developer.flutterwave.com/reference/orders_post
+ * @see https://developer.flutterwave.com/reference/orchestration_direct_order_post
  */
-final readonly class CreateOrderRequest
+final readonly class CreateOrchestratorOrderRequest
 {
     /**
      * @param  float  $amount  Payment amount in decimals (>= 0.01)
      * @param  string  $currency  ISO 4217 currency code
      * @param  string  $reference  Unique transaction identifier (6-42 chars)
-     * @param  string  $customerId  The customer's ID
-     * @param  string  $paymentMethodId  The payment method ID
+     * @param  array<string, mixed>  $customer  Customer details object
+     * @param  array<string, mixed>  $paymentMethod  Payment method details object
      * @param  array<string, mixed>|null  $meta  Optional metadata object
      * @param  string|null  $redirectUrl  URL to redirect to after payment
      * @param  array<string, mixed>|null  $authorization  Authorization details (e.g., for 3DS)
@@ -28,22 +28,25 @@ final readonly class CreateOrderRequest
         public float $amount,
         public string $currency,
         public string $reference,
-        public string $customerId,
-        public string $paymentMethodId,
+        public array $customer,
+        public array $paymentMethod,
         public ?array $meta = null,
         public ?string $redirectUrl = null,
         public ?array $authorization = null,
     ) {}
 
     /**
-     * Create order request with fluent builder pattern.
+     * Create orchestrator order request with fluent builder pattern.
+     *
+     * @param  array<string, mixed>  $customer  Customer details (name, email, phone, etc.)
+     * @param  array<string, mixed>  $paymentMethod  Payment method details
      */
     public static function make(
         float $amount,
         string $currency,
         string $reference,
-        string $customerId,
-        string $paymentMethodId,
+        array $customer,
+        array $paymentMethod,
         ?array $meta = null,
         ?string $redirectUrl = null,
         ?array $authorization = null,
@@ -52,8 +55,8 @@ final readonly class CreateOrderRequest
             amount: $amount,
             currency: $currency,
             reference: $reference,
-            customerId: $customerId,
-            paymentMethodId: $paymentMethodId,
+            customer: $customer,
+            paymentMethod: $paymentMethod,
             meta: $meta,
             redirectUrl: $redirectUrl,
             authorization: $authorization,
@@ -71,8 +74,8 @@ final readonly class CreateOrderRequest
             'amount' => $this->amount,
             'currency' => $this->currency,
             'reference' => $this->reference,
-            'customer_id' => $this->customerId,
-            'payment_method_id' => $this->paymentMethodId,
+            'customer' => $this->customer,
+            'payment_method' => $this->paymentMethod,
         ];
 
         if ($this->meta !== null) {

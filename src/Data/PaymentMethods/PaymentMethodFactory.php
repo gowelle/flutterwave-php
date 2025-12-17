@@ -29,6 +29,10 @@ final class PaymentMethodFactory
             PaymentMethodType::CARD => CardPaymentMethod::fromApi($data),
             PaymentMethodType::BANK_ACCOUNT => BankAccountPaymentMethod::fromApi($data),
             PaymentMethodType::MOBILE_MONEY => MobileMoneyPaymentMethod::fromApi($data),
+            PaymentMethodType::OPAY => OpayPaymentMethod::fromApi($data),
+            PaymentMethodType::APPLEPAY => ApplePayPaymentMethod::fromApi($data),
+            PaymentMethodType::GOOGLEPAY => GooglePayPaymentMethod::fromApi($data),
+            PaymentMethodType::USSD => UssdPaymentMethod::fromApi($data),
         };
     }
 }

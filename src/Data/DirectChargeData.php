@@ -16,6 +16,7 @@ final readonly class DirectChargeData
 {
     /**
      * @param  array<string, mixed>|null  $customer
+     * @param  array<string, mixed>|null  $billingDetails
      * @param  array<string, mixed>|null  $paymentMethodDetails
      * @param  array<string, mixed>|null  $issuerResponse
      * @param  array<string, mixed>|null  $meta
@@ -29,10 +30,16 @@ final readonly class DirectChargeData
         public NextActionData $nextAction,
         public ?string $customerId = null,
         public ?array $customer = null,
+        public ?array $billingDetails = null,
         public ?string $redirectUrl = null,
         public ?array $paymentMethodDetails = null,
         public ?array $issuerResponse = null,
         public ?array $meta = null,
+        public ?float $fees = null,
+        public ?string $description = null,
+        public ?bool $disputed = null,
+        public ?bool $settled = null,
+        public ?string $settlementId = null,
         public ?string $createdAt = null,
     ) {}
 
@@ -53,6 +60,12 @@ final readonly class DirectChargeData
         $customer = null;
         if (isset($data['customer']) && \is_array($data['customer'])) {
             $customer = $data['customer'];
+        }
+
+        // Extract billing details
+        $billingDetails = null;
+        if (isset($data['billing_details']) && \is_array($data['billing_details'])) {
+            $billingDetails = $data['billing_details'];
         }
 
         // Extract payment method details
@@ -85,10 +98,16 @@ final readonly class DirectChargeData
             nextAction: $nextAction,
             customerId: isset($data['customer']) && \is_string($data['customer']) ? $data['customer'] : null,
             customer: $customer,
+            billingDetails: $billingDetails,
             redirectUrl: $redirectUrl,
             paymentMethodDetails: $paymentMethodDetails,
             issuerResponse: $issuerResponse,
             meta: $meta,
+            fees: isset($data['fees']) ? (float) $data['fees'] : null,
+            description: $data['description'] ?? null,
+            disputed: isset($data['disputed']) ? (bool) $data['disputed'] : null,
+            settled: isset($data['settled']) ? (bool) $data['settled'] : null,
+            settlementId: $data['settlement_id'] ?? null,
             createdAt: $data['created_at'] ?? $data['created_datetime'] ?? null,
         );
     }
@@ -198,6 +217,34 @@ final readonly class DirectChargeData
     }
 
     /**
+     * Check if charge is disputed
+     */
+    public function isDisputed(): bool
+    {
+        return $this->disputed === true;
+    }
+
+    /**
+     * Check if charge is settled
+     */
+    public function isSettled(): bool
+    {
+        return $this->settled === true;
+    }
+
+    /**
+     * Get billing email if available
+     */
+    public function getBillingEmail(): ?string
+    {
+        if ($this->billingDetails === null) {
+            return null;
+        }
+
+        return $this->billingDetails['email'] ?? null;
+    }
+
+    /**
      * Convert to array
      *
      * @return array<string, mixed>
@@ -213,10 +260,16 @@ final readonly class DirectChargeData
             'next_action' => $this->nextAction->toArray(),
             'customer_id' => $this->customerId,
             'customer' => $this->customer,
+            'billing_details' => $this->billingDetails,
             'redirect_url' => $this->redirectUrl,
             'payment_method_details' => $this->paymentMethodDetails,
             'issuer_response' => $this->issuerResponse,
             'meta' => $this->meta,
+            'fees' => $this->fees,
+            'description' => $this->description,
+            'disputed' => $this->disputed,
+            'settled' => $this->settled,
+            'settlement_id' => $this->settlementId,
             'created_at' => $this->createdAt,
         ];
     }

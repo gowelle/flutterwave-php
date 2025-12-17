@@ -57,15 +57,17 @@ class FlutterwaveBaseService
     /**
      * List the items
      *
+     * @param  array<string, mixed>  $params  Optional query parameters
+     *
      * @throws Exception
      */
-    public function list(FlutterwaveApi $api, Wavable $wavable): ApiResponse
+    public function list(FlutterwaveApi $api, Wavable $wavable, array $params = []): ApiResponse
     {
         $headers = $this->headerBuilder->build($wavable);
 
         return $this->apiProvider
             ->useApi($api, $this->getAccessToken(), $headers)
-            ->list();
+            ->listWithParams($params);
     }
 
     /**

@@ -15,6 +15,7 @@ enum FlutterwaveApi: string
     case BANK_ACCOUNT_RESOLVE = 'bank-account-resolve';
     case MOBILE_NETWORKS = 'mobile-networks';
     case ORDER = 'order';
+    case DIRECT_ORDER = 'direct-order';
     case REFUND = 'refund';
     case TRANSFER = 'transfer';
     case DIRECT_TRANSFER = 'direct-transfer';
@@ -40,6 +41,7 @@ enum FlutterwaveApi: string
             self::BANK_ACCOUNT_RESOLVE => '/banks/account-resolve',
             self::MOBILE_NETWORKS => '/mobile-networks',
             self::ORDER => '/orders',
+            self::DIRECT_ORDER => '/orchestration/direct-orders',
             self::REFUND => '/refunds',
             self::TRANSFER => '/transfers',
             self::DIRECT_TRANSFER => '/direct-transfers',

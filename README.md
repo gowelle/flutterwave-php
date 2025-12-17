@@ -379,6 +379,44 @@ try {
 }
 ```
 
+**Using DTO (type-safe):**
+
+```php
+use Gowelle\Flutterwave\Data\DirectCharge\CreateDirectChargeRequest;
+use Gowelle\Flutterwave\Facades\Flutterwave;
+
+$request = CreateDirectChargeRequest::make(
+    amount: 10000,
+    currency: 'NGN',
+    reference: 'ORDER-' . uniqid(),
+    customer: [
+        'email' => 'customer@example.com',
+        'name' => 'John Doe',
+        'phone_number' => '+2341234567890',
+    ],
+    paymentMethod: [
+        'type' => 'card',
+        'card' => [
+            'nonce' => 'RANDOMLY_GENERATED_12_CHAR_NONCE',
+            'encrypted_card_number' => 'BASE64_ENCRYPTED_CARD_NUMBER',
+            'encrypted_cvv' => 'BASE64_ENCRYPTED_CVV',
+            'encrypted_expiry_month' => 'BASE64_ENCRYPTED_EXPIRY_MONTH',
+            'encrypted_expiry_year' => 'BASE64_ENCRYPTED_EXPIRY_YEAR',
+        ],
+    ],
+    redirectUrl: 'https://example.com/callback',
+    meta: ['order_id' => '12345'],
+);
+
+$charge = Flutterwave::directCharge()->createFromDto($request);
+
+// Access charge details including new fields
+echo $charge->fees;          // Transaction fees
+echo $charge->settlementId;  // Settlement ID
+$charge->isSettled();        // Check if settled
+$charge->isDisputed();       // Check if disputed
+```
+
 #### Updating Charge Authorization
 
 When a charge requires additional authorization (PIN, OTP, AVS), submit the authorization data:
@@ -582,26 +620,23 @@ $customers = Flutterwave::customers()->list([
 
 ### Orders
 
-Manage orders for tracking purchases and payments.
+Manage orders for tracking purchases and payments. The Order API supports both a simple creation method (using existing customer and payment method IDs) and an orchestrator method (with inline customer and payment details).
 
-#### Create Order
+#### Create Order (Simple)
+
+Create an order using existing customer and payment method IDs:
 
 ```php
+use Gowelle\Flutterwave\Facades\Flutterwave;
+
 $order = Flutterwave::orders()->create([
-    'order_reference' => 'ORDER-123',
     'amount' => 10000,
-    'currency' => 'TZS',
-    'customer' => [
-        'email' => 'customer@example.com',
-        'name' => 'John Doe',
-    ],
-    'items' => [
-        [
-            'name' => 'Product 1',
-            'quantity' => 2,
-            'unit_price' => 5000,
-        ],
-    ],
+    'currency' => 'NGN',
+    'reference' => 'ORDER-' . uniqid(),  // 6-42 chars, unique
+    'customer_id' => 'cust_abc123',
+    'payment_method_id' => 'pm_xyz789',
+    'meta' => ['order_type' => 'subscription'],  // optional
+    'redirect_url' => 'https://example.com/callback',  // optional
 ]);
 ```
 
@@ -610,49 +645,128 @@ $order = Flutterwave::orders()->create([
 ```php
 use Gowelle\Flutterwave\Data\Order\CreateOrderRequest;
 
-// Using static factory method
 $request = CreateOrderRequest::make(
-    orderReference: 'ORDER-123',
-    amount: 10000,
-    currency: 'TZS',
-    customerName: 'John Doe',
-    customerEmail: 'customer@example.com',
-    items: [
-        ['name' => 'Product 1', 'quantity' => 2, 'amount' => 5000],
-    ],
-    customerPhone: '+255123456789',  // optional
+    amount: 10000.00,
+    currency: 'NGN',
+    reference: 'ORDER-' . uniqid(),
+    customerId: 'cust_abc123',
+    paymentMethodId: 'pm_xyz789',
+    meta: ['source' => 'api'],      // optional
+    redirectUrl: 'https://example.com/callback',  // optional
 );
 
 $order = Flutterwave::orders()->createFromDto($request);
 ```
 
+#### Create Order with Orchestrator
+
+Create an order with inline customer and payment method details:
+
+```php
+use Gowelle\Flutterwave\Data\Order\CreateOrchestratorOrderRequest;
+
+$request = CreateOrchestratorOrderRequest::make(
+    amount: 10000.00,
+    currency: 'NGN',
+    reference: 'ORDER-' . uniqid(),
+    customer: [
+        'email' => 'customer@example.com',
+        'name' => 'John Doe',
+        'phone' => '+2341234567890',
+    ],
+    paymentMethod: [
+        'type' => 'card',
+        'card' => [
+            'nonce' => 'RANDOM_12_CHAR',
+            'encrypted_card_number' => 'ENCRYPTED_DATA',
+            'encrypted_cvv' => 'ENCRYPTED_DATA',
+            'encrypted_expiry_month' => 'ENCRYPTED_DATA',
+            'encrypted_expiry_year' => 'ENCRYPTED_DATA',
+        ],
+    ],
+    meta: ['order_type' => 'subscription'],  // optional
+    redirectUrl: 'https://example.com/callback',  // optional
+);
+
+$order = Flutterwave::orders()->createWithOrchestrator($request);
+```
+
 #### Get Order
 
 ```php
-$order = Flutterwave::orders()->get('order-id');
+$order = Flutterwave::orders()->retrieve('order-id');
 ```
 
 #### List Orders
 
+List orders with optional filtering and pagination:
+
 ```php
-$orders = Flutterwave::orders()->list([
-    'page' => 1,
-    'limit' => 20,
-]);
+use Gowelle\Flutterwave\Data\Order\ListOrdersRequest;
+use Gowelle\Flutterwave\Data\Order\OrderStatus;
+
+// List all orders (default pagination)
+$orders = Flutterwave::orders()->list();
+
+// List with filters
+$request = new ListOrdersRequest(
+    status: OrderStatus::Completed,      // Filter by status
+    from: new DateTime('2024-01-01'),   // Start date
+    to: new DateTime('2024-12-31'),     // End date
+    customerId: 'cust_abc123',          // Filter by customer
+    paymentMethodId: 'pm_xyz789',       // Filter by payment method
+    page: 1,                            // Page number (>=1)
+    size: 20,                           // Results per page (10-50)
+);
+
+$orders = Flutterwave::orders()->listWithFilters($request);
+```
+
+**Available Order Statuses:**
+
+```php
+use Gowelle\Flutterwave\Data\Order\OrderStatus;
+
+OrderStatus::Completed          // Order completed successfully
+OrderStatus::Pending            // Order is pending
+OrderStatus::Authorized         // Order is authorized, awaiting capture
+OrderStatus::PartiallyCompleted // Partially completed
+OrderStatus::Voided             // Order was voided
+OrderStatus::Failed             // Order failed
 ```
 
 #### Update Order
 
+Update order metadata or perform actions (void/capture):
+
 ```php
 use Gowelle\Flutterwave\Data\Order\UpdateOrderRequest;
+use Gowelle\Flutterwave\Data\Order\OrderAction;
 
-$request = new UpdateOrderRequest(
-    amount: 15000,
-    status: 'completed',
-);
+// Update with metadata only
+$request = UpdateOrderRequest::withMeta(['updated' => true]);
+$order = Flutterwave::orders()->updateFromDto('order-id', $request);
 
-$updatedOrder = Flutterwave::orders()->updateFromDto('order-id', $request);
+// Void an order
+$request = UpdateOrderRequest::void(['reason' => 'Customer cancelled']);
+$order = Flutterwave::orders()->updateFromDto('order-id', $request);
+
+// Capture an authorized order
+$request = UpdateOrderRequest::capture();
+$order = Flutterwave::orders()->updateFromDto('order-id', $request);
 ```
+
+**Convenience methods:**
+
+```php
+// Void an order directly
+$order = Flutterwave::orders()->void('order-id', ['reason' => 'Cancelled']);
+
+// Capture an authorized order directly
+$order = Flutterwave::orders()->capture('order-id');
+```
+
+
 
 ### Refunds
 

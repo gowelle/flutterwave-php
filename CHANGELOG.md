@@ -4,6 +4,72 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.6.0] - 2025-12-17
+
+### Added
+
+- **Enhanced DirectChargeData DTO**: Added missing response fields for complete API coverage:
+  - `fees` (float) - Transaction fees charged by Flutterwave
+  - `description` (string) - Charge description
+  - `disputed` (boolean) - Dispute status flag
+  - `settled` (boolean) - Settlement status flag
+  - `settlementId` (string) - Settlement reference ID
+  - `billingDetails` (array) - Structured billing information from API response
+
+- **New Helper Methods** for DirectChargeData:
+  - `isDisputed()` - Check if charge is disputed
+  - `isSettled()` - Check if charge is settled
+  - `getBillingEmail()` - Get billing email from billing details
+
+- **Request DTO for Direct Charge API**: Type-safe request DTO following v2.5.0 pattern:
+  - `CreateDirectChargeRequest` - Typed DTO for direct charge creation with `amount`, `currency`, `reference`, `customer`, `paymentMethod`, `redirectUrl`, `meta`
+  - Static `make()` factory method for convenient instantiation
+  - `toApiPayload()` method for API request conversion
+
+- **New Service Methods**:
+  - `createFromDto(CreateDirectChargeRequest $request)` - Type-safe charge creation using DTO
+  - `retrieve(string $id)` - Retrieve full charge data (alias for getting complete DirectChargeData instead of just status)
+
+### Improved
+
+- **Type Safety**: Direct Charge API now has complete DTO support matching Customer, Order, and Banks APIs (v2.5.0)
+- **Settlement Tracking**: New fields enable tracking of settlement status and IDs
+- **Dispute Management**: New fields support dispute detection and handling
+- **Backward Compatibility**: All existing array-based methods remain functional
+
+### Usage Example
+
+**Before (array-based, still supported):**
+```php
+$charge = Flutterwave::directCharge()->create([
+    'amount' => 10000,
+    'currency' => 'NGN',
+    'reference' => 'ORDER-123',
+    'customer' => ['email' => 'user@example.com', 'name' => 'John Doe'],
+    'payment_method' => ['type' => 'card', ...],
+]);
+```
+
+**After (typed DTO):**
+```php
+use Gowelle\Flutterwave\Data\DirectCharge\CreateDirectChargeRequest;
+
+$request = CreateDirectChargeRequest::make(
+    amount: 10000,
+    currency: 'NGN',
+    reference: 'ORDER-123',
+    customer: ['email' => 'user@example.com', 'name' => 'John Doe'],
+    paymentMethod: ['type' => 'card', ...],
+);
+$charge = Flutterwave::directCharge()->createFromDto($request);
+
+// Access new fields
+echo $charge->fees;          // Transaction fees
+echo $charge->settlementId;  // Settlement ID
+$charge->isSettled();        // Check settlement status
+$charge->isDisputed();       // Check dispute status
+```
+
 ## [2.5.0] - 2025-12-16
 
 ### Added

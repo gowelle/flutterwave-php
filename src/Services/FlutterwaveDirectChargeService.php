@@ -123,4 +123,52 @@ final class FlutterwaveDirectChargeService implements DirectChargeServiceInterfa
 
         return $chargeData->status;
     }
+
+    /**
+     * Create a direct charge from DTO
+     *
+     * Type-safe alternative to create() using CreateDirectChargeRequest DTO.
+     *
+     * @param  \Gowelle\Flutterwave\Data\DirectCharge\CreateDirectChargeRequest  $request  Charge request DTO
+     *
+     * @throws FlutterwaveApiException
+     *
+     * @example
+     * use Gowelle\Flutterwave\Data\DirectCharge\CreateDirectChargeRequest;
+     *
+     * $request = CreateDirectChargeRequest::make(
+     *     amount: 10000,
+     *     currency: 'NGN',
+     *     reference: 'ORDER-' . uniqid(),
+     *     customer: ['email' => 'user@example.com', 'name' => 'John Doe'],
+     *     paymentMethod: ['type' => 'card', 'card' => [...encrypted data...]],
+     * );
+     * $charge = $service->createFromDto($request);
+     */
+    public function createFromDto(\Gowelle\Flutterwave\Data\DirectCharge\CreateDirectChargeRequest $request): DirectChargeData
+    {
+        return $this->create($request->toApiPayload());
+    }
+
+    /**
+     * Retrieve a direct charge
+     *
+     * Alias for getting full charge data instead of just status.
+     *
+     * @param  string  $id  The charge ID
+     *
+     * @throws FlutterwaveApiException
+     */
+    public function retrieve(string $id): DirectChargeData
+    {
+        $wavable = $this->buildWavable(
+            ['id' => $id],
+            FlutterwaveApi::DIRECT_CHARGE,
+            $this->flutterwaveBaseService->getConfig()->isProduction(),
+        );
+
+        $response = $this->flutterwaveBaseService->retrieve(FlutterwaveApi::DIRECT_CHARGE, $wavable, $id);
+
+        return DirectChargeData::fromApi($response->data ?? []);
+    }
 }

@@ -192,3 +192,386 @@ it('can resolve bank account', function () {
 
     expect($result)->toBeInstanceOf(BankAccountResolveData::class);
 });
+
+it('can create virtual account', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Virtual account created',
+        data: [
+            'id' => 'va_123',
+            'amount' => 0,
+            'account_number' => '7824822527',
+            'reference' => 'test_ref_123',
+            'account_bank_name' => 'WEMA BANK',
+            'account_type' => 'static',
+            'status' => 'active',
+            'account_expiration_datetime' => '2025-12-31T23:59:59Z',
+            'customer_id' => 'cus_123',
+            'currency' => 'NGN',
+        ],
+    );
+
+    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock->shouldReceive('create')
+        ->once()
+        ->with(\Mockery::type('array'))
+        ->andReturn($response);
+
+    $this->baseService
+        ->shouldReceive('getAccessToken')
+        ->once()
+        ->andReturn('test_token');
+
+    $this->baseService
+        ->shouldReceive('getHeaderBuilder')
+        ->once()
+        ->andReturn($this->headerBuilder);
+
+    $this->headerBuilder
+        ->shouldReceive('build')
+        ->once()
+        ->andReturn(['Content-Type' => 'application/json']);
+
+    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+        $mock->shouldReceive('useApi')
+            ->once()
+            ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
+            ->andReturn($apiMock);
+    }));
+
+    $request = new \Gowelle\Flutterwave\Data\VirtualAccount\CreateVirtualAccountRequestDTO(
+        reference: 'test_ref_123',
+        customerId: 'cus_123',
+        amount: 0,
+        currency: \Gowelle\Flutterwave\Enums\VirtualAccountCurrency::NGN,
+        accountType: \Gowelle\Flutterwave\Enums\VirtualAccountType::STATIC,
+    );
+
+    $result = $this->service->createVirtualAccount($request);
+
+    expect($result)->toBeInstanceOf(\Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData::class);
+    expect($result->id)->toBe('va_123');
+});
+
+it('throws exception when creating virtual account fails', function () {
+    $response = new ApiResponse(
+        status: 'error',
+        message: 'Failed to create virtual account',
+        data: null,
+    );
+
+    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock->shouldReceive('create')
+        ->once()
+        ->andReturn($response);
+
+    $this->baseService
+        ->shouldReceive('getAccessToken')
+        ->once()
+        ->andReturn('test_token');
+
+    $this->baseService
+        ->shouldReceive('getHeaderBuilder')
+        ->once()
+        ->andReturn($this->headerBuilder);
+
+    $this->headerBuilder
+        ->shouldReceive('build')
+        ->once()
+        ->andReturn(['Content-Type' => 'application/json']);
+
+    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+        $mock->shouldReceive('useApi')
+            ->once()
+            ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
+            ->andReturn($apiMock);
+    }));
+
+    $request = new \Gowelle\Flutterwave\Data\VirtualAccount\CreateVirtualAccountRequestDTO(
+        reference: 'test_ref_123',
+        customerId: 'cus_123',
+        amount: 0,
+        currency: \Gowelle\Flutterwave\Enums\VirtualAccountCurrency::NGN,
+        accountType: \Gowelle\Flutterwave\Enums\VirtualAccountType::STATIC,
+    );
+
+    expect(fn () => $this->service->createVirtualAccount($request))
+        ->toThrow(FlutterwaveApiException::class);
+});
+
+it('can retrieve virtual account', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Virtual account retrieved',
+        data: [
+            'id' => 'va_123',
+            'amount' => 0,
+            'account_number' => '7824822527',
+            'reference' => 'test_ref_123',
+            'account_bank_name' => 'WEMA BANK',
+            'account_type' => 'static',
+            'status' => 'active',
+            'account_expiration_datetime' => '2025-12-31T23:59:59Z',
+            'customer_id' => 'cus_123',
+            'currency' => 'NGN',
+        ],
+    );
+
+    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock->shouldReceive('retrieve')
+        ->once()
+        ->with('va_123')
+        ->andReturn($response);
+
+    $this->baseService
+        ->shouldReceive('getAccessToken')
+        ->once()
+        ->andReturn('test_token');
+
+    $this->baseService
+        ->shouldReceive('getHeaderBuilder')
+        ->once()
+        ->andReturn($this->headerBuilder);
+
+    $this->headerBuilder
+        ->shouldReceive('build')
+        ->once()
+        ->andReturn(['Content-Type' => 'application/json']);
+
+    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+        $mock->shouldReceive('useApi')
+            ->once()
+            ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
+            ->andReturn($apiMock);
+    }));
+
+    $result = $this->service->retrieveVirtualAccount('va_123');
+
+    expect($result)->toBeInstanceOf(\Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData::class);
+    expect($result->id)->toBe('va_123');
+});
+
+it('can list virtual accounts', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Virtual accounts retrieved',
+        data: [
+            [
+                'id' => 'va_123',
+                'amount' => 0,
+                'account_number' => '7824822527',
+                'reference' => 'test_ref_123',
+                'account_bank_name' => 'WEMA BANK',
+                'account_type' => 'static',
+                'status' => 'active',
+                'account_expiration_datetime' => '2025-12-31T23:59:59Z',
+                'customer_id' => 'cus_123',
+                'currency' => 'NGN',
+            ],
+            [
+                'id' => 'va_456',
+                'amount' => 100,
+                'account_number' => '7824822528',
+                'reference' => 'test_ref_456',
+                'account_bank_name' => 'WEMA BANK',
+                'account_type' => 'dynamic',
+                'status' => 'active',
+                'account_expiration_datetime' => '2025-12-31T23:59:59Z',
+                'customer_id' => 'cus_456',
+                'currency' => 'NGN',
+            ],
+        ],
+    );
+
+    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock->shouldReceive('list')
+        ->once()
+        ->andReturn($response);
+
+    $this->baseService
+        ->shouldReceive('getAccessToken')
+        ->once()
+        ->andReturn('test_token');
+
+    $this->baseService
+        ->shouldReceive('getHeaderBuilder')
+        ->once()
+        ->andReturn($this->headerBuilder);
+
+    $this->headerBuilder
+        ->shouldReceive('build')
+        ->once()
+        ->andReturn(['Content-Type' => 'application/json']);
+
+    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+        $mock->shouldReceive('useApi')
+            ->once()
+            ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
+            ->andReturn($apiMock);
+    }));
+
+    $result = $this->service->listVirtualAccounts();
+
+    expect($result)->toBeArray();
+    expect(\count($result))->toBe(2);
+    expect($result[0])->toBeInstanceOf(\Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData::class);
+});
+
+it('can list virtual accounts with params', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Virtual accounts retrieved',
+        data: [
+            [
+                'id' => 'va_123',
+                'amount' => 0,
+                'account_number' => '7824822527',
+                'reference' => 'test_ref_123',
+                'account_bank_name' => 'WEMA BANK',
+                'account_type' => 'static',
+                'status' => 'active',
+                'account_expiration_datetime' => '2025-12-31T23:59:59Z',
+                'customer_id' => 'cus_123',
+                'currency' => 'NGN',
+            ],
+        ],
+    );
+
+    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock->shouldReceive('listWithParams')
+        ->once()
+        ->with(\Mockery::type('array'))
+        ->andReturn($response);
+
+    $this->baseService
+        ->shouldReceive('getAccessToken')
+        ->once()
+        ->andReturn('test_token');
+
+    $this->baseService
+        ->shouldReceive('getHeaderBuilder')
+        ->once()
+        ->andReturn($this->headerBuilder);
+
+    $this->headerBuilder
+        ->shouldReceive('build')
+        ->once()
+        ->andReturn(['Content-Type' => 'application/json']);
+
+    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+        $mock->shouldReceive('useApi')
+            ->once()
+            ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
+            ->andReturn($apiMock);
+    }));
+
+    $params = new \Gowelle\Flutterwave\Data\VirtualAccount\ListVirtualAccountsParamsDTO(
+        page: 1,
+        size: 10,
+        reference: 'test_ref_123',
+    );
+
+    $result = $this->service->listVirtualAccountsWithParams($params);
+
+    expect($result)->toBeArray();
+    expect(\count($result))->toBe(1);
+    expect($result[0])->toBeInstanceOf(\Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData::class);
+});
+
+it('can update virtual account', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Virtual account updated',
+        data: [
+            'id' => 'va_123',
+            'amount' => 0,
+            'account_number' => '7824822527',
+            'reference' => 'test_ref_123',
+            'account_bank_name' => 'WEMA BANK',
+            'account_type' => 'static',
+            'status' => 'inactive',
+            'account_expiration_datetime' => '2025-12-31T23:59:59Z',
+            'customer_id' => 'cus_123',
+            'currency' => 'NGN',
+        ],
+    );
+
+    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock->shouldReceive('update')
+        ->once()
+        ->with('va_123', \Mockery::type('array'))
+        ->andReturn($response);
+
+    $this->baseService
+        ->shouldReceive('getAccessToken')
+        ->once()
+        ->andReturn('test_token');
+
+    $this->baseService
+        ->shouldReceive('getHeaderBuilder')
+        ->once()
+        ->andReturn($this->headerBuilder);
+
+    $this->headerBuilder
+        ->shouldReceive('build')
+        ->once()
+        ->andReturn(['Content-Type' => 'application/json']);
+
+    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+        $mock->shouldReceive('useApi')
+            ->once()
+            ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
+            ->andReturn($apiMock);
+    }));
+
+    $request = \Gowelle\Flutterwave\Data\VirtualAccount\UpdateVirtualAccountRequestDTO::forStatusUpdate(
+        \Gowelle\Flutterwave\Enums\VirtualAccountStatus::INACTIVE
+    );
+
+    $result = $this->service->updateVirtualAccount('va_123', $request);
+
+    expect($result)->toBeInstanceOf(\Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData::class);
+    expect($result->status->value)->toBe('inactive');
+});
+
+it('throws exception when updating virtual account fails', function () {
+    $response = new ApiResponse(
+        status: 'error',
+        message: 'Failed to update virtual account',
+        data: null,
+    );
+
+    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock->shouldReceive('update')
+        ->once()
+        ->andReturn($response);
+
+    $this->baseService
+        ->shouldReceive('getAccessToken')
+        ->once()
+        ->andReturn('test_token');
+
+    $this->baseService
+        ->shouldReceive('getHeaderBuilder')
+        ->once()
+        ->andReturn($this->headerBuilder);
+
+    $this->headerBuilder
+        ->shouldReceive('build')
+        ->once()
+        ->andReturn(['Content-Type' => 'application/json']);
+
+    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+        $mock->shouldReceive('useApi')
+            ->once()
+            ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
+            ->andReturn($apiMock);
+    }));
+
+    $request = \Gowelle\Flutterwave\Data\VirtualAccount\UpdateVirtualAccountRequestDTO::forStatusUpdate(
+        \Gowelle\Flutterwave\Enums\VirtualAccountStatus::INACTIVE
+    );
+
+    expect(fn () => $this->service->updateVirtualAccount('va_123', $request))
+        ->toThrow(FlutterwaveApiException::class);
+});

@@ -4,6 +4,71 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.7.0] - 2025-12-17
+
+### Added
+
+- **Virtual Account Integration into Banks Service**: VirtualAccount operations now integrated into `FlutterwaveBanksService` for unified banking experience:
+  
+  - `createVirtualAccount(CreateVirtualAccountRequestDTO $request)` - Create virtual accounts using type-safe DTO
+  - `retrieveVirtualAccount(string $id)` - Retrieve virtual account details
+  - `listVirtualAccounts()` - List all virtual accounts
+  - `listVirtualAccountsWithParams(ListVirtualAccountsParamsDTO $params)` - List with pagination and filtering using DTO
+  - `updateVirtualAccount(string $id, UpdateVirtualAccountRequestDTO $request)` - Update virtual account using DTO
+
+- **New DTO**: `ListVirtualAccountsParamsDTO` for type-safe virtual account query parameters:
+  - `from` - Start date filter (ISO 8601 format)
+  - `to` - End date filter (ISO 8601 format)
+  - `page` - Page number (min: 1)
+  - `size` - Page size (10-50)
+  - `reference` - Filter by transaction reference
+
+### Improved
+
+- **Unified Banking Interface**: All bank-related operations (banks, branches, account resolution, virtual accounts) now accessible through single `Flutterwave::banks()` facade
+- **Type Safety**: Virtual account operations now use DTOs exclusively, eliminating array-based parameters
+- **Developer Experience**: Consistent API across all banking operations with full IDE autocomplete support
+- **Backward Compatibility**: Existing VirtualAccount API classes remain functional for direct usage
+
+### Usage Example
+
+**Before (direct API usage):**
+```php
+use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
+
+$api = app(\Gowelle\Flutterwave\FlutterwaveApiProvider::class)->useApi(
+    FlutterwaveApi::VIRTUAL_ACCOUNT,
+    $accessToken,
+    $headers
+);
+
+$account = $api->create([
+    'reference' => 'ref-123',
+    'customer_id' => 'cus_123',
+    'amount' => 0,
+    'currency' => 'NGN',
+    'account_type' => 'static',
+]);
+```
+
+**After (unified service with DTOs):**
+```php
+use Gowelle\Flutterwave\Facades\Flutterwave;
+use Gowelle\Flutterwave\Data\VirtualAccount\CreateVirtualAccountRequestDTO;
+use Gowelle\Flutterwave\Enums\VirtualAccountCurrency;
+use Gowelle\Flutterwave\Enums\VirtualAccountType;
+
+$request = new CreateVirtualAccountRequestDTO(
+    reference: 'ref-123',
+    customerId: 'cus_123',
+    amount: 0,
+    currency: VirtualAccountCurrency::NGN,
+    accountType: VirtualAccountType::STATIC,
+);
+
+$account = Flutterwave::banks()->createVirtualAccount($request);
+```
+
 ## [2.6.0] - 2025-12-17
 
 ### Added

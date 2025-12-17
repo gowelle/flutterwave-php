@@ -1367,54 +1367,35 @@ foreach ($balances as $balance) {
 
 ### Virtual Accounts
 
-Create and manage virtual bank accounts for receiving payments.
+Create and manage virtual bank accounts for receiving payments. Virtual account operations are now integrated into the Banks service for a unified banking experience.
 
 #### Create Virtual Account
 
-Create a virtual account for a specific customer:
+Create a virtual account for a specific customer using type-safe DTOs:
 
 ```php
-use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
+use Gowelle\Flutterwave\Facades\Flutterwave;
+use Gowelle\Flutterwave\Data\VirtualAccount\CreateVirtualAccountRequestDTO;
+use Gowelle\Flutterwave\Enums\VirtualAccountCurrency;
+use Gowelle\Flutterwave\Enums\VirtualAccountType;
 
-$api = app(\Gowelle\Flutterwave\FlutterwaveApiProvider::class)->useApi(
-    FlutterwaveApi::VIRTUAL_ACCOUNT,
-    $accessToken,
-    $headers
+$request = new CreateVirtualAccountRequestDTO(
+    reference: 'unique-ref-' . time(),      // 6-42 chars, unique
+    customerId: 'cus_123',                  // Existing customer ID
+    amount: 0,                              // 0 for static accounts
+    currency: VirtualAccountCurrency::NGN,  // NGN, GHS, EGP, or KES
+    accountType: VirtualAccountType::STATIC, // STATIC or DYNAMIC
+    narration: 'Payment for Order #123',    // Optional
+    meta: ['order_id' => '123'],            // Optional metadata
 );
 
-$account = $api->create([
-    'reference' => 'unique-ref-' . time(),
-    'customer_id' => 'cus_123',
-    'amount' => 0,  // 0 for static accounts
-    'currency' => 'NGN',
-    'account_type' => 'static',
-    'narration' => 'Payment for Order #123',
-    'meta' => ['order_id' => '123'],
-]);
-```
+$account = Flutterwave::banks()->createVirtualAccount($request);
 
-#### List Virtual Accounts
-
-List all virtual accounts with optional pagination and filtering:
-
-```php
-// List all accounts
-$response = $api->list();
-
-// List with pagination and filters
-$response = $api->listWithParams([
-    'page' => 1,
-    'size' => 20,
-    'from' => '2024-01-01T00:00:00Z',
-    'to' => '2024-12-31T23:59:59Z',
-    'reference' => 'unique-ref-123',
-]);
-
-foreach ($response->data as $account) {
-    echo $account['account_number'];
-    echo $account['status'];
-    echo $account['currency'];
-}
+// Access account details
+echo $account->accountNumber;      // Virtual account number
+echo $account->accountBankName;    // Bank name (e.g., "WEMA BANK")
+echo $account->reference;          // Your reference
+echo $account->status->value;      // 'active' or 'inactive'
 ```
 
 #### Retrieve Virtual Account
@@ -1422,29 +1403,73 @@ foreach ($response->data as $account) {
 Get details of a specific virtual account:
 
 ```php
-$account = $api->retrieve('va_123');
+$account = Flutterwave::banks()->retrieveVirtualAccount('va_123');
 
-echo $account['account_number'];
-echo $account['account_bank_name'];  // e.g., "WEMA BANK"
-echo $account['status'];              // "active" or "inactive"
+echo $account->accountNumber;
+echo $account->accountBankName;
+echo $account->status->value;
+echo $account->currency->value;
+```
+
+#### List Virtual Accounts
+
+List all virtual accounts:
+
+```php
+$accounts = Flutterwave::banks()->listVirtualAccounts();
+
+foreach ($accounts as $account) {
+    echo $account->accountNumber;
+    echo $account->status->value;
+    echo $account->currency->value;
+}
+```
+
+#### List Virtual Accounts with Filters
+
+List virtual accounts with pagination and filtering using DTOs:
+
+```php
+use Gowelle\Flutterwave\Data\VirtualAccount\ListVirtualAccountsParamsDTO;
+
+$params = new ListVirtualAccountsParamsDTO(
+    page: 1,                                // Page number (min: 1)
+    size: 20,                               // Page size (10-50)
+    from: '2024-01-01T00:00:00Z',          // Start date (ISO 8601)
+    to: '2024-12-31T23:59:59Z',            // End date (ISO 8601)
+    reference: 'unique-ref-123',            // Filter by reference
+);
+
+$accounts = Flutterwave::banks()->listVirtualAccountsWithParams($params);
+
+foreach ($accounts as $account) {
+    echo $account->accountNumber;
+    echo $account->reference;
+}
 ```
 
 #### Update Virtual Account
 
-Update account status or BVN:
+Update account status or BVN using DTOs:
 
 ```php
+use Gowelle\Flutterwave\Data\VirtualAccount\UpdateVirtualAccountRequestDTO;
+use Gowelle\Flutterwave\Enums\VirtualAccountStatus;
+
 // Deactivate an account
-$updated = $api->update('va_123', [
-    'action_type' => 'update_status',
-    'status' => 'inactive',
-]);
+$request = UpdateVirtualAccountRequestDTO::forStatusUpdate(
+    VirtualAccountStatus::INACTIVE
+);
+
+$updated = Flutterwave::banks()->updateVirtualAccount('va_123', $request);
 
 // Update BVN
-$updated = $api->update('va_123', [
-    'action_type' => 'update_bvn',
-    'bvn' => '12345678901',
-]);
+$request = UpdateVirtualAccountRequestDTO::forBvnUpdate(
+    bvn: '12345678901',
+    meta: ['updated_by' => 'admin']  // Optional
+);
+
+$updated = Flutterwave::banks()->updateVirtualAccount('va_123', $request);
 ```
 
 #### Supported Currencies
@@ -1458,42 +1483,40 @@ Virtual accounts support the following currencies:
 
 #### Account Types
 
-- **static** - Permanent account that can be reused (amount should be 0)
-- **dynamic** - Temporary account for specific transaction (expires after configured duration)
+- **STATIC** - Permanent account that can be reused (amount should be 0)
+- **DYNAMIC** - Temporary account for specific transaction (expires after configured duration)
 
 #### Example: Complete Virtual Account Flow
 
 ```php
-use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
-
-$provider = app(\Gowelle\Flutterwave\FlutterwaveApiProvider::class);
-$api = $provider->useApi(
-    FlutterwaveApi::VIRTUAL_ACCOUNT,
-    $accessToken,
-    $headers
-);
+use Gowelle\Flutterwave\Facades\Flutterwave;
+use Gowelle\Flutterwave\Data\VirtualAccount\CreateVirtualAccountRequestDTO;
+use Gowelle\Flutterwave\Enums\VirtualAccountCurrency;
+use Gowelle\Flutterwave\Enums\VirtualAccountType;
 
 // Create a static account for a customer
-$account = $api->create([
-    'reference' => 'order-' . $order->id,
-    'customer_id' => 'cus_' . $customer->id,
-    'amount' => 0,
-    'currency' => 'NGN',
-    'account_type' => 'static',
-    'narration' => "Payment for Order #{$order->id}",
-    'meta' => [
+$request = new CreateVirtualAccountRequestDTO(
+    reference: 'order-' . $order->id,
+    customerId: 'cus_' . $customer->id,
+    amount: 0,
+    currency: VirtualAccountCurrency::NGN,
+    accountType: VirtualAccountType::STATIC,
+    narration: "Payment for Order #{$order->id}",
+    meta: [
         'order_id' => $order->id,
         'customer_id' => $customer->id,
     ],
-]);
+);
+
+$account = Flutterwave::banks()->createVirtualAccount($request);
 
 // Store the account number for the customer to pay into
-$bankAccount = $account['data']['account_number'];
-$bankName = $account['data']['account_bank_name'];
+$bankAccount = $account->accountNumber;
+$bankName = $account->accountBankName;
 
 // Later, retrieve to check status
-$current = $api->retrieve($account['data']['id']);
-if ($current['data']['status'] === 'active') {
+$current = Flutterwave::banks()->retrieveVirtualAccount($account->id);
+if ($current->isActive()) {
     // Account is still active
 }
 

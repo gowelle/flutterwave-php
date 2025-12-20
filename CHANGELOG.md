@@ -4,7 +4,89 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.8.0] - 2025-12-20
+
+### Added
+
+- **Livewire UI Components**: Pre-built payment UI components for Laravel Livewire applications:
+  - `flutterwave-payment-form` - Complete card payment form with client-side encryption
+  - `flutterwave-pin-input` - Secure PIN authorization input with masked fields
+  - `flutterwave-otp-input` - OTP verification with resend countdown timer
+  - `flutterwave-payment-status` - Real-time payment status display with polling
+  - `flutterwave-payment-methods` - Manage saved payment methods listing
+
+- **Vue/Inertia UI Components**: TypeScript Vue 3 components with Composition API:
+  - `PaymentForm.vue` - Card payment form with encryption composable
+  - `PinInput.vue` - PIN input with auto-focus and auto-submit
+  - `OtpInput.vue` - OTP verification with countdown
+  - `PaymentStatus.vue` - Status polling and display
+  - `PaymentMethods.vue` - Saved payment methods management
+
+- **Client-Side Encryption Utilities**: JavaScript/TypeScript utilities for secure card data handling:
+  - `encryptCardData()` - AES-256-GCM card encryption
+  - `encryptPin()` - PIN encryption for authorization
+  - `detectCardBrand()` - Card brand detection from number
+  - `generateNonce()` - Cryptographic nonce generation
+
+- **Vue Composable**: `useFlutterwave()` composable for Vue 3 applications:
+  - Reactive payment state management
+  - Card encryption integration
+  - Payment flow handling
+
+- **TypeScript Types**: Complete type definitions (`types.ts`) for Vue components:
+  - Component props interfaces
+  - API response types
+  - Event emitter types
+
+- **Comprehensive Tests**:
+  - 46 Livewire component tests (87 assertions)
+  - 41 Vue component tests with Vitest
+
+### Improved
+
+- **Service Provider**: Automatic Livewire component registration when Livewire is installed
+- **Developer Experience**: Client-side encryption eliminates need for server-side card handling
+
+### Usage
+
+**Livewire (Blade):**
+```php
+<livewire:flutterwave-payment-form
+    :amount="10000"
+    currency="TZS"
+    :customer="['email' => 'user@example.com']"
+    @payment-success="handleSuccess"
+/>
+```
+
+**Vue/Inertia:**
+```vue
+<script setup>
+import { PaymentForm } from '@/vendor/flutterwave';
+</script>
+
+<template>
+  <PaymentForm
+    :amount="10000"
+    currency="TZS"
+    :encryption-key="encryptionKey"
+    @success="handleSuccess"
+  />
+</template>
+```
+
+### Publishing Assets
+
+```bash
+# Publish Livewire views
+php artisan vendor:publish --tag=flutterwave-views
+
+# Publish Vue components
+php artisan vendor:publish --tag=flutterwave-vue
+```
+
 ## [2.7.0] - 2025-12-17
+
 
 ### Added
 

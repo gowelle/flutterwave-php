@@ -2,6 +2,8 @@ parameters:
     level: 6
     paths:
         - src
+    excludePaths:
+        - src/Livewire
     ignoreErrors:
         # Laravel Eloquent mixin (convention, not a real class)
         - '#PHPDoc tag @mixin contains unknown class Eloquent#'

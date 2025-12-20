@@ -47,6 +47,7 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
         $package
             ->name('flutterwave')
             ->hasConfigFile('flutterwave')
+            ->hasViews()
             ->hasMigration('create_flutterwave_charge_sessions_table')
             ->hasCommands([
                 CleanupChargeSessionsCommand::class,
@@ -94,6 +95,33 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
 
         // Register charge session listeners
         $this->registerChargeSessionListeners();
+
+        // Register Livewire components if Livewire is available
+        $this->registerLivewireComponents();
+
+        // Publish Vue/Inertia components (separate from Blade views)
+        $this->publishes([
+            __DIR__.'/../resources/js' => resource_path('js/vendor/flutterwave'),
+        ], 'flutterwave-vue');
+    }
+
+    /**
+     * Register Livewire components if Livewire is installed
+     */
+    private function registerLivewireComponents(): void
+    {
+        // Use string-based check to avoid IDE warnings (Livewire is optional)
+        $livewireClass = 'Livewire\\Livewire';
+
+        if (! class_exists($livewireClass)) {
+            return;
+        }
+
+        $livewireClass::component('flutterwave-payment-form', \Gowelle\Flutterwave\Livewire\PaymentForm::class);
+        $livewireClass::component('flutterwave-pin-input', \Gowelle\Flutterwave\Livewire\PinInput::class);
+        $livewireClass::component('flutterwave-otp-input', \Gowelle\Flutterwave\Livewire\OtpInput::class);
+        $livewireClass::component('flutterwave-payment-status', \Gowelle\Flutterwave\Livewire\PaymentStatus::class);
+        $livewireClass::component('flutterwave-payment-methods', \Gowelle\Flutterwave\Livewire\PaymentMethods::class);
     }
 
     /**

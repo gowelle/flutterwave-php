@@ -26,6 +26,9 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
   - [Mobile Networks](#mobile-networks)
   - [Virtual Accounts](#virtual-accounts)
   - [Wallets](#wallets)
+- [UI Components](#ui-components)
+  - [Livewire Components](#livewire-components)
+  - [Vue Components](#vue-components)
 - [Charge Sessions](#charge-sessions)
 - [Events & Listeners](#events--listeners)
 - [Webhooks](#webhooks)
@@ -63,6 +66,7 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
 - **Database Migrations** - Built-in migrations for charge session tracking
 - **Testing Ready** - Full test suite with Pest framework and HTTP faking support
 - **Laravel Integration** - Service provider, facade, and comprehensive configuration system
+- **UI Components** - Pre-built Livewire and Vue/Inertia components for payment forms, PIN/OTP input, status display, and saved payment methods
 
 ## Requirements
 
@@ -1527,7 +1531,262 @@ $api->update($account['data']['id'], [
 ]);
 ```
 
+## UI Components
+
+This package includes pre-built UI components for both Laravel Livewire and Vue/Inertia applications, enabling rapid payment form integration with client-side encryption.
+
+### Publishing Assets
+
+```bash
+# Publish Livewire Blade views (for customization)
+php artisan vendor:publish --tag=flutterwave-views
+
+# Publish Vue components (for Vue/Inertia apps)
+php artisan vendor:publish --tag=flutterwave-vue
+```
+
+### Livewire Components
+
+The package includes 5 Livewire components that are automatically registered when Livewire is installed.
+
+#### Payment Form
+
+A complete card payment form with client-side encryption:
+
+```blade
+<livewire:flutterwave-payment-form
+    :amount="10000"
+    currency="TZS"
+    :customer="['email' => 'user@example.com', 'firstName' => 'John', 'lastName' => 'Doe']"
+    redirect-url="/payment/callback"
+    @payment-success="handleSuccess"
+    @payment-error="handleError"
+    @authorization-required="handleAuth"
+/>
+```
+
+**Props:**
+- `amount` (int) - Payment amount in minor units
+- `currency` (string) - 3-letter currency code (e.g., "TZS", "NGN", "KES")
+- `customer` (array) - Customer details with `email`, `firstName`, `lastName`, `phone`
+- `redirectUrl` (string) - Callback URL after payment
+
+**Events:**
+- `payment-success` - Payment completed successfully
+- `payment-error` - Payment failed
+- `authorization-required` - PIN/OTP/redirect needed
+
+#### PIN Input
+
+Secure PIN authorization input with masked fields:
+
+```blade
+<livewire:flutterwave-pin-input
+    :charge-id="$chargeId"
+    :pin-length="4"
+    @pin-submitted="handlePinSubmit"
+    @cancelled="handleCancel"
+/>
+```
+
+**Props:**
+- `chargeId` (string) - Direct charge ID requiring authorization
+- `pinLength` (int) - Number of PIN digits (default: 4)
+
+#### OTP Input
+
+OTP verification with resend countdown:
+
+```blade
+<livewire:flutterwave-otp-input
+    :charge-id="$chargeId"
+    :length="6"
+    :resend-countdown="60"
+    @otp-submitted="handleOtpSubmit"
+    @otp-resent="handleResend"
+    @cancelled="handleCancel"
+/>
+```
+
+**Props:**
+- `chargeId` (string) - Direct charge ID requiring OTP
+- `length` (int) - OTP length (default: 6)
+- `resendCountdown` (int) - Seconds before resend allowed (default: 60)
+
+#### Payment Status
+
+Real-time payment status display with polling:
+
+```blade
+<livewire:flutterwave-payment-status
+    :charge-id="$chargeId"
+    :poll-interval="3000"
+    :auto-poll="true"
+    @status-updated="handleStatusUpdate"
+    @payment-complete="handleComplete"
+/>
+```
+
+**Props:**
+- `chargeId` (string) - Direct charge ID to monitor
+- `pollInterval` (int) - Polling interval in milliseconds (default: 3000)
+- `autoPoll` (bool) - Start polling automatically (default: true)
+
+#### Payment Methods
+
+List and manage saved payment methods:
+
+```blade
+<livewire:flutterwave-payment-methods
+    :customer-id="$customerId"
+    currency="TZS"
+    @method-selected="handleMethodSelect"
+    @add-new-clicked="handleAddNew"
+/>
+```
+
+**Props:**
+- `customerId` (string) - Customer ID to fetch methods for
+- `currency` (string) - Currency to filter methods
+
+### Vue Components
+
+For Vue/Inertia applications, publish the components and import them:
+
+```bash
+php artisan vendor:publish --tag=flutterwave-vue
+```
+
+Components will be published to `resources/js/vendor/flutterwave/`.
+
+#### Payment Form (Vue)
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+import PaymentForm from '@/vendor/flutterwave/components/PaymentForm.vue';
+
+const encryptionKey = ref('your-encryption-key');
+
+function handleSuccess(charge) {
+  console.log('Payment successful:', charge);
+}
+
+function handleError(error) {
+  console.error('Payment failed:', error);
+}
+</script>
+
+<template>
+  <PaymentForm
+    :amount="10000"
+    currency="TZS"
+    :encryption-key="encryptionKey"
+    :customer="{ email: 'user@example.com', firstName: 'John', lastName: 'Doe' }"
+    @success="handleSuccess"
+    @error="handleError"
+  />
+</template>
+```
+
+#### PIN Input (Vue)
+
+```vue
+<script setup lang="ts">
+import PinInput from '@/vendor/flutterwave/components/PinInput.vue';
+
+function handleSubmit({ nonce, encrypted_pin }) {
+  // Submit encrypted PIN to API
+}
+</script>
+
+<template>
+  <PinInput
+    charge-id="dc_123"
+    :encryption-key="encryptionKey"
+    :pin-length="4"
+    @submit="handleSubmit"
+    @cancel="handleCancel"
+  />
+</template>
+```
+
+#### OTP Input (Vue)
+
+```vue
+<script setup lang="ts">
+import OtpInput from '@/vendor/flutterwave/components/OtpInput.vue';
+</script>
+
+<template>
+  <OtpInput
+    charge-id="dc_123"
+    :length="6"
+    @submit="handleOtpSubmit"
+    @resend="handleResend"
+    @cancel="handleCancel"
+  />
+</template>
+```
+
+#### Payment Status (Vue)
+
+```vue
+<script setup lang="ts">
+import PaymentStatus from '@/vendor/flutterwave/components/PaymentStatus.vue';
+</script>
+
+<template>
+  <PaymentStatus
+    charge-id="dc_123"
+    :start-polling="true"
+    :poll-interval="3000"
+    @success="handleSuccess"
+    @failed="handleFailed"
+    @timeout="handleTimeout"
+  />
+</template>
+```
+
+#### Payment Methods (Vue)
+
+```vue
+<script setup lang="ts">
+import PaymentMethods from '@/vendor/flutterwave/components/PaymentMethods.vue';
+</script>
+
+<template>
+  <PaymentMethods
+    customer-id="cust_123"
+    :selected-method-id="selectedId"
+    @select="handleSelect"
+    @add-new="handleAddNew"
+  />
+</template>
+```
+
+### Client-Side Encryption
+
+The Vue components include encryption utilities for secure card data handling:
+
+```typescript
+import { encryptCardData, encryptPin, generateNonce } from '@/vendor/flutterwave/utils/encryption';
+
+// Encrypt card data
+const nonce = generateNonce();
+const encrypted = await encryptCardData(encryptionKey, {
+  cardNumber: '4111111111111111',
+  expiryMonth: '12',
+  expiryYear: '25',
+  cvv: '123',
+}, nonce);
+
+// Encrypt PIN
+const pinEncrypted = await encryptPin(encryptionKey, '1234');
+```
+
 ## Charge Sessions
+
 
 Charge Sessions provide database-backed tracking of direct charge transactions. This feature is particularly useful for tracking charges that require multiple authorization steps (PIN, OTP, redirects).
 

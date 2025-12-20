@@ -9,9 +9,9 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
             </svg>
         </div>
-        <h3 class="flw-otp-title">Enter Verification Code</h3>
+        <h3 class="flw-otp-title">{{ __('flutterwave::messages.enter_verification_code') }}</h3>
         <p class="flw-otp-subtitle">
-            We've sent a {{ $otpLength }}-digit code to your phone
+            {{ __('flutterwave::messages.sent_code_message', ['length' => $otpLength]) }}
             @if ($maskedPhone)
                 <strong>{{ $maskedPhone }}</strong>
             @endif
@@ -53,25 +53,25 @@
         :disabled="processing || !isOtpComplete()"
         x-bind:class="{ 'flw-btn-loading': processing }"
     >
-        <span x-show="!processing">Verify Code</span>
+        <span x-show="!processing">{{ __('flutterwave::messages.verify_code') }}</span>
         <span x-show="processing" class="flw-btn-spinner">
             <svg class="flw-spinner" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="32" stroke-dashoffset="12"></circle>
             </svg>
-            Verifying...
+            {{ __('flutterwave::messages.verifying') }}
         </span>
     </button>
 
     {{-- Resend OTP --}}
     <div class="flw-resend-section">
         <p class="flw-resend-text">
-            Didn't receive the code?
+            {{ __('flutterwave::messages.didnt_receive_code') }}
             <template x-if="countdown > 0">
-                <span class="flw-countdown">Resend in <strong x-text="countdown"></strong>s</span>
+                <span class="flw-countdown">{!! __('flutterwave::messages.resend_in', ['seconds' => '<strong x-text="countdown"></strong>']) !!}</span>
             </template>
             <template x-if="countdown <= 0">
                 <button type="button" wire:click="resendOtp" class="flw-resend-link" @click="resendClicked()">
-                    Resend Code
+                    {{ __('flutterwave::messages.resend_code') }}
                 </button>
             </template>
         </p>
@@ -79,7 +79,7 @@
 
     {{-- Cancel Link --}}
     <button type="button" wire:click="cancel" class="flw-cancel-link">
-        Cancel Payment
+        {{ __('flutterwave::messages.cancel_payment') }}
     </button>
 </div>
 

@@ -130,6 +130,27 @@ export interface AvsAuthorizationData {
 }
 
 // Component Props
+export interface PaymentFormLabels {
+  payment_form: string;
+  customer_details: string;
+  email: string;
+  phone_number: string;
+  first_name: string;
+  last_name: string;
+  card_details: string;
+  card_number: string;
+  month: string;
+  year: string;
+  cvv: string;
+  total: string;
+  pay: string;
+  processing: string;
+  secured_by: string;
+  payment_failed: string;
+  redirect_notice: string;
+  continue_authorization: string;
+}
+
 export interface PaymentFormProps {
   amount: number;
   currency?: string;
@@ -138,18 +159,55 @@ export interface PaymentFormProps {
   customer?: Partial<Customer>;
   meta?: Record<string, unknown>;
   encryptionKey: string;
+  labels?: Partial<PaymentFormLabels>;
+}
+
+export interface PinInputLabels {
+  enter_card_pin: string;
+  enter_pin_message: string;
+  confirm_pin: string;
+  verifying: string;
+  cancel_payment: string;
 }
 
 export interface PinInputProps {
   chargeId: string;
   pinLength?: number;
   encryptionKey: string;
+  labels?: Partial<PinInputLabels>;
+}
+
+export interface OtpInputLabels {
+  enter_verification_code: string;
+  sent_code_message: string;
+  verify_code: string;
+  verifying: string;
+  didnt_receive_code: string;
+  resend_in: string;
+  resend_code: string;
+  cancel_payment: string;
 }
 
 export interface OtpInputProps {
   chargeId: string;
   otpLength?: number;
   maskedPhone?: string;
+  labels?: Partial<OtpInputLabels>;
+}
+
+export interface PaymentStatusLabels {
+  processing_payment: string;
+  awaiting_authorization: string;
+  payment_successful: string;
+  payment_failed: string;
+  payment_cancelled: string;
+  payment_timeout: string;
+  processing: string;
+  amount: string;
+  reference: string;
+  checking_status: string;
+  continue: string;
+  try_again: string;
 }
 
 export interface PaymentStatusProps {
@@ -157,6 +215,7 @@ export interface PaymentStatusProps {
   startPolling?: boolean;
   pollInterval?: number;
   maxPolls?: number;
+  labels?: Partial<PaymentStatusLabels>;
 }
 
 export interface PaymentMethodsProps {

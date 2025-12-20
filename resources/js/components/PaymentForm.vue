@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useFlutterwave } from '../composables/useFlutterwave';
-import type { PaymentFormProps, DirectChargeResponse } from '../types';
+import type { PaymentFormProps, DirectChargeResponse, PaymentFormLabels } from '../types';
 
 const props = withDefaults(defineProps<PaymentFormProps>(), {
   currency: 'TZS',
@@ -9,7 +9,31 @@ const props = withDefaults(defineProps<PaymentFormProps>(), {
   redirectUrl: '',
   customer: () => ({}),
   meta: () => ({}),
+  labels: () => ({}),
 });
+
+const defaultLabels: PaymentFormLabels = {
+  payment_form: 'Payment Form',
+  customer_details: 'Customer Details',
+  email: 'Email',
+  phone_number: 'Phone Number',
+  first_name: 'First Name',
+  last_name: 'Last Name',
+  card_details: 'Card Details',
+  card_number: 'Card Number',
+  month: 'Month',
+  year: 'Year',
+  cvv: 'CVV',
+  total: 'Total',
+  pay: 'Pay',
+  processing: 'Processing...',
+  secured_by: 'Secured with 256-bit encryption',
+  payment_failed: 'Payment failed',
+  redirect_notice: 'You will be redirected to complete payment authorization.',
+  continue_authorization: 'Continue to Authorization',
+};
+
+const t = computed(() => ({ ...defaultLabels, ...props.labels }));
 
 const emit = defineEmits<{
   (e: 'success', charge: DirectChargeResponse): void;
@@ -91,7 +115,7 @@ async function handleSubmit() {
 
     handleResult(result);
   } catch (e) {
-    emit('error', error.value || 'Payment failed');
+    emit('error', error.value || t.value.payment_failed);
   }
 }
 
@@ -133,22 +157,22 @@ function handleResult(result: DirectChargeResponse) {
     <form @submit.prevent="handleSubmit" class="flw-form">
       <!-- Customer Details -->
       <div class="flw-form-section">
-        <h3 class="flw-form-section-title">Customer Details</h3>
+        <h3 class="flw-form-section-title">{{ t.customer_details }}</h3>
         <div class="flw-form-grid">
           <div class="flw-form-group">
-            <label for="email" class="flw-label">Email</label>
+            <label for="email" class="flw-label">{{ t.email }}</label>
             <input type="email" id="email" v-model="email" class="flw-input" placeholder="customer@example.com" required>
           </div>
           <div class="flw-form-group">
-            <label for="phone" class="flw-label">Phone</label>
+            <label for="phone" class="flw-label">{{ t.phone_number }}</label>
             <input type="tel" id="phone" v-model="phoneNumber" class="flw-input" placeholder="+255123456789" required>
           </div>
           <div class="flw-form-group">
-            <label for="firstName" class="flw-label">First Name</label>
+            <label for="firstName" class="flw-label">{{ t.first_name }}</label>
             <input type="text" id="firstName" v-model="firstName" class="flw-input" placeholder="John" required>
           </div>
           <div class="flw-form-group">
-            <label for="lastName" class="flw-label">Last Name</label>
+            <label for="lastName" class="flw-label">{{ t.last_name }}</label>
             <input type="text" id="lastName" v-model="lastName" class="flw-input" placeholder="Doe" required>
           </div>
         </div>
@@ -156,9 +180,9 @@ function handleResult(result: DirectChargeResponse) {
 
       <!-- Card Details -->
       <div class="flw-form-section">
-        <h3 class="flw-form-section-title">Card Details</h3>
+        <h3 class="flw-form-section-title">{{ t.card_details }}</h3>
         <div class="flw-form-group">
-          <label for="cardNumber" class="flw-label">Card Number</label>
+          <label for="cardNumber" class="flw-label">{{ t.card_number }}</label>
           <div class="flw-input-with-icon">
             <input type="text" id="cardNumber" v-model="cardNumber" class="flw-input" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number" required>
             <img v-if="cardBrandIcon" :src="cardBrandIcon" :alt="cardBrand" class="flw-card-brand-icon">
@@ -166,21 +190,21 @@ function handleResult(result: DirectChargeResponse) {
         </div>
         <div class="flw-form-grid flw-form-grid-3">
           <div class="flw-form-group">
-            <label for="expiryMonth" class="flw-label">Month</label>
+            <label for="expiryMonth" class="flw-label">{{ t.month }}</label>
             <select id="expiryMonth" v-model="expiryMonth" class="flw-input" required>
               <option value="">MM</option>
               <option v-for="m in 12" :key="m" :value="String(m).padStart(2, '0')">{{ String(m).padStart(2, '0') }}</option>
             </select>
           </div>
           <div class="flw-form-group">
-            <label for="expiryYear" class="flw-label">Year</label>
+            <label for="expiryYear" class="flw-label">{{ t.year }}</label>
             <select id="expiryYear" v-model="expiryYear" class="flw-input" required>
               <option value="">YY</option>
               <option v-for="y in 16" :key="y" :value="String(new Date().getFullYear() + y - 1).slice(-2)">{{ new Date().getFullYear() + y - 1 }}</option>
             </select>
           </div>
           <div class="flw-form-group">
-            <label for="cvv" class="flw-label">CVV</label>
+            <label for="cvv" class="flw-label">{{ t.cvv }}</label>
             <input type="password" id="cvv" v-model="cvv" class="flw-input" placeholder="***" maxlength="4" autocomplete="cc-csc" required>
           </div>
         </div>
@@ -188,21 +212,21 @@ function handleResult(result: DirectChargeResponse) {
 
       <!-- Amount -->
       <div class="flw-payment-summary">
-        <span class="flw-amount-label">Total</span>
+        <span class="flw-amount-label">{{ t.total }}</span>
         <span class="flw-amount-value">{{ currency }} {{ amount.toLocaleString() }}</span>
       </div>
 
       <!-- Submit -->
       <button type="submit" class="flw-btn flw-btn-primary flw-btn-full" :disabled="!canSubmit" :class="{ 'flw-btn-loading': processing }">
-        <span v-if="!processing">Pay {{ currency }} {{ amount.toLocaleString() }}</span>
-        <span v-else class="flw-btn-spinner">Processing...</span>
+        <span v-if="!processing">{{ t.pay }} {{ currency }} {{ amount.toLocaleString() }}</span>
+        <span v-else class="flw-btn-spinner">{{ t.processing }}</span>
       </button>
 
       <div class="flw-security-notice">
         <svg class="flw-security-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
         </svg>
-        <span>Secured with 256-bit encryption</span>
+        <span>{{ t.secured_by }}</span>
       </div>
     </form>
   </div>

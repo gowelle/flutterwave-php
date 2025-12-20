@@ -17,20 +17,20 @@
     {{-- Redirect Notice --}}
     @if ($actionRedirectUrl)
         <div class="flw-redirect-notice">
-            <p>You will be redirected to complete payment authorization.</p>
+            <p>{{ __('flutterwave::messages.redirect_notice') }}</p>
             <a href="{{ $actionRedirectUrl }}" class="flw-btn flw-btn-primary">
-                Continue to Authorization
+                {{ __('flutterwave::messages.continue_authorization') }}
             </a>
         </div>
     @else
         <form @submit.prevent="submitPayment" class="flw-form">
             {{-- Customer Details --}}
             <div class="flw-form-section">
-                <h3 class="flw-form-section-title">Customer Details</h3>
+                <h3 class="flw-form-section-title">{{ __('flutterwave::messages.customer_details') }}</h3>
                 
                 <div class="flw-form-grid">
                     <div class="flw-form-group">
-                        <label for="email" class="flw-label">Email</label>
+                        <label for="email" class="flw-label">{{ __('flutterwave::messages.email') }}</label>
                         <input
                             type="email"
                             id="email"
@@ -43,7 +43,7 @@
                     </div>
 
                     <div class="flw-form-group">
-                        <label for="phoneNumber" class="flw-label">Phone Number</label>
+                        <label for="phoneNumber" class="flw-label">{{ __('flutterwave::messages.phone_number') }}</label>
                         <input
                             type="tel"
                             id="phoneNumber"
@@ -56,7 +56,7 @@
                     </div>
 
                     <div class="flw-form-group">
-                        <label for="firstName" class="flw-label">First Name</label>
+                        <label for="firstName" class="flw-label">{{ __('flutterwave::messages.first_name') }}</label>
                         <input
                             type="text"
                             id="firstName"
@@ -69,7 +69,7 @@
                     </div>
 
                     <div class="flw-form-group">
-                        <label for="lastName" class="flw-label">Last Name</label>
+                        <label for="lastName" class="flw-label">{{ __('flutterwave::messages.last_name') }}</label>
                         <input
                             type="text"
                             id="lastName"
@@ -89,11 +89,12 @@
                     <svg class="flw-section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                     </svg>
-                    Card Details
+                    </svg>
+                    {{ __('flutterwave::messages.card_details') }}
                 </h3>
 
                 <div class="flw-form-group">
-                    <label for="cardNumber" class="flw-label">Card Number</label>
+                    <label for="cardNumber" class="flw-label">{{ __('flutterwave::messages.card_number') }}</label>
                     <div class="flw-input-with-icon">
                         <input
                             type="text"
@@ -114,7 +115,7 @@
 
                 <div class="flw-form-grid flw-form-grid-3">
                     <div class="flw-form-group">
-                        <label for="expiryMonth" class="flw-label">Month</label>
+                        <label for="expiryMonth" class="flw-label">{{ __('flutterwave::messages.month') }}</label>
                         <select
                             id="expiryMonth"
                             x-model="expiryMonth"
@@ -129,7 +130,7 @@
                     </div>
 
                     <div class="flw-form-group">
-                        <label for="expiryYear" class="flw-label">Year</label>
+                        <label for="expiryYear" class="flw-label">{{ __('flutterwave::messages.year') }}</label>
                         <select
                             id="expiryYear"
                             x-model="expiryYear"
@@ -144,7 +145,7 @@
                     </div>
 
                     <div class="flw-form-group">
-                        <label for="cvv" class="flw-label">CVV</label>
+                        <label for="cvv" class="flw-label">{{ __('flutterwave::messages.cvv') }}</label>
                         <input
                             type="password"
                             id="cvv"
@@ -164,7 +165,7 @@
             @if ($amount > 0)
                 <div class="flw-payment-summary">
                     <div class="flw-payment-amount">
-                        <span class="flw-amount-label">Total</span>
+                        <span class="flw-amount-label">{{ __('flutterwave::messages.total') }}</span>
                         <span class="flw-amount-value">{{ $currency }} {{ number_format($amount, 2) }}</span>
                     </div>
                 </div>
@@ -178,13 +179,13 @@
                 x-bind:class="{ 'flw-btn-loading': processing }"
             >
                 <span x-show="!processing">
-                    Pay {{ $currency }} {{ number_format($amount, 2) }}
+                    {{ __('flutterwave::messages.pay') }} {{ $currency }} {{ number_format($amount, 2) }}
                 </span>
                 <span x-show="processing" class="flw-btn-spinner">
                     <svg class="flw-spinner" viewBox="0 0 24 24">
                         <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="32" stroke-dashoffset="12"></circle>
                     </svg>
-                    Processing...
+                    {{ __('flutterwave::messages.processing') }}
                 </span>
             </button>
 
@@ -193,7 +194,7 @@
                 <svg class="flw-security-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                 </svg>
-                <span>Your payment is secured with 256-bit encryption</span>
+                <span>{{ __('flutterwave::messages.secured_by') }}</span>
             </div>
         </form>
     @endif

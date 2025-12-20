@@ -29,6 +29,7 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
 - [UI Components](#ui-components)
   - [Livewire Components](#livewire-components)
   - [Vue Components](#vue-components)
+- [Localization](#localization)
 - [Charge Sessions](#charge-sessions)
 - [Events & Listeners](#events--listeners)
 - [Webhooks](#webhooks)
@@ -1783,6 +1784,41 @@ const encrypted = await encryptCardData(encryptionKey, {
 
 // Encrypt PIN
 const pinEncrypted = await encryptPin(encryptionKey, '1234');
+```
+
+## Localization
+
+The package includes built-in support for multiple languages. Currently supported languages:
+
+- English (`en`) - Default
+- Swahili (`sw`)
+- French (`fr`)
+
+### Publishing Translations
+
+To customize the translation strings, publish the language files:
+
+```bash
+php artisan vendor:publish --tag="flutterwave-translations"
+```
+
+This will publish the files to `resources/lang/vendor/flutterwave`.
+
+### Using in Vue Components
+
+All Vue components accept a `labels` prop to override specific text:
+
+```vue
+<script setup>
+const customLabels = {
+    pay: 'Lipa Sasa',
+    processing: 'Inachakata...'
+};
+</script>
+
+<template>
+    <PaymentForm :labels="customLabels" />
+</template>
 ```
 
 ## Charge Sessions

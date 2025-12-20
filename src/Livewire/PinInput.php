@@ -48,7 +48,7 @@ class PinInput extends Component
         $this->error = '';
 
         if (empty($encryptedData['encrypted_pin']) || empty($encryptedData['nonce'])) {
-            $this->error = 'PIN encryption failed. Please try again.';
+            $this->error = __('flutterwave::messages.pin_encryption_failed');
             $this->processing = false;
 
             return;

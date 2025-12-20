@@ -48,6 +48,7 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
             ->name('flutterwave')
             ->hasConfigFile('flutterwave')
             ->hasViews()
+            ->hasTranslations()
             ->hasMigration('create_flutterwave_charge_sessions_table')
             ->hasCommands([
                 CleanupChargeSessionsCommand::class,

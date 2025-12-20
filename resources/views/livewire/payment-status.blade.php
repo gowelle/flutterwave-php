@@ -25,12 +25,12 @@
         @if ($showDetails && $amount)
             <div class="flw-payment-details">
                 <div class="flw-detail-row">
-                    <span class="flw-detail-label">Amount</span>
+                    <span class="flw-detail-label">{{ __('flutterwave::messages.amount') }}</span>
                     <span class="flw-detail-value">{{ $currency }} {{ number_format($amount, 2) }}</span>
                 </div>
                 @if ($reference)
                     <div class="flw-detail-row">
-                        <span class="flw-detail-label">Reference</span>
+                        <span class="flw-detail-label">{{ __('flutterwave::messages.reference') }}</span>
                         <span class="flw-detail-value">{{ $reference }}</span>
                     </div>
                 @endif
@@ -40,15 +40,15 @@
         @if ($polling)
             <div class="flw-polling-indicator">
                 <div class="flw-polling-dots"><span></span><span></span><span></span></div>
-                <p>Checking payment status...</p>
+                <p>{{ __('flutterwave::messages.checking_status') }}</p>
             </div>
         @endif
 
         <div class="flw-status-actions">
             @if ($status === 'succeeded')
-                <button type="button" class="flw-btn flw-btn-success flw-btn-full">Continue</button>
+                <button type="button" class="flw-btn flw-btn-success flw-btn-full">{{ __('flutterwave::messages.continue') }}</button>
             @elseif (in_array($status, ['failed', 'cancelled', 'timeout']))
-                <button type="button" class="flw-btn flw-btn-primary flw-btn-full">Try Again</button>
+                <button type="button" class="flw-btn flw-btn-primary flw-btn-full">{{ __('flutterwave::messages.try_again') }}</button>
             @endif
         </div>
     </div>

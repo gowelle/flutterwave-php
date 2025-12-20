@@ -4,6 +4,15 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.9.0] - 2025-12-20
+
+### Added
+
+- **Localization Support**: Built-in translation support for English (en), Swahili (sw), and French (fr):
+  - Dynamic labels for all Vue components via `labels` prop
+  - Livewire component translations using Laravel's localization system
+  - Publishable translation files for customization
+
 ## [2.8.0] - 2025-12-20
 
 ### Added
@@ -40,6 +49,8 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 - **Comprehensive Tests**:
   - 46 Livewire component tests (87 assertions)
+  - 41 Vue component tests with Vitest
+
   - 41 Vue component tests with Vitest
 
 ### Improved

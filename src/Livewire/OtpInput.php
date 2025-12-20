@@ -77,14 +77,14 @@ class OtpInput extends Component
 
         // Validate OTP format
         if (\strlen($this->otp) !== $this->otpLength) {
-            $this->error = "Please enter a valid {$this->otpLength}-digit OTP.";
+            $this->error = __('flutterwave::messages.invalid_otp_length', ['length' => $this->otpLength]);
             $this->processing = false;
 
             return;
         }
 
         if (! ctype_digit($this->otp)) {
-            $this->error = 'OTP must contain only numbers.';
+            $this->error = __('flutterwave::messages.otp_digits_only');
             $this->processing = false;
 
             return;

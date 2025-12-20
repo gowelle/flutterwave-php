@@ -24,7 +24,7 @@ class PaymentStatus extends Component
 
     public string $status = 'pending';
 
-    public string $statusMessage = 'Processing your payment...';
+    public string $statusMessage = ''; // Will be set in mount or checkStatus
 
     public ?float $amount = null;
 
@@ -80,7 +80,7 @@ class PaymentStatus extends Component
             $charge = Flutterwave::directCharge()->retrieve($this->chargeId);
             $this->updateFromCharge($charge);
         } catch (\Exception $e) {
-            $this->statusMessage = 'Unable to check payment status.';
+            $this->statusMessage = __('flutterwave::messages.payment_failed');
         }
     }
 
@@ -99,7 +99,7 @@ class PaymentStatus extends Component
 
         if ($this->pollCount >= $this->maxPolls) {
             $this->polling = false;
-            $this->statusMessage = 'Payment status check timed out.';
+            $this->statusMessage = __('flutterwave::messages.payment_timeout');
             $this->dispatch('polling-timeout', chargeId: $this->chargeId);
 
             return;
@@ -120,12 +120,12 @@ class PaymentStatus extends Component
         $this->chargeData = $charge->toArray();
 
         $this->statusMessage = match ($charge->status) {
-            DirectChargeStatus::PENDING => 'Payment is being processed...',
-            DirectChargeStatus::REQUIRES_ACTION => 'Awaiting authorization...',
-            DirectChargeStatus::SUCCEEDED => 'Payment successful!',
-            DirectChargeStatus::FAILED => $charge->getIssuerResponseMessage() ?? 'Payment failed.',
-            DirectChargeStatus::CANCELLED => 'Payment was cancelled.',
-            DirectChargeStatus::TIMEOUT => 'Payment authorization timed out.',
+            DirectChargeStatus::PENDING => __('flutterwave::messages.processing_payment'),
+            DirectChargeStatus::REQUIRES_ACTION => __('flutterwave::messages.awaiting_authorization'),
+            DirectChargeStatus::SUCCEEDED => __('flutterwave::messages.payment_successful'),
+            DirectChargeStatus::FAILED => $charge->getIssuerResponseMessage() ?? __('flutterwave::messages.payment_failed'),
+            DirectChargeStatus::CANCELLED => __('flutterwave::messages.payment_cancelled'),
+            DirectChargeStatus::TIMEOUT => __('flutterwave::messages.payment_timeout'),
         };
 
         if ($charge->status->isSuccessful()) {

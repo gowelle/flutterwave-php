@@ -125,7 +125,7 @@ class PaymentForm extends Component
 
             // Validate encrypted data received from JS
             if (empty($encryptedData['nonce']) || empty($encryptedData['encrypted_card_number'])) {
-                throw new \InvalidArgumentException('Card encryption data is missing.');
+                throw new \InvalidArgumentException(__('flutterwave::messages.card_encryption_missing'));
             }
 
             // Create the direct charge
@@ -164,7 +164,7 @@ class PaymentForm extends Component
             $this->error = $e->getUserFriendlyMessage();
             $this->dispatch('payment-error', error: $this->error);
         } catch (\Exception $e) {
-            $this->error = 'An unexpected error occurred. Please try again.';
+            $this->error = __('flutterwave::messages.unexpected_error');
             $this->dispatch('payment-error', error: $this->error);
         } finally {
             $this->processing = false;
@@ -199,7 +199,7 @@ class PaymentForm extends Component
         }
 
         if ($charge->status->isTerminal()) {
-            $this->error = $charge->getIssuerResponseMessage() ?? 'Payment failed.';
+            $this->error = $charge->getIssuerResponseMessage() ?? __('flutterwave::messages.payment_failed');
             $this->dispatch('payment-failed', charge: $charge->toArray());
         }
     }

@@ -96,18 +96,34 @@ function resendOtp() {
   <div class="flw-otp-input">
     <div class="flw-otp-header">
       <div class="flw-otp-icon">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+          />
         </svg>
       </div>
-      <h3 class="flw-otp-title">{{ t.enter_verification_code }}</h3>
+      <h3 class="flw-otp-title">
+        {{ t.enter_verification_code }}
+      </h3>
       <p class="flw-otp-subtitle">
         {{ t.sent_code_message.replace(':length', String(otpLength)) }}
         <strong v-if="maskedPhone">{{ maskedPhone }}</strong>
       </p>
     </div>
 
-    <div v-if="error" class="flw-alert flw-alert-error">{{ error }}</div>
+    <div
+      v-if="error"
+      class="flw-alert flw-alert-error"
+    >
+      {{ error }}
+    </div>
 
     <div class="flw-otp-boxes">
       <input
@@ -127,7 +143,12 @@ function resendOtp() {
       >
     </div>
 
-    <button type="button" class="flw-btn flw-btn-primary flw-btn-full" :disabled="!isOtpComplete || processing" @click="submitOtp">
+    <button
+      type="button"
+      class="flw-btn flw-btn-primary flw-btn-full"
+      :disabled="!isOtpComplete || processing"
+      @click="submitOtp"
+    >
       <span v-if="!processing">{{ t.verify_code }}</span>
       <span v-else>{{ t.verifying }}</span>
     </button>
@@ -135,12 +156,28 @@ function resendOtp() {
     <div class="flw-resend-section">
       <p>
         {{ t.didnt_receive_code }}
-        <span v-if="countdown > 0" class="flw-countdown">{{ t.resend_in.replace(':seconds', String(countdown)) }}</span>
-        <button v-else type="button" class="flw-resend-link" @click="resendOtp">{{ t.resend_code }}</button>
+        <span
+          v-if="countdown > 0"
+          class="flw-countdown"
+        >{{ t.resend_in.replace(':seconds', String(countdown)) }}</span>
+        <button
+          v-else
+          type="button"
+          class="flw-resend-link"
+          @click="resendOtp"
+        >
+          {{ t.resend_code }}
+        </button>
       </p>
     </div>
 
-    <button type="button" class="flw-cancel-link" @click="emit('cancel')">{{ t.cancel_payment }}</button>
+    <button
+      type="button"
+      class="flw-cancel-link"
+      @click="emit('cancel')"
+    >
+      {{ t.cancel_payment }}
+    </button>
   </div>
 </template>
 

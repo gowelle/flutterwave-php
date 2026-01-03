@@ -2,7 +2,6 @@ import { ref, computed, type Ref } from 'vue';
 import { encryptCardData, encryptPin, detectCardBrand, formatCardNumber } from '../utils/encryption';
 import type {
     DirectChargeResponse,
-    DirectChargeStatus,
     NextActionType,
     EncryptedCardData,
     PinAuthorizationData,

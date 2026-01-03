@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import type { PaymentMethodsProps, SavedPaymentMethod } from '../types';
 
 const props = withDefaults(defineProps<PaymentMethodsProps>(), {
@@ -66,12 +66,32 @@ const cardIcons: Record<string, string> = {
 
 <template>
   <div class="flw-payment-methods">
-    <div v-if="loading" class="flw-loading">
-      <svg class="flw-spinner" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="32" stroke-dashoffset="12"/></svg>
+    <div
+      v-if="loading"
+      class="flw-loading"
+    >
+      <svg
+        class="flw-spinner"
+        viewBox="0 0 24 24"
+      ><circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+        fill="none"
+        stroke-dasharray="32"
+        stroke-dashoffset="12"
+      /></svg>
       <span>Loading payment methods...</span>
     </div>
 
-    <div v-else-if="error" class="flw-alert flw-alert-error">{{ error }}</div>
+    <div
+      v-else-if="error"
+      class="flw-alert flw-alert-error"
+    >
+      {{ error }}
+    </div>
 
     <template v-else>
       <div class="flw-methods-list">
@@ -84,25 +104,60 @@ const cardIcons: Record<string, string> = {
           @click="selectMethod(method.id)"
         >
           <div class="flw-method-icon">
-            <img :src="cardIcons[method.card.brand.toLowerCase()] || cardIcons.visa" :alt="method.card.brand">
+            <img
+              :src="cardIcons[method.card.brand.toLowerCase()] || cardIcons.visa"
+              :alt="method.card.brand"
+            >
           </div>
           <div class="flw-method-info">
             <span class="flw-method-name">{{ getCardDisplay(method) }}</span>
             <span class="flw-method-expiry">
               Expires {{ method.card.exp_month }}/{{ method.card.exp_year }}
-              <span v-if="isExpired(method)" class="flw-expired-badge">Expired</span>
+              <span
+                v-if="isExpired(method)"
+                class="flw-expired-badge"
+              >Expired</span>
             </span>
           </div>
-          <svg v-if="selectedMethodId === method.id" class="flw-check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          <svg
+            v-if="selectedMethodId === method.id"
+            class="flw-check-icon"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
           </svg>
         </button>
 
-        <p v-if="methods.length === 0" class="flw-no-methods">No saved payment methods</p>
+        <p
+          v-if="methods.length === 0"
+          class="flw-no-methods"
+        >
+          No saved payment methods
+        </p>
       </div>
 
-      <button type="button" class="flw-add-new-btn" @click="emit('add-new')">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      <button
+        type="button"
+        class="flw-add-new-btn"
+        @click="emit('add-new')"
+      >
+        <svg
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        ><path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 4v16m8-8H4"
+        /></svg>
         Add New Card
       </button>
     </template>

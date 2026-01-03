@@ -47,17 +47,17 @@ const emit = defineEmits<{
 const {
   processing,
   error,
-  charge,
-  currentAction,
+  charge: _charge,
+  currentAction: _currentAction,
   cardNumber,
   expiryMonth,
   expiryYear,
   cvv,
   cardBrand,
-  formattedCardNumber,
+  formattedCardNumber: _formattedCardNumber,
   isFormValid,
   createCharge,
-  resetForm,
+  resetForm: _resetForm,
 } = useFlutterwave({ encryptionKey: props.encryptionKey });
 
 // Customer form fields
@@ -114,7 +114,7 @@ async function handleSubmit() {
     });
 
     handleResult(result);
-  } catch (e) {
+  } catch (_e) {
     emit('error', error.value || t.value.payment_failed);
   }
 }
@@ -147,65 +147,186 @@ function handleResult(result: DirectChargeResponse) {
 <template>
   <div class="flw-payment-form">
     <!-- Error Alert -->
-    <div v-if="error" class="flw-alert flw-alert-error">
-      <svg class="flw-alert-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    <div
+      v-if="error"
+      class="flw-alert flw-alert-error"
+    >
+      <svg
+        class="flw-alert-icon"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
       <span>{{ error }}</span>
     </div>
 
-    <form @submit.prevent="handleSubmit" class="flw-form">
+    <form
+      class="flw-form"
+      @submit.prevent="handleSubmit"
+    >
       <!-- Customer Details -->
       <div class="flw-form-section">
-        <h3 class="flw-form-section-title">{{ t.customer_details }}</h3>
+        <h3 class="flw-form-section-title">
+          {{ t.customer_details }}
+        </h3>
         <div class="flw-form-grid">
           <div class="flw-form-group">
-            <label for="email" class="flw-label">{{ t.email }}</label>
-            <input type="email" id="email" v-model="email" class="flw-input" placeholder="customer@example.com" required>
+            <label
+              for="email"
+              class="flw-label"
+            >{{ t.email }}</label>
+            <input
+              id="email"
+              v-model="email"
+              type="email"
+              class="flw-input"
+              placeholder="customer@example.com"
+              required
+            >
           </div>
           <div class="flw-form-group">
-            <label for="phone" class="flw-label">{{ t.phone_number }}</label>
-            <input type="tel" id="phone" v-model="phoneNumber" class="flw-input" placeholder="+255123456789" required>
+            <label
+              for="phone"
+              class="flw-label"
+            >{{ t.phone_number }}</label>
+            <input
+              id="phone"
+              v-model="phoneNumber"
+              type="tel"
+              class="flw-input"
+              placeholder="+255123456789"
+              required
+            >
           </div>
           <div class="flw-form-group">
-            <label for="firstName" class="flw-label">{{ t.first_name }}</label>
-            <input type="text" id="firstName" v-model="firstName" class="flw-input" placeholder="John" required>
+            <label
+              for="firstName"
+              class="flw-label"
+            >{{ t.first_name }}</label>
+            <input
+              id="firstName"
+              v-model="firstName"
+              type="text"
+              class="flw-input"
+              placeholder="John"
+              required
+            >
           </div>
           <div class="flw-form-group">
-            <label for="lastName" class="flw-label">{{ t.last_name }}</label>
-            <input type="text" id="lastName" v-model="lastName" class="flw-input" placeholder="Doe" required>
+            <label
+              for="lastName"
+              class="flw-label"
+            >{{ t.last_name }}</label>
+            <input
+              id="lastName"
+              v-model="lastName"
+              type="text"
+              class="flw-input"
+              placeholder="Doe"
+              required
+            >
           </div>
         </div>
       </div>
 
       <!-- Card Details -->
       <div class="flw-form-section">
-        <h3 class="flw-form-section-title">{{ t.card_details }}</h3>
+        <h3 class="flw-form-section-title">
+          {{ t.card_details }}
+        </h3>
         <div class="flw-form-group">
-          <label for="cardNumber" class="flw-label">{{ t.card_number }}</label>
+          <label
+            for="cardNumber"
+            class="flw-label"
+          >{{ t.card_number }}</label>
           <div class="flw-input-with-icon">
-            <input type="text" id="cardNumber" v-model="cardNumber" class="flw-input" placeholder="1234 5678 9012 3456" maxlength="19" autocomplete="cc-number" required>
-            <img v-if="cardBrandIcon" :src="cardBrandIcon" :alt="cardBrand" class="flw-card-brand-icon">
+            <input
+              id="cardNumber"
+              v-model="cardNumber"
+              type="text"
+              class="flw-input"
+              placeholder="1234 5678 9012 3456"
+              maxlength="19"
+              autocomplete="cc-number"
+              required
+            >
+            <img
+              v-if="cardBrandIcon"
+              :src="cardBrandIcon"
+              :alt="cardBrand"
+              class="flw-card-brand-icon"
+            >
           </div>
         </div>
         <div class="flw-form-grid flw-form-grid-3">
           <div class="flw-form-group">
-            <label for="expiryMonth" class="flw-label">{{ t.month }}</label>
-            <select id="expiryMonth" v-model="expiryMonth" class="flw-input" required>
-              <option value="">MM</option>
-              <option v-for="m in 12" :key="m" :value="String(m).padStart(2, '0')">{{ String(m).padStart(2, '0') }}</option>
+            <label
+              for="expiryMonth"
+              class="flw-label"
+            >{{ t.month }}</label>
+            <select
+              id="expiryMonth"
+              v-model="expiryMonth"
+              class="flw-input"
+              required
+            >
+              <option value="">
+                MM
+              </option>
+              <option
+                v-for="m in 12"
+                :key="m"
+                :value="String(m).padStart(2, '0')"
+              >
+                {{ String(m).padStart(2, '0') }}
+              </option>
             </select>
           </div>
           <div class="flw-form-group">
-            <label for="expiryYear" class="flw-label">{{ t.year }}</label>
-            <select id="expiryYear" v-model="expiryYear" class="flw-input" required>
-              <option value="">YY</option>
-              <option v-for="y in 16" :key="y" :value="String(new Date().getFullYear() + y - 1).slice(-2)">{{ new Date().getFullYear() + y - 1 }}</option>
+            <label
+              for="expiryYear"
+              class="flw-label"
+            >{{ t.year }}</label>
+            <select
+              id="expiryYear"
+              v-model="expiryYear"
+              class="flw-input"
+              required
+            >
+              <option value="">
+                YY
+              </option>
+              <option
+                v-for="y in 16"
+                :key="y"
+                :value="String(new Date().getFullYear() + y - 1).slice(-2)"
+              >
+                {{ new Date().getFullYear() + y - 1 }}
+              </option>
             </select>
           </div>
           <div class="flw-form-group">
-            <label for="cvv" class="flw-label">{{ t.cvv }}</label>
-            <input type="password" id="cvv" v-model="cvv" class="flw-input" placeholder="***" maxlength="4" autocomplete="cc-csc" required>
+            <label
+              for="cvv"
+              class="flw-label"
+            >{{ t.cvv }}</label>
+            <input
+              id="cvv"
+              v-model="cvv"
+              type="password"
+              class="flw-input"
+              placeholder="***"
+              maxlength="4"
+              autocomplete="cc-csc"
+              required
+            >
           </div>
         </div>
       </div>
@@ -217,14 +338,32 @@ function handleResult(result: DirectChargeResponse) {
       </div>
 
       <!-- Submit -->
-      <button type="submit" class="flw-btn flw-btn-primary flw-btn-full" :disabled="!canSubmit" :class="{ 'flw-btn-loading': processing }">
+      <button
+        type="submit"
+        class="flw-btn flw-btn-primary flw-btn-full"
+        :disabled="!canSubmit"
+        :class="{ 'flw-btn-loading': processing }"
+      >
         <span v-if="!processing">{{ t.pay }} {{ currency }} {{ amount.toLocaleString() }}</span>
-        <span v-else class="flw-btn-spinner">{{ t.processing }}</span>
+        <span
+          v-else
+          class="flw-btn-spinner"
+        >{{ t.processing }}</span>
       </button>
 
       <div class="flw-security-notice">
-        <svg class="flw-security-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+        <svg
+          class="flw-security-icon"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+          />
         </svg>
         <span>{{ t.secured_by }}</span>
       </div>

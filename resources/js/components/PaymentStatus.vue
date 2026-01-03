@@ -53,7 +53,13 @@ onMounted(() => {
 
 onUnmounted(() => stopPolling());
 
-watch(polling, (val) => { val ? startPolling() : stopPolling(); });
+watch(polling, (val) => {
+  if (val) {
+    startPolling();
+  } else {
+    stopPolling();
+  }
+});
 
 async function checkStatus() {
   try {
@@ -113,43 +119,101 @@ function stopPolling() {
 <template>
   <div class="flw-payment-status">
     <div class="flw-status-container">
-      <div class="flw-status-icon" :class="statusColor">
-        <svg v-if="status === 'succeeded'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <div
+        class="flw-status-icon"
+        :class="statusColor"
+      >
+        <svg
+          v-if="status === 'succeeded'"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
-        <svg v-else-if="isTerminal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg
+          v-else-if="isTerminal"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
-        <svg v-else class="flw-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        <svg
+          v-else
+          class="flw-spin"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          />
         </svg>
       </div>
 
-      <h3 class="flw-status-title">{{ statusMessage }}</h3>
+      <h3 class="flw-status-title">
+        {{ statusMessage }}
+      </h3>
 
-      <div v-if="charge && status === 'succeeded'" class="flw-payment-details">
+      <div
+        v-if="charge && status === 'succeeded'"
+        class="flw-payment-details"
+      >
         <div class="flw-detail-row">
           <span>{{ t.amount }}</span>
           <span class="flw-detail-value">{{ charge.currency }} {{ charge.amount.toLocaleString() }}</span>
         </div>
-        <div v-if="charge.reference" class="flw-detail-row">
+        <div
+          v-if="charge.reference"
+          class="flw-detail-row"
+        >
           <span>{{ t.reference }}</span>
           <span class="flw-detail-value">{{ charge.reference }}</span>
         </div>
       </div>
 
-      <div v-if="polling" class="flw-polling-indicator">
-        <div class="flw-polling-dots"><span></span><span></span><span></span></div>
+      <div
+        v-if="polling"
+        class="flw-polling-indicator"
+      >
+        <div class="flw-polling-dots">
+          <span /><span /><span />
+        </div>
         <p>{{ t.checking_status }}</p>
       </div>
 
       <div class="flw-status-actions">
-        <slot name="actions" :status="status" :charge="charge">
-          <button v-if="status === 'succeeded'" class="flw-btn flw-btn-success flw-btn-full">{{ t.continue }}</button>
-          <button v-else-if="isTerminal" class="flw-btn flw-btn-primary flw-btn-full">{{ t.try_again }}</button>
+        <slot
+          name="actions"
+          :status="status"
+          :charge="charge"
+        >
+          <button
+            v-if="status === 'succeeded'"
+            class="flw-btn flw-btn-success flw-btn-full"
+          >
+            {{ t.continue }}
+          </button>
+          <button
+            v-else-if="isTerminal"
+            class="flw-btn flw-btn-primary flw-btn-full"
+          >
+            {{ t.try_again }}
+          </button>
         </slot>
       </div>
     </div>

@@ -1,5 +1,5 @@
 {
-    "name": "@gowelle/flutterwave-vue",
+    "name": "@gowelle/flutterwave-php-vue-components",
     "version": "1.0.0",
     "private": true,
     "description": "Vue components for Flutterwave Laravel package",
@@ -8,13 +8,20 @@
         "test": "vitest",
         "test:run": "vitest run",
         "test:coverage": "vitest run --coverage",
-        "typecheck": "vue-tsc --noEmit"
+        "typecheck": "vue-tsc --noEmit",
+        "lint": "eslint resources/",
+        "lint:fix": "eslint resources/ --fix"
     },
     "devDependencies": {
+        "@eslint/js": "^9.39.2",
         "@vitejs/plugin-vue": "^5.0.0",
         "@vue/test-utils": "^2.4.0",
+        "eslint": "^9.39.2",
+        "eslint-plugin-vue": "^10.6.2",
+        "globals": "^17.0.0",
         "happy-dom": "^13.0.0",
         "typescript": "^5.3.0",
+        "typescript-eslint": "^8.51.0",
         "vite": "^5.0.0",
         "vitest": "^2.0.0",
         "vue": "^3.4.0",

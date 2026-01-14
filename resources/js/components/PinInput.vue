@@ -77,29 +77,15 @@ async function submitPin() {
     processing.value = false;
   }
 }
-
-function _clearPin() {
-  pin.value = Array(props.pinLength).fill('');
-  inputRefs.value.forEach(input => { if (input) input.value = ''; });
-  inputRefs.value[0]?.focus();
-}
 </script>
 
 <template>
   <div class="flw-pin-input">
     <div class="flw-pin-header">
       <div class="flw-pin-icon">
-        <svg
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-          />
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
       </div>
       <h3 class="flw-pin-title">
@@ -110,45 +96,23 @@ function _clearPin() {
       </p>
     </div>
 
-    <div
-      v-if="error"
-      class="flw-alert flw-alert-error"
-    >
+    <div v-if="error" class="flw-alert flw-alert-error">
       {{ error }}
     </div>
 
     <div class="flw-pin-boxes">
-      <input
-        v-for="(_, i) in pinLength"
-        :key="i"
-        :ref="(el) => { if (el) inputRefs[i] = el as HTMLInputElement }"
-        type="password"
-        class="flw-pin-box"
-        maxlength="1"
-        inputmode="numeric"
-        pattern="[0-9]*"
-        :disabled="processing"
-        @input="handleInput(i, $event)"
-        @keydown="handleKeyDown(i, $event)"
-        @paste="handlePaste"
-      >
+      <input v-for="(_, i) in pinLength" :key="i" :ref="(el) => { if (el) inputRefs[i] = el as HTMLInputElement }"
+        type="password" class="flw-pin-box" maxlength="1" inputmode="numeric" pattern="[0-9]*" :disabled="processing"
+        @input="handleInput(i, $event)" @keydown="handleKeyDown(i, $event)" @paste="handlePaste">
     </div>
 
-    <button
-      type="button"
-      class="flw-btn flw-btn-primary flw-btn-full"
-      :disabled="!isPinComplete || processing"
-      @click="submitPin"
-    >
+    <button type="button" class="flw-btn flw-btn-primary flw-btn-full" :disabled="!isPinComplete || processing"
+      @click="submitPin">
       <span v-if="!processing">{{ t.confirm_pin }}</span>
       <span v-else>{{ t.verifying }}</span>
     </button>
 
-    <button
-      type="button"
-      class="flw-cancel-link"
-      @click="emit('cancel')"
-    >
+    <button type="button" class="flw-cancel-link" @click="emit('cancel')">
       {{ t.cancel_payment }}
     </button>
   </div>

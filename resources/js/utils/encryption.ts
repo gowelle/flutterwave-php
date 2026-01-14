@@ -26,8 +26,11 @@ export async function encryptData(
     data: string
 ): Promise<string> {
     const encoder = new TextEncoder();
+    // Create a new Uint8Array backed by a regular ArrayBuffer for TypeScript compatibility
+    const ivBuffer = new Uint8Array(iv.length);
+    ivBuffer.set(iv);
     const encrypted = await crypto.subtle.encrypt(
-        { name: 'AES-GCM', iv },
+        { name: 'AES-GCM', iv: ivBuffer },
         key,
         encoder.encode(data)
     );

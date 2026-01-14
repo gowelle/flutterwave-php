@@ -55,14 +55,44 @@ export interface PaymentMethod {
   card?: EncryptedCardData;
 }
 
+export type PaymentMethodType = 'card' | 'mobile_money' | 'bank_account' | 'ussd' | 'applepay' | 'googlepay' | 'opay';
+
+export interface SavedCardDetails {
+  brand: string;
+  last4: string;
+  exp_month: string;
+  exp_year: string;
+}
+
+export interface SavedMobileMoneyDetails {
+  network: string;
+  phone_number: string;
+  country_code: string;
+}
+
+export interface SavedBankAccountDetails {
+  bank_name: string;
+  account_number_last4: string;
+}
+
+export interface SavedUssdDetails {
+  bank_name: string;
+  bank_code: string;
+}
+
 export interface SavedPaymentMethod {
   id: string;
-  type: 'card';
-  card: {
-    brand: string;
-    last4: string;
-    exp_month: string;
-    exp_year: string;
+  type: PaymentMethodType;
+  card?: SavedCardDetails;
+  mobile_money?: SavedMobileMoneyDetails;
+  bank_account?: SavedBankAccountDetails;
+  ussd?: SavedUssdDetails;
+  // Apple Pay and Google Pay typically show as card after tokenization
+  applepay?: SavedCardDetails;
+  googlepay?: SavedCardDetails;
+  // OPay uses wallet-style display
+  opay?: {
+    account_id?: string;
   };
 }
 

@@ -15,7 +15,7 @@
                     class="flw-method-card {{ $selectedMethodId === $method['id'] ? 'flw-method-selected' : '' }} {{ $this->isExpired($method) ? 'flw-method-expired' : '' }}"
                 >
                     <div class="flw-method-icon">
-                        <img src="https://cdn.jsdelivr.net/gh/greenvisionmedia/responsive-images@main/img/{{ $this->getCardIcon($method) }}.svg" alt="{{ $method['card']['brand'] ?? 'Card' }}">
+                        <img src="https://raw.githubusercontent.com/aaronfagan/svg-credit-card-payment-icons/main/flat-rounded/{{ $this->getCardIcon($method) }}.svg" alt="{{ $method['card']['brand'] ?? 'Card' }}">
                     </div>
                     <div class="flw-method-info">
                         <span class="flw-method-name">{{ $this->getCardDisplay($method) }}</span>

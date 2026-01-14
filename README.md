@@ -1650,6 +1650,175 @@ List and manage saved payment methods:
 - `customerId` (string) - Customer ID to fetch methods for
 - `currency` (string) - Currency to filter methods
 
+---
+
+#### Complete Livewire Payment Flow Example
+
+Here's how to implement a complete payment flow in a Livewire component:
+
+```php
+// app/Livewire/CheckoutPage.php
+namespace App\Livewire;
+
+use Livewire\Component;
+use Gowelle\Flutterwave\Facades\Flutterwave;
+use Gowelle\Flutterwave\Data\AuthorizationData;
+
+class CheckoutPage extends Component
+{
+    public int $amount = 10000;
+    public string $currency = 'TZS';
+    
+    // Payment flow state
+    public string $step = 'form'; // 'form', 'pin', 'otp', 'status'
+    public ?string $chargeId = null;
+    public ?string $error = null;
+    
+    protected $listeners = [
+        'payment-success' => 'handlePaymentSuccess',
+        'payment-error' => 'handlePaymentError',
+        'authorization-required' => 'handleAuthorizationRequired',
+        'pin-submitted' => 'handlePinSubmitted',
+        'otp-submitted' => 'handleOtpSubmitted',
+        'cancelled' => 'handleCancelled',
+    ];
+    
+    public function handlePaymentSuccess($charge)
+    {
+        // Payment completed - redirect to success page
+        return redirect()->route('payment.success', ['reference' => $charge['reference']]);
+    }
+    
+    public function handlePaymentError($message)
+    {
+        $this->error = $message;
+        $this->step = 'form';
+    }
+    
+    public function handleAuthorizationRequired($data)
+    {
+        $this->chargeId = $data['chargeId'];
+        
+        // Switch to appropriate input based on authorization type
+        match ($data['type']) {
+            'requires_pin' => $this->step = 'pin',
+            'requires_otp' => $this->step = 'otp',
+            'redirect_url' => redirect($data['redirectUrl']),
+            default => null,
+        };
+    }
+    
+    public function handlePinSubmitted($data)
+    {
+        try {
+            $authorization = AuthorizationData::createPin(
+                nonce: $data['nonce'],
+                encryptedPin: $data['encrypted_pin']
+            );
+            
+            $charge = Flutterwave::directCharge()->updateChargeAuthorization(
+                chargeId: $this->chargeId,
+                authorizationData: $authorization
+            );
+            
+            $this->processChargeResult($charge);
+        } catch (\Exception $e) {
+            $this->error = $e->getMessage();
+            $this->step = 'form';
+        }
+    }
+    
+    public function handleOtpSubmitted($otp)
+    {
+        try {
+            $authorization = AuthorizationData::createOtp(code: $otp);
+            
+            $charge = Flutterwave::directCharge()->updateChargeAuthorization(
+                chargeId: $this->chargeId,
+                authorizationData: $authorization
+            );
+            
+            $this->processChargeResult($charge);
+        } catch (\Exception $e) {
+            $this->error = $e->getMessage();
+            $this->step = 'form';
+        }
+    }
+    
+    public function handleCancelled()
+    {
+        $this->step = 'form';
+        $this->chargeId = null;
+    }
+    
+    protected function processChargeResult($charge)
+    {
+        if ($charge->status->isSuccessful()) {
+            return redirect()->route('payment.success');
+        }
+        
+        if ($charge->status->requiresAction()) {
+            $this->handleAuthorizationRequired([
+                'chargeId' => $charge->id,
+                'type' => $charge->nextAction->type->value,
+                'redirectUrl' => $charge->nextAction->data['redirect_url'] ?? null,
+            ]);
+        }
+    }
+    
+    public function render()
+    {
+        return view('livewire.checkout-page');
+    }
+}
+```
+
+**Blade Template:**
+
+```blade
+{{-- resources/views/livewire/checkout-page.blade.php --}}
+<div class="checkout-container">
+    @if ($error)
+        <div class="alert alert-danger">{{ $error }}</div>
+    @endif
+
+    @if ($step === 'form')
+        <livewire:flutterwave-payment-form
+            :amount="$amount"
+            :currency="$currency"
+            :customer="['email' => auth()->user()->email, 'firstName' => auth()->user()->first_name, 'lastName' => auth()->user()->last_name]"
+        />
+    @elseif ($step === 'pin')
+        <livewire:flutterwave-pin-input :charge-id="$chargeId" />
+    @elseif ($step === 'otp')
+        <livewire:flutterwave-otp-input :charge-id="$chargeId" />
+    @elseif ($step === 'status')
+        <livewire:flutterwave-payment-status :charge-id="$chargeId" :auto-poll="true" />
+    @endif
+</div>
+```
+
+---
+
+#### Livewire Events Reference
+
+All Livewire components dispatch events that you can listen to in parent components:
+
+| Component | Event | Payload |
+|-----------|-------|---------|
+| `flutterwave-payment-form` | `payment-success` | `['id' => string, 'reference' => string, 'status' => string]` |
+| `flutterwave-payment-form` | `payment-error` | `string` (error message) |
+| `flutterwave-payment-form` | `authorization-required` | `['chargeId' => string, 'type' => string, 'redirectUrl' => ?string]` |
+| `flutterwave-pin-input` | `pin-submitted` | `['nonce' => string, 'encrypted_pin' => string]` |
+| `flutterwave-pin-input` | `cancelled` | - |
+| `flutterwave-otp-input` | `otp-submitted` | `string` (OTP code) |
+| `flutterwave-otp-input` | `otp-resent` | - |
+| `flutterwave-otp-input` | `cancelled` | - |
+| `flutterwave-payment-status` | `status-updated` | `['status' => string, 'charge' => array]` |
+| `flutterwave-payment-status` | `payment-complete` | `array` (charge data) |
+| `flutterwave-payment-methods` | `method-selected` | `string` (method ID) |
+| `flutterwave-payment-methods` | `add-new-clicked` | - |
+
 ### Vue Components
 
 For Vue/Inertia applications, publish the components and import them:
@@ -1785,6 +1954,338 @@ const encrypted = await encryptCardData(encryptionKey, {
 // Encrypt PIN
 const pinEncrypted = await encryptPin(encryptionKey, '1234');
 ```
+
+---
+
+### Backend API Setup
+
+The Vue components communicate with your backend via API endpoints. Add these routes to handle payment processing:
+
+```php
+// routes/api.php
+use App\Http\Controllers\FlutterwaveController;
+
+Route::prefix('flutterwave')->group(function () {
+    Route::post('/charges', [FlutterwaveController::class, 'createCharge']);
+    Route::post('/charges/{chargeId}/authorize', [FlutterwaveController::class, 'authorize']);
+    Route::get('/charges/{chargeId}/status', [FlutterwaveController::class, 'status']);
+});
+```
+
+**Example Controller:**
+
+```php
+// app/Http/Controllers/FlutterwaveController.php
+namespace App\Http\Controllers;
+
+use Gowelle\Flutterwave\Facades\Flutterwave;
+use Gowelle\Flutterwave\Data\AuthorizationData;
+use Illuminate\Http\Request;
+
+class FlutterwaveController extends Controller
+{
+    public function createCharge(Request $request)
+    {
+        $validated = $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'currency' => 'required|string|size:3',
+            'reference' => 'required|string',
+            'customer' => 'required|array',
+            'customer.email' => 'required|email',
+            'customer.name.first' => 'required|string',
+            'customer.name.last' => 'required|string',
+            'customer.phone_number' => 'required|string',
+            'payment_method' => 'required|array',
+            'redirect_url' => 'nullable|url',
+            'meta' => 'nullable|array',
+        ]);
+
+        $charge = Flutterwave::directCharge()->create($validated);
+
+        return response()->json(['charge' => $charge]);
+    }
+
+    public function authorize(Request $request, string $chargeId)
+    {
+        $type = $request->input('type');
+
+        $authorization = match ($type) {
+            'pin' => AuthorizationData::createPin(
+                nonce: $request->input('nonce'),
+                encryptedPin: $request->input('encrypted_pin')
+            ),
+            'otp' => AuthorizationData::createOtp(
+                code: $request->input('code')
+            ),
+            default => throw new \InvalidArgumentException('Invalid authorization type'),
+        };
+
+        $charge = Flutterwave::directCharge()->updateChargeAuthorization(
+            chargeId: $chargeId,
+            authorizationData: $authorization
+        );
+
+        return response()->json(['charge' => $charge]);
+    }
+
+    public function status(string $chargeId)
+    {
+        $status = Flutterwave::directCharge()->status($chargeId);
+
+        return response()->json(['charge' => $status]);
+    }
+}
+```
+
+---
+
+### Complete Payment Flow Example
+
+Here's how to implement a complete payment flow using the Vue components together:
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue';
+import PaymentForm from '@/vendor/flutterwave/components/PaymentForm.vue';
+import PinInput from '@/vendor/flutterwave/components/PinInput.vue';
+import OtpInput from '@/vendor/flutterwave/components/OtpInput.vue';
+import PaymentStatus from '@/vendor/flutterwave/components/PaymentStatus.vue';
+
+const props = defineProps<{
+  encryptionKey: string;
+  amount: number;
+  currency: string;
+}>();
+
+// Payment flow state
+type Step = 'form' | 'pin' | 'otp' | 'status' | 'redirect';
+const currentStep = ref<Step>('form');
+const chargeId = ref<string>('');
+const redirectUrl = ref<string>('');
+
+// Handle events from PaymentForm
+function onRequiresPin(id: string) {
+  chargeId.value = id;
+  currentStep.value = 'pin';
+}
+
+function onRequiresOtp(id: string) {
+  chargeId.value = id;
+  currentStep.value = 'otp';
+}
+
+function onRequiresRedirect(url: string, id: string) {
+  chargeId.value = id;
+  redirectUrl.value = url;
+  currentStep.value = 'redirect';
+}
+
+// Handle PIN/OTP submission
+async function onPinSubmit(data: { nonce: string; encrypted_pin: string }) {
+  const response = await fetch(`/api/flutterwave/charges/${chargeId.value}/authorize`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'pin', ...data }),
+  });
+  const result = await response.json();
+  handleChargeResult(result.charge);
+}
+
+async function onOtpSubmit(otp: string) {
+  const response = await fetch(`/api/flutterwave/charges/${chargeId.value}/authorize`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'otp', code: otp }),
+  });
+  const result = await response.json();
+  handleChargeResult(result.charge);
+}
+
+function handleChargeResult(charge: any) {
+  if (charge.status === 'succeeded') {
+    currentStep.value = 'status';
+  } else if (charge.status === 'requires_action') {
+    const action = charge.next_action?.type;
+    if (action === 'requires_otp') currentStep.value = 'otp';
+    else if (action === 'redirect_url') {
+      redirectUrl.value = charge.next_action.redirect_url;
+      currentStep.value = 'redirect';
+    }
+  }
+}
+
+function onSuccess() {
+  window.location.href = '/payment/success';
+}
+</script>
+
+<template>
+  <div class="payment-container">
+    <!-- Step 1: Payment Form -->
+    <PaymentForm
+      v-if="currentStep === 'form'"
+      :amount="amount"
+      :currency="currency"
+      :encryption-key="encryptionKey"
+      @success="onSuccess"
+      @requires-pin="onRequiresPin"
+      @requires-otp="onRequiresOtp"
+      @requires-redirect="onRequiresRedirect"
+    />
+
+    <!-- Step 2a: PIN Input -->
+    <PinInput
+      v-else-if="currentStep === 'pin'"
+      :charge-id="chargeId"
+      :encryption-key="encryptionKey"
+      @submit="onPinSubmit"
+      @cancel="currentStep = 'form'"
+    />
+
+    <!-- Step 2b: OTP Input -->
+    <OtpInput
+      v-else-if="currentStep === 'otp'"
+      :charge-id="chargeId"
+      @submit="onOtpSubmit"
+      @cancel="currentStep = 'form'"
+    />
+
+    <!-- Step 2c: Redirect Required -->
+    <div v-else-if="currentStep === 'redirect'" class="redirect-notice">
+      <p>You need to complete authorization on your bank's page.</p>
+      <button @click="window.location.href = redirectUrl">Continue to Authorization</button>
+    </div>
+
+    <!-- Step 3: Payment Status -->
+    <PaymentStatus
+      v-else-if="currentStep === 'status'"
+      :charge-id="chargeId"
+      :start-polling="true"
+      @success="onSuccess"
+    />
+  </div>
+</template>
+```
+
+---
+
+### Detailed Props & Events Reference
+
+#### PaymentForm Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `amount` | `number` | *required* | Payment amount in minor units |
+| `currency` | `string` | `'TZS'` | 3-letter ISO currency code |
+| `reference` | `string` | auto-generated | Unique payment reference |
+| `redirectUrl` | `string` | `''` | Callback URL after 3DS authorization |
+| `customer` | `object` | `{}` | Pre-filled customer data |
+| `meta` | `object` | `{}` | Custom metadata to attach |
+| `encryptionKey` | `string` | *required* | Flutterwave encryption key |
+| `labels` | `object` | `{}` | Custom label overrides for i18n |
+
+#### PaymentForm Events
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `success` | `DirectChargeResponse` | Payment completed successfully |
+| `failed` | `DirectChargeResponse` | Payment failed/cancelled/timeout |
+| `error` | `string` | Error message for display |
+| `requires-pin` | `chargeId: string` | Card requires PIN |
+| `requires-otp` | `chargeId: string` | Card requires OTP |
+| `requires-redirect` | `url, chargeId` | Redirect needed for 3DS |
+
+#### PinInput Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `chargeId` | `string` | *required* | Charge ID |
+| `pinLength` | `number` | `4` | PIN digit count |
+| `encryptionKey` | `string` | *required* | Encryption key |
+| `labels` | `object` | `{}` | Label overrides |
+
+#### OtpInput Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `chargeId` | `string` | *required* | Charge ID |
+| `otpLength` | `number` | `6` | OTP digit count |
+| `maskedPhone` | `string` | `''` | Phone to display |
+| `labels` | `object` | `{}` | Label overrides |
+
+#### PaymentStatus Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `chargeId` | `string` | *required* | Charge ID to monitor |
+| `startPolling` | `boolean` | `false` | Start polling on mount |
+| `pollInterval` | `number` | `3000` | Poll interval (ms) |
+| `maxPolls` | `number` | `60` | Max attempts before timeout |
+
+---
+
+### useFlutterwave Composable
+
+For custom payment implementations, use the `useFlutterwave` composable:
+
+```typescript
+import { useFlutterwave } from '@/vendor/flutterwave/composables/useFlutterwave';
+
+const {
+  // Reactive state
+  processing,        // Ref<boolean> - true during API calls
+  error,             // Ref<string | null> - error message
+  charge,            // Ref<DirectChargeResponse | null>
+  
+  // Card form state (use with v-model)
+  cardNumber,        // Ref<string>
+  expiryMonth,       // Ref<string>
+  expiryYear,        // Ref<string>
+  cvv,               // Ref<string>
+  
+  // Computed
+  cardBrand,         // 'visa', 'mastercard', etc.
+  isFormValid,       // All card fields valid
+  isSuccessful,      // Charge succeeded
+  isFailed,          // Charge failed
+  
+  // Methods
+  createCharge,      // (payload) => Promise<DirectChargeResponse>
+  submitPin,         // (chargeId, pin) => Promise<DirectChargeResponse>
+  submitOtp,         // (chargeId, otp) => Promise<DirectChargeResponse>
+  checkStatus,       // (chargeId) => Promise<DirectChargeResponse>
+  resetForm,         // () => void
+} = useFlutterwave({
+  encryptionKey: 'your-key',
+  apiEndpoint: '/api/flutterwave', // optional
+});
+```
+
+---
+
+### Styling & Customization
+
+All components use scoped CSS with `.flw-` prefixed class names.
+
+**Key CSS Classes:**
+
+| Class | Element |
+|-------|---------|
+| `.flw-payment-form` | Form container |
+| `.flw-input` | Input fields |
+| `.flw-btn-primary` | Primary buttons |
+| `.flw-alert-error` | Error messages |
+| `.flw-pin-box` | PIN digit inputs |
+| `.flw-otp-box` | OTP digit inputs |
+
+**Override Example:**
+
+```css
+.flw-btn-primary {
+  background: linear-gradient(135deg, #your-color, #your-secondary) !important;
+}
+```
+
 
 ## Localization
 

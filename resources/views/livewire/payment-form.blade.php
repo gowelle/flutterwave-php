@@ -236,10 +236,10 @@ function flutterwavePaymentForm(config) {
 
         getCardBrandIcon() {
             const icons = {
-                visa: 'https://cdn.jsdelivr.net/gh/greenvisionmedia/responsive-images@main/img/visa.svg',
-                mastercard: 'https://cdn.jsdelivr.net/gh/greenvisionmedia/responsive-images@main/img/mastercard.svg',
-                verve: 'https://cdn.jsdelivr.net/gh/greenvisionmedia/responsive-images@main/img/verve.svg',
-                amex: 'https://cdn.jsdelivr.net/gh/greenvisionmedia/responsive-images@main/img/amex.svg',
+                visa: 'https://raw.githubusercontent.com/aaronfagan/svg-credit-card-payment-icons/main/flat-rounded/visa.svg',
+                mastercard: 'https://raw.githubusercontent.com/aaronfagan/svg-credit-card-payment-icons/main/flat-rounded/mastercard.svg',
+                amex: 'https://raw.githubusercontent.com/aaronfagan/svg-credit-card-payment-icons/main/flat-rounded/amex.svg',
+                verve: 'https://raw.githubusercontent.com/aaronfagan/svg-credit-card-payment-icons/main/flat-rounded/generic.svg',
             };
             return icons[this.cardBrand] || '';
         },

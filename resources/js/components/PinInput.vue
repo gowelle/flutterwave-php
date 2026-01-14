@@ -223,4 +223,34 @@ async function submitPin() {
   border-radius: 0.5rem;
   margin-bottom: 1rem;
 }
+
+@media (prefers-color-scheme: dark) {
+  .flw-pin-title {
+    color: #f3f4f6;
+  }
+
+  .flw-pin-subtitle {
+    color: #9ca3af;
+  }
+
+  .flw-pin-box {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f3f4f6;
+  }
+
+  .flw-pin-box:focus {
+    border-color: #f5a623;
+  }
+
+  .flw-cancel-link {
+    color: #9ca3af;
+  }
+
+  .flw-alert-error {
+    background: #451a1a;
+    border-color: #7f1d1d;
+    color: #fca5a5;
+  }
+}
 </style>

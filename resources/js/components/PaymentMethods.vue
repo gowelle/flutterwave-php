@@ -397,4 +397,61 @@ const methodTypeLabels: Record<PaymentMethodType, string> = {
   padding: 0.75rem;
   border-radius: 0.5rem;
 }
+
+@media (prefers-color-scheme: dark) {
+  .flw-payment-methods {
+    background: transparent;
+  }
+
+  .flw-loading {
+    color: #9ca3af;
+  }
+
+  .flw-method-card {
+    background: #1f2937;
+    border-color: #374151;
+  }
+
+  .flw-method-card:hover {
+    border-color: #4b5563;
+  }
+
+  .flw-method-selected {
+    background: #374151;
+    border-color: #f5a623;
+  }
+
+  .flw-method-name {
+    color: #f3f4f6;
+  }
+
+  .flw-method-expiry {
+    color: #9ca3af;
+  }
+
+  .flw-expired-badge {
+    background: #451a1a;
+    color: #fca5a5;
+  }
+
+  .flw-add-new-btn {
+    border-color: #4b5563;
+    color: #9ca3af;
+  }
+
+  .flw-add-new-btn:hover {
+    border-color: #6b7280;
+    color: #d1d5db;
+  }
+
+  .flw-no-methods {
+    color: #9ca3af;
+  }
+
+  .flw-alert-error {
+    background: #451a1a;
+    border-color: #7f1d1d;
+    color: #fca5a5;
+  }
+}
 </style>

@@ -413,11 +413,55 @@ function handleResult(result: DirectChargeResponse) {
   height: 1rem;
 }
 
-@media (max-width: 480px) {
-
   .flw-form-grid,
   .flw-form-grid-3 {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .flw-payment-form {
+    color: #f3f4f6;
+  }
+
+  .flw-form-section-title {
+    color: #d1d5db;
+  }
+
+  .flw-label {
+    color: #d1d5db;
+  }
+
+  .flw-input {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f3f4f6;
+  }
+
+  .flw-input:focus {
+    border-color: #f5a623;
+  }
+
+  .flw-payment-summary {
+    background: #374151;
+  }
+
+  .flw-amount-label {
+    color: #9ca3af;
+  }
+
+  .flw-amount-value {
+    color: #f3f4f6;
+  }
+
+  .flw-security-notice {
+    color: #9ca3af;
+  }
+
+  .flw-alert-error {
+    background: #451a1a;
+    border-color: #7f1d1d;
+    color: #fca5a5;
   }
 }
 </style>

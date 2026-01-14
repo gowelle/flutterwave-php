@@ -355,4 +355,31 @@ function stopPolling() {
     transform: rotate(360deg);
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  .flw-status-container {
+    background: #1f2937;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  }
+
+  .flw-status-title {
+    color: #f3f4f6;
+  }
+
+  .flw-payment-details {
+    background: #374151;
+  }
+
+  .flw-detail-row {
+    color: #9ca3af;
+  }
+
+  .flw-detail-value {
+    color: #f3f4f6;
+  }
+
+  .flw-polling-indicator p {
+    color: #9ca3af;
+  }
+}
 </style>

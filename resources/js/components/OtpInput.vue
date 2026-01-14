@@ -201,4 +201,42 @@ function resendOtp() {
 .flw-btn-full { width: 100%; }
 .flw-cancel-link { display: block; margin-top: 1.5rem; font-size: 0.875rem; color: #6b7280; background: none; border: none; cursor: pointer; text-decoration: underline; }
 .flw-alert-error { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem; }
+
+@media (prefers-color-scheme: dark) {
+  .flw-otp-title {
+    color: #f3f4f6;
+  }
+
+  .flw-otp-subtitle {
+    color: #9ca3af;
+  }
+
+  .flw-otp-box {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f3f4f6;
+  }
+
+  .flw-otp-box:focus {
+    border-color: #3b82f6;
+  }
+
+  .flw-countdown {
+    color: #d1d5db;
+  }
+
+  .flw-countdown strong {
+    color: #f3f4f6;
+  }
+
+  .flw-cancel-link {
+    color: #9ca3af;
+  }
+
+  .flw-alert-error {
+    background: #451a1a;
+    border-color: #7f1d1d;
+    color: #fca5a5;
+  }
+}
 </style>

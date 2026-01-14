@@ -1,3 +1,35 @@
+# Release v2.11.0
+
+**Release Date:** 2026-01-15
+
+## What's Changed
+
+### 🎨 UI Improvements
+
+- **Dark Mode Support** - Added full dark mode support to all Vue components:
+  - `PaymentForm.vue` - Inputs, text, and backgrounds adapt to system theme.
+  - `PaymentMethods.vue` - Payment cards and method lists are dark-mode ready.
+  - `OtpInput.vue` & `PinInput.vue` - Styled for visibility in dark environments.
+  - `PaymentStatus.vue` - Success/Error states optimized for dark mode.
+- **Mobile Responsiveness** - Improved layouts for smaller screens:
+  - Better padding and width control on mobile devices.
+  - Responsive grid layouts for form inputs.
+
+## Files Changed
+
+- `resources/js/components/PaymentForm.vue`
+- `resources/js/components/PaymentMethods.vue`
+- `resources/js/components/OtpInput.vue`
+- `resources/js/components/PinInput.vue`
+- `resources/js/components/PaymentStatus.vue`
+- `package.json`
+
+## Upgrade Notes
+
+No breaking changes. This update purely affects styles. Ensure your build pipeline processes the new CSS.
+
+**Full Changelog**: https://github.com/gowelle/flutterwave-php/compare/v2.10.0...v2.11.0
+
 # Release v2.9.2
 
 **Release Date:** 2026-01-14

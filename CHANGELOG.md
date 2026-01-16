@@ -4,6 +4,12 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.11.1] - 2026-01-16
+
+### Security
+
+- Updated `happy-dom` to v20.3.0 to resolve security vulnerabilities found in `npm audit`.
+
 ## [2.9.0] - 2025-12-20
 
 ### Added

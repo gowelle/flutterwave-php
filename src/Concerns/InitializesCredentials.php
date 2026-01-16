@@ -14,8 +14,8 @@ trait InitializesCredentials
 
     public function initializeCredentials(): void
     {
-        $this->clientId = config('services.flutterwave.client_id');
-        $this->clientSecret = config('services.flutterwave.client_secret');
-        $this->environment = config('services.flutterwave.environment');
+        $this->clientId = config('flutterwave.client_id');
+        $this->clientSecret = config('flutterwave.client_secret');
+        $this->environment = config('flutterwave.environment');
     }
 }

@@ -4,6 +4,12 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.11.2] - 2026-02-01
+
+### Fixed
+
+- Use `config('flutterwave.*')` for credentials so they match the published config file (fixes invalid client ID when using published config). Thanks to laurenttandika.
+
 ## [2.11.1] - 2026-01-16
 
 ### Security

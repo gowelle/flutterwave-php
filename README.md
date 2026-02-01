@@ -563,37 +563,55 @@ Manage customer records.
 
 #### Create Customer
 
-> **Required Fields:** When creating a customer, the following fields are required: `email`, `name.first`, `name.last`, and `phone_number`. The `name.middle` field is optional.
+> **Per v4:** Only `email` is required. `name`, `phone`, and `address` are optional. `phone` must be an object with `country_code` (ISO 3166 alpha-3) and `number` (7–10 digits without country code).
 
 ```php
 $customer = Flutterwave::customers()->create([
     'email' => 'john@example.com',        // Required
     'name' => [
-        'first' => 'John',                 // Required
+        'first' => 'John',
         'middle' => 'Michael',             // Optional
-        'last' => 'Doe',                   // Required
+        'last' => 'Doe',
     ],
-    'phone_number' => '+255123456789',      // Required
+    'phone' => [
+        'country_code' => 'TZA',
+        'number' => '712345678',
+    ],
 ]);
 ```
 
-**Using DTO (type-safe):**
+**Using DTO (type-safe, v4-aligned):**
+
+Per [Flutterwave v4](https://developer.flutterwave.com/reference/customers_create), only `email` is required; `name`, `phone`, and `address` are optional. `phone` must be an object with `country_code` (ISO 3166 alpha-3) and `number` (7–10 digits without country code).
 
 ```php
 use Gowelle\Flutterwave\Data\Customer\CreateCustomerRequest;
 
+// Minimal (email only)
+$request = new CreateCustomerRequest(email: 'john@example.com');
+
+// With name, phone object, and optional address
 $request = new CreateCustomerRequest(
     email: 'john@example.com',
     firstName: 'John',
     lastName: 'Doe',
-    phoneNumber: '+255123456789',
+    phone: ['country_code' => 'TZA', 'number' => '712345678'],
     middleName: 'Michael',  // optional
+    address: [              // optional: line1, line2?, city, state, postal_code, country
+        'line1' => '221B Baker Street',
+        'city' => 'London',
+        'state' => 'England',
+        'postal_code' => 'NW1 6XE',
+        'country' => 'GB',
+    ],
 );
 
 $customer = Flutterwave::customers()->createFromDto($request);
 ```
 
 #### Update Customer
+
+Per [Flutterwave v4](https://developer.flutterwave.com/reference/customers_put), only `email` is required.
 
 ```php
 use Gowelle\Flutterwave\Data\Customer\UpdateCustomerRequest;
@@ -602,7 +620,8 @@ $request = new UpdateCustomerRequest(
     email: 'john.updated@example.com',
     firstName: 'John',
     lastName: 'Doe',
-    phoneNumber: '+255987654321',
+    phone: ['country_code' => 'TZA', 'number' => '987654321'],
+    address: [ /* optional */ ],
 );
 
 $customer = Flutterwave::customers()->updateFromDto('customer-id', $request);

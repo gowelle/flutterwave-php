@@ -1,3 +1,39 @@
+# Release v2.12.0
+
+**Release Date:** 2025-02-02
+
+## What's Changed
+
+### ✨ Added
+
+- **FlutterwaveBanksService**: `resolveFromDto(BankAccountResolveRequest $request)` – type-safe alternative to `resolveAccount()` for bank account resolution. Matches `BankAccountResolveApi::resolveFromDto()`.
+
+### 🔄 Changed
+
+- **Customer API v4 alignment** ([customers_create](https://developer.flutterwave.com/reference/customers_create), [customers_put](https://developer.flutterwave.com/reference/customers_put)):
+  - Only `email` is required for create/update; `name`, `phone`, and `address` are optional.
+  - `phone` is now an object: `{ country_code: string (ISO 3166 alpha-3), number: string (7–10 digits) }` instead of a string `phone_number`.
+  - Optional `address` support added to `CreateCustomerRequest` and `UpdateCustomerRequest` (line1, line2, city, state, postal_code, country).
+  - `CustomerApi::validateCreateData()` and `validateUpdateData()` relaxed to match v4 (email only required; `phone` object validated when present).
+- **FlutterwaveCustomerService**: DTO methods exposed – `createFromDto(CreateCustomerRequest)`, `updateFromDto(string $id, UpdateCustomerRequest)`, `searchFromDto(SearchCustomerRequest)` (previously only on `CustomerApi`).
+
+## Files Changed
+
+- `CHANGELOG.md`, `README.md`, `RELEASE_NOTES.md`
+- `src/Api/Customer/CustomerApi.php`
+- `src/Contracts/CustomerServiceInterface.php`
+- `src/Data/Customer/CreateCustomerRequest.php`, `UpdateCustomerRequest.php`
+- `src/Services/FlutterwaveBanksService.php`, `FlutterwaveCustomerService.php`
+- `tests/Integration/*`, `tests/Unit/Data/Customer/*`, `tests/Unit/Services/FlutterwaveBanksServiceTest.php`, `FlutterwaveCustomerServiceTest.php`
+
+## Upgrade Notes
+
+**Customer API (breaking for DTO callers):** If you use `CreateCustomerRequest` or `UpdateCustomerRequest`, replace `phoneNumber: '+255...'` with `phone: ['country_code' => 'TZA', 'number' => '712345678']`. Array-based `create()`/`update()` now accept optional `phone` object; `phone_number` is no longer validated for Customer API.
+
+**Full Changelog**: https://github.com/gowelle/flutterwave-php/compare/v2.11.2...v2.12.0
+
+---
+
 # Release v2.11.0
 
 **Release Date:** 2026-01-15

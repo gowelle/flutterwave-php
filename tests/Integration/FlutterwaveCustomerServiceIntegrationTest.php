@@ -71,7 +71,10 @@ describe('FlutterwaveCustomerService Integration', function () {
                 'first' => 'Updated',
                 'last' => 'Customer',
             ],
-            'phone_number' => '+255712345678',
+            'phone' => [
+                'country_code' => 'TZA',
+                'number' => '712345678',
+            ],
         ]);
 
         expect($updatedCustomer)

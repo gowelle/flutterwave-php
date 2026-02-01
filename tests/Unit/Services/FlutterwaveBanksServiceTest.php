@@ -6,6 +6,7 @@ use Gowelle\Flutterwave\Data\ApiResponse;
 use Gowelle\Flutterwave\Data\BankAccountResolveData;
 use Gowelle\Flutterwave\Data\BankBranchData;
 use Gowelle\Flutterwave\Data\BankData;
+use Gowelle\Flutterwave\Data\Banks\BankAccountResolveRequest;
 use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 use Gowelle\Flutterwave\FlutterwaveApiProvider;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
@@ -189,6 +190,56 @@ it('can resolve bank account', function () {
     }));
 
     $result = $this->service->resolveAccount('044', '0123456789', 'NGN');
+
+    expect($result)->toBeInstanceOf(BankAccountResolveData::class);
+});
+
+it('can resolve bank account from DTO', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Account resolved',
+        data: [
+            'account_number' => '0123456789',
+            'account_name' => 'John Doe',
+            'bank_code' => '044',
+        ],
+    );
+
+    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock->shouldReceive('resolve')
+        ->once()
+        ->with('044', '0123456789', 'NGN')
+        ->andReturn($response);
+
+    $this->baseService
+        ->shouldReceive('getAccessToken')
+        ->once()
+        ->andReturn('test_token');
+
+    $this->baseService
+        ->shouldReceive('getHeaderBuilder')
+        ->once()
+        ->andReturn($this->headerBuilder);
+
+    $this->headerBuilder
+        ->shouldReceive('build')
+        ->once()
+        ->andReturn(['Content-Type' => 'application/json']);
+
+    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+        $mock->shouldReceive('useApi')
+            ->once()
+            ->with(FlutterwaveApi::BANK_ACCOUNT_RESOLVE, 'test_token', ['Content-Type' => 'application/json'])
+            ->andReturn($apiMock);
+    }));
+
+    $request = new BankAccountResolveRequest(
+        bankCode: '044',
+        accountNumber: '0123456789',
+        currency: 'NGN',
+    );
+
+    $result = $this->service->resolveFromDto($request);
 
     expect($result)->toBeInstanceOf(BankAccountResolveData::class);
 });

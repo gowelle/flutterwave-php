@@ -4,6 +4,21 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [2.12.0] - 2025-02-02
+
+### Added
+
+- **FlutterwaveBanksService**: `resolveFromDto(BankAccountResolveRequest $request)` – type-safe alternative to `resolveAccount()` for bank account resolution. Matches `BankAccountResolveApi::resolveFromDto()`.
+
+### Changed
+
+- **Customer API v4 alignment** ([customers_create](https://developer.flutterwave.com/reference/customers_create), [customers_put](https://developer.flutterwave.com/reference/customers_put)):
+  - Only `email` is required for create/update; `name`, `phone`, and `address` are optional.
+  - `phone` is now an object: `{ country_code: string (ISO 3166 alpha-3), number: string (7–10 digits) }` instead of a string `phone_number`.
+  - Optional `address` support added to `CreateCustomerRequest` and `UpdateCustomerRequest` (line1, line2, city, state, postal_code, country).
+  - `CustomerApi::validateCreateData()` and `validateUpdateData()` relaxed to match v4 (email only required; `phone` object validated when present).
+- **FlutterwaveCustomerService**: DTO methods exposed – `createFromDto(CreateCustomerRequest)`, `updateFromDto(string $id, UpdateCustomerRequest)`, `searchFromDto(SearchCustomerRequest)` (previously only on `CustomerApi`).
+
 ## [2.11.2] - 2026-02-01
 
 ### Fixed
@@ -246,7 +261,7 @@ $charge->isDisputed();       // Check dispute status
 
 - **Request DTOs for Customer API**: Type-safe request DTOs for customer operations:
 
-  - `CreateCustomerRequest` - Typed DTO for customer creation with `email`, `firstName`, `lastName`, `phoneNumber`, `middleName` (maps to API format: `name.first`, `name.middle`, `name.last`)
+  - `CreateCustomerRequest` - Typed DTO for customer creation with `email`, optional `firstName`, `lastName`, `phone` (object: `country_code`, `number`), `middleName`, `address` (v4-aligned)
   - `UpdateCustomerRequest` - Typed DTO for customer updates
   - `SearchCustomerRequest` - Typed DTO for customer search with optional email filter
   - New `CustomerApi` methods: `createFromDto()`, `updateFromDto()`, `searchFromDto()`
@@ -284,7 +299,7 @@ $charge->isDisputed();       // Check dispute status
 $api->create([
     'email' => 'john@example.com',
     'name' => ['first' => 'John', 'last' => 'Doe'],
-    'phone_number' => '+255123456789',
+    'phone' => ['country_code' => 'TZA', 'number' => '712345678'],
 ]);
 ```
 
@@ -297,7 +312,7 @@ $request = new CreateCustomerRequest(
     email: 'john@example.com',
     firstName: 'John',
     lastName: 'Doe',
-    phoneNumber: '+255123456789',
+    phone: ['country_code' => 'TZA', 'number' => '712345678'],
 );
 $api->createFromDto($request);
 ```

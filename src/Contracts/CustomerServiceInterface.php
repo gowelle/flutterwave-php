@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Contracts;
 
+use Gowelle\Flutterwave\Data\Customer\CreateCustomerRequest;
+use Gowelle\Flutterwave\Data\Customer\SearchCustomerRequest;
+use Gowelle\Flutterwave\Data\Customer\UpdateCustomerRequest;
 use Gowelle\Flutterwave\Data\CustomerData;
 use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 
@@ -24,6 +27,13 @@ interface CustomerServiceInterface
     public function create(array $data): CustomerData;
 
     /**
+     * Create a customer from DTO
+     *
+     * @throws FlutterwaveApiException
+     */
+    public function createFromDto(CreateCustomerRequest $request): CustomerData;
+
+    /**
      * Update a customer
      *
      * @param  array<string, mixed>  $data
@@ -31,6 +41,13 @@ interface CustomerServiceInterface
      * @throws FlutterwaveApiException
      */
     public function update(string $id, array $data): CustomerData;
+
+    /**
+     * Update a customer from DTO
+     *
+     * @throws FlutterwaveApiException
+     */
+    public function updateFromDto(string $id, UpdateCustomerRequest $request): CustomerData;
 
     /**
      * Get a customer
@@ -57,4 +74,11 @@ interface CustomerServiceInterface
      * @throws FlutterwaveApiException
      */
     public function search(string $email): CustomerData;
+
+    /**
+     * Search for a customer from DTO
+     *
+     * @throws FlutterwaveApiException
+     */
+    public function searchFromDto(SearchCustomerRequest $request): CustomerData;
 }

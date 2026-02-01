@@ -104,7 +104,10 @@ abstract class IntegrationTestCase extends Orchestra
                 'first' => 'Integration',
                 'last' => 'TestUser',
             ],
-            'phone_number' => '+255712345678',
+            'phone' => [
+                'country_code' => 'TZA',
+                'number' => '712345678',
+            ],
         ];
     }
 

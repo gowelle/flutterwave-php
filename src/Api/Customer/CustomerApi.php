@@ -102,14 +102,28 @@ class CustomerApi extends FlutterwaveBaseApi
         }
     }
 
+    /**
+     * Validate update data per Flutterwave v4 (only email required).
+     *
+     * @see https://developer.flutterwave.com/reference/customers_put
+     */
     public function validateUpdateData(array $data): array
     {
         $validator = Validator::make($data, [
             'email' => 'required|email',
-            'name.first' => 'required|string',
+            'name.first' => 'nullable|string',
             'name.middle' => 'nullable|string',
-            'name.last' => 'required|string',
-            'phone_number' => 'required|string',
+            'name.last' => 'nullable|string',
+            'phone' => 'nullable|array',
+            'phone.country_code' => 'required_with:phone|string',
+            'phone.number' => 'required_with:phone|string',
+            'address' => 'nullable|array',
+            'address.line1' => 'nullable|string',
+            'address.line2' => 'nullable|string',
+            'address.city' => 'nullable|string',
+            'address.state' => 'nullable|string',
+            'address.postal_code' => 'nullable|string',
+            'address.country' => 'nullable|string',
         ]);
 
         return $validator->validate();
@@ -124,14 +138,28 @@ class CustomerApi extends FlutterwaveBaseApi
         return $validator->validate();
     }
 
+    /**
+     * Validate create data per Flutterwave v4 (only email required).
+     *
+     * @see https://developer.flutterwave.com/reference/customers_create
+     */
     protected function validateCreateData(array $data): array
     {
         $validator = Validator::make($data, [
             'email' => 'required|email',
-            'name.first' => 'required|string',
+            'name.first' => 'nullable|string',
             'name.middle' => 'nullable|string',
-            'name.last' => 'required|string',
-            'phone_number' => 'required|string',
+            'name.last' => 'nullable|string',
+            'phone' => 'nullable|array',
+            'phone.country_code' => 'required_with:phone|string',
+            'phone.number' => 'required_with:phone|string',
+            'address' => 'nullable|array',
+            'address.line1' => 'nullable|string',
+            'address.line2' => 'nullable|string',
+            'address.city' => 'nullable|string',
+            'address.state' => 'nullable|string',
+            'address.postal_code' => 'nullable|string',
+            'address.country' => 'nullable|string',
         ]);
 
         return $validator->validate();

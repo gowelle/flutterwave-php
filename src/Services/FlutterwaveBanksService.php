@@ -7,6 +7,7 @@ namespace Gowelle\Flutterwave\Services;
 use Gowelle\Flutterwave\Data\BankAccountResolveData;
 use Gowelle\Flutterwave\Data\BankBranchData;
 use Gowelle\Flutterwave\Data\BankData;
+use Gowelle\Flutterwave\Data\Banks\BankAccountResolveRequest;
 use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 use Gowelle\Flutterwave\FlutterwaveApiProvider;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
@@ -81,6 +82,24 @@ final class FlutterwaveBanksService
         }
 
         return BankAccountResolveData::fromApiResponse($response->data);
+    }
+
+    /**
+     * Resolve bank account details from DTO
+     *
+     * Type-safe alternative to resolveAccount() using BankAccountResolveRequest DTO.
+     *
+     * @throws FlutterwaveApiException
+     */
+    public function resolveFromDto(BankAccountResolveRequest $request): BankAccountResolveData
+    {
+        $payload = $request->toApiPayload();
+
+        return $this->resolveAccount(
+            $payload['bank_code'],
+            $payload['account_number'],
+            $payload['currency'],
+        );
     }
 
     /**

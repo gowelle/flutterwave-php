@@ -7,23 +7,28 @@ namespace Gowelle\Flutterwave\Data\Customer;
 /**
  * Request DTO for updating customers via the Flutterwave API.
  *
- * @see https://developer.flutterwave.com/reference/customers_update
+ * Only email is required per v4; name, phone and address are optional but recommended.
+ * Phone must be an object with country_code (ISO 3166 alpha-3) and number (7-10 digits without country code).
+ *
+ * @see https://developer.flutterwave.com/reference/customers_put
  */
 final readonly class UpdateCustomerRequest
 {
     /**
-     * @param  string  $email  Customer email address
-     * @param  string  $firstName  Customer first name
-     * @param  string  $lastName  Customer last name
-     * @param  string  $phoneNumber  Customer phone number
+     * @param  string  $email  Customer email address (required)
+     * @param  string|null  $firstName  Customer first name (optional)
+     * @param  string|null  $lastName  Customer last name (optional)
+     * @param  array{country_code: string, number: string}|null  $phone  Customer phone: country_code (ISO 3166 alpha-3), number (7-10 digits, no country code) (optional)
      * @param  string|null  $middleName  Customer middle name (optional)
+     * @param  array{line1: string, line2?: string, city: string, state: string, postal_code: string, country: string}|null  $address  Customer address (optional)
      */
     public function __construct(
         public string $email,
-        public string $firstName,
-        public string $lastName,
-        public string $phoneNumber,
+        public ?string $firstName = null,
+        public ?string $lastName = null,
+        public ?array $phone = null,
         public ?string $middleName = null,
+        public ?array $address = null,
     ) {}
 
     /**
@@ -33,16 +38,37 @@ final readonly class UpdateCustomerRequest
      */
     public function toApiPayload(): array
     {
+        $payload = ['email' => $this->email];
+
         $name = array_filter([
             'first' => $this->firstName,
             'middle' => $this->middleName,
             'last' => $this->lastName,
         ], fn ($value) => $value !== null && $value !== '');
 
-        return [
-            'email' => $this->email,
-            'name' => $name,
-            'phone_number' => $this->phoneNumber,
-        ];
+        if ($name !== []) {
+            $payload['name'] = $name;
+        }
+
+        if ($this->phone !== null && isset($this->phone['country_code'], $this->phone['number'])
+            && (string) $this->phone['country_code'] !== '' && (string) $this->phone['number'] !== '') {
+            $payload['phone'] = [
+                'country_code' => (string) $this->phone['country_code'],
+                'number' => (string) $this->phone['number'],
+            ];
+        }
+
+        if ($this->address !== null && $this->address !== []) {
+            $payload['address'] = array_filter([
+                'line1' => $this->address['line1'] ?? '',
+                'line2' => $this->address['line2'] ?? null,
+                'city' => $this->address['city'] ?? '',
+                'state' => $this->address['state'] ?? '',
+                'postal_code' => $this->address['postal_code'] ?? '',
+                'country' => $this->address['country'] ?? '',
+            ], fn ($value) => $value !== null && $value !== '');
+        }
+
+        return $payload;
     }
 }

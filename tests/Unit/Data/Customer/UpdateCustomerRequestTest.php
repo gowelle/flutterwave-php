@@ -10,7 +10,7 @@ describe('UpdateCustomerRequest', function () {
             email: 'john@example.com',
             firstName: 'John',
             lastName: 'Doe',
-            phoneNumber: '+255123456789',
+            phone: ['country_code' => 'TZA', 'number' => '712345678'],
         );
 
         expect($request)
@@ -18,7 +18,7 @@ describe('UpdateCustomerRequest', function () {
             ->email->toBe('john@example.com')
             ->firstName->toBe('John')
             ->lastName->toBe('Doe')
-            ->phoneNumber->toBe('+255123456789')
+            ->phone->toBe(['country_code' => 'TZA', 'number' => '712345678'])
             ->middleName->toBeNull();
     });
 
@@ -27,7 +27,7 @@ describe('UpdateCustomerRequest', function () {
             email: 'updated@example.com',
             firstName: 'Jane',
             lastName: 'Smith',
-            phoneNumber: '+255987654321',
+            phone: ['country_code' => 'TZA', 'number' => '987654321'],
             middleName: 'Elizabeth',
         );
 
@@ -39,15 +39,19 @@ describe('UpdateCustomerRequest', function () {
             email: 'john@example.com',
             firstName: 'John',
             lastName: 'Doe',
-            phoneNumber: '+255123456789',
+            phone: ['country_code' => 'TZA', 'number' => '712345678'],
         );
 
         $payload = $request->toApiPayload();
 
         expect($payload)
             ->toHaveKey('email', 'john@example.com')
-            ->toHaveKey('phone_number', '+255123456789')
+            ->toHaveKey('phone')
             ->toHaveKey('name');
+
+        expect($payload['phone'])
+            ->toHaveKey('country_code', 'TZA')
+            ->toHaveKey('number', '712345678');
 
         expect($payload['name'])
             ->toHaveKey('first', 'John')
@@ -60,7 +64,7 @@ describe('UpdateCustomerRequest', function () {
             email: 'john@example.com',
             firstName: 'John',
             lastName: 'Doe',
-            phoneNumber: '+255123456789',
+            phone: ['country_code' => 'TZA', 'number' => '712345678'],
             middleName: 'Michael',
         );
 
@@ -68,5 +72,52 @@ describe('UpdateCustomerRequest', function () {
 
         expect($payload['name'])
             ->toHaveKey('middle', 'Michael');
+    });
+
+    it('creates with email only per v4 API', function () {
+        $request = new UpdateCustomerRequest(email: 'minimal@example.com');
+
+        $payload = $request->toApiPayload();
+
+        expect($payload)
+            ->toHaveKey('email', 'minimal@example.com')
+            ->toHaveCount(1);
+    });
+
+    it('includes address in payload when provided', function () {
+        $request = new UpdateCustomerRequest(
+            email: 'john@example.com',
+            address: [
+                'line1' => '221B Baker Street',
+                'city' => 'London',
+                'state' => 'England',
+                'postal_code' => 'NW1 6XE',
+                'country' => 'GB',
+            ],
+        );
+
+        $payload = $request->toApiPayload();
+
+        expect($payload)
+            ->toHaveKey('email', 'john@example.com')
+            ->toHaveKey('address');
+
+        expect($payload['address'])
+            ->toHaveKey('line1', '221B Baker Street')
+            ->toHaveKey('country', 'GB');
+    });
+
+    it('includes phone object in payload when provided', function () {
+        $request = new UpdateCustomerRequest(
+            email: 'john@example.com',
+            phone: ['country_code' => 'GBR', 'number' => '7911123456'],
+        );
+
+        $payload = $request->toApiPayload();
+
+        expect($payload['phone'])->toBe([
+            'country_code' => 'GBR',
+            'number' => '7911123456',
+        ]);
     });
 });

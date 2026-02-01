@@ -305,7 +305,7 @@ class PaymentMethods extends Component
     {
         $type = $method['type'] ?? 'card';
 
-        return in_array($type, ['mobile_money', 'bank_account', 'ussd', 'opay', 'applepay', 'googlepay']);
+        return \in_array($type, ['mobile_money', 'bank_account', 'ussd', 'opay', 'applepay', 'googlepay']);
     }
 
     /**

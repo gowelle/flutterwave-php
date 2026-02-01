@@ -50,12 +50,15 @@ final readonly class UpdateCustomerRequest
             $payload['name'] = $name;
         }
 
-        if ($this->phone !== null && isset($this->phone['country_code'], $this->phone['number'])
-            && (string) $this->phone['country_code'] !== '' && (string) $this->phone['number'] !== '') {
-            $payload['phone'] = [
-                'country_code' => (string) $this->phone['country_code'],
-                'number' => (string) $this->phone['number'],
-            ];
+        if ($this->phone !== null && $this->phone !== []) {
+            $countryCode = trim((string) ($this->phone['country_code'] ?? ''));
+            $number = trim((string) ($this->phone['number'] ?? ''));
+            if ($countryCode !== '' && $number !== '') {
+                $payload['phone'] = [
+                    'country_code' => $countryCode,
+                    'number' => $number,
+                ];
+            }
         }
 
         if ($this->address !== null && $this->address !== []) {

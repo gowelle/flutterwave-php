@@ -96,6 +96,12 @@ abstract class IntegrationTestCase extends Orchestra
      *
      * @return array<string, mixed>
      */
+    /**
+     * Get test customer data (v4: only email required).
+     * Uses email + name only to avoid staging API phone-format differences.
+     *
+     * @return array<string, mixed>
+     */
     protected function getTestCustomerData(): array
     {
         return [
@@ -103,10 +109,6 @@ abstract class IntegrationTestCase extends Orchestra
             'name' => [
                 'first' => 'Integration',
                 'last' => 'TestUser',
-            ],
-            'phone' => [
-                'country_code' => 'TZA',
-                'number' => '712345678',
             ],
         ];
     }

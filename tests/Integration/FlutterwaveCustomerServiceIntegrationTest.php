@@ -64,16 +64,12 @@ describe('FlutterwaveCustomerService Integration', function () {
         $customerData = $this->getTestCustomerData();
         $createdCustomer = $customerService->create($customerData);
 
-        // Update the customer - API requires FULL customer data, not partial
+        // Update the customer (v4: only email required; name optional)
         $updatedCustomer = $customerService->update($createdCustomer->id, [
             'email' => $customerData['email'],
             'name' => [
                 'first' => 'Updated',
                 'last' => 'Customer',
-            ],
-            'phone' => [
-                'country_code' => 'TZA',
-                'number' => '712345678',
             ],
         ]);
 

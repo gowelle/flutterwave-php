@@ -11,6 +11,7 @@ use Gowelle\Flutterwave\FlutterwaveBaseApi;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Virtual Account API
@@ -121,7 +122,7 @@ class VirtualAccountApi extends FlutterwaveBaseApi
         // Additional validation: customer_account_number is required for EGP and KES
         $currency = VirtualAccountCurrency::fromApiResponse($validated['currency']);
         if ($currency->requiresAccountNumber() && empty($validated['customer_account_number'] ?? null)) {
-            throw new \Illuminate\Validation\ValidationException(
+            throw new ValidationException(
                 Validator::make($data, [
                     'customer_account_number' => 'required_if:currency,EGP,KES',
                 ])
@@ -149,7 +150,7 @@ class VirtualAccountApi extends FlutterwaveBaseApi
         $actionType = $validated['action_type'] ?? null;
 
         if ($actionType === 'update_bvn' && empty($validated['bvn'] ?? null)) {
-            throw new \Illuminate\Validation\ValidationException(
+            throw new ValidationException(
                 Validator::make($data, [
                     'bvn' => 'required_if:action_type,update_bvn',
                 ])
@@ -157,7 +158,7 @@ class VirtualAccountApi extends FlutterwaveBaseApi
         }
 
         if ($actionType === 'update_status' && empty($validated['status'] ?? null)) {
-            throw new \Illuminate\Validation\ValidationException(
+            throw new ValidationException(
                 Validator::make($data, [
                     'status' => 'required_if:action_type,update_status',
                 ])

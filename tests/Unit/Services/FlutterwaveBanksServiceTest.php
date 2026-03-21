@@ -7,6 +7,13 @@ use Gowelle\Flutterwave\Data\BankAccountResolveData;
 use Gowelle\Flutterwave\Data\BankBranchData;
 use Gowelle\Flutterwave\Data\BankData;
 use Gowelle\Flutterwave\Data\Banks\BankAccountResolveRequest;
+use Gowelle\Flutterwave\Data\VirtualAccount\CreateVirtualAccountRequestDTO;
+use Gowelle\Flutterwave\Data\VirtualAccount\ListVirtualAccountsParamsDTO;
+use Gowelle\Flutterwave\Data\VirtualAccount\UpdateVirtualAccountRequestDTO;
+use Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData;
+use Gowelle\Flutterwave\Enums\VirtualAccountCurrency;
+use Gowelle\Flutterwave\Enums\VirtualAccountStatus;
+use Gowelle\Flutterwave\Enums\VirtualAccountType;
 use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 use Gowelle\Flutterwave\FlutterwaveApiProvider;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
@@ -16,8 +23,8 @@ use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Support\HeaderBuilder;
 
 beforeEach(function () {
-    $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);
-    $this->headerBuilder = \Mockery::mock(HeaderBuilder::class);
+    $this->baseService = Mockery::mock(FlutterwaveBaseService::class);
+    $this->headerBuilder = Mockery::mock(HeaderBuilder::class);
     $this->service = new FlutterwaveBanksService($this->baseService);
 });
 
@@ -31,7 +38,7 @@ it('can get banks by country', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('retrieveByCountry')
         ->once()
         ->with('NG')
@@ -52,7 +59,7 @@ it('can get banks by country', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::BANKS, 'test_token', ['Content-Type' => 'application/json'])
@@ -73,7 +80,7 @@ it('throws exception when getting banks fails', function () {
         data: null,
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('retrieveByCountry')
         ->once()
         ->with('NG')
@@ -94,7 +101,7 @@ it('throws exception when getting banks fails', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::BANKS, 'test_token', ['Content-Type' => 'application/json'])
@@ -115,7 +122,7 @@ it('can get bank branches by bank id', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('retrieveByBankId')
         ->once()
         ->with('bank_123')
@@ -136,7 +143,7 @@ it('can get bank branches by bank id', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::BANK_BRANCHES, 'test_token', ['Content-Type' => 'application/json'])
@@ -161,7 +168,7 @@ it('can resolve bank account', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('resolve')
         ->once()
         ->with('044', '0123456789', 'NGN')
@@ -182,7 +189,7 @@ it('can resolve bank account', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::BANK_ACCOUNT_RESOLVE, 'test_token', ['Content-Type' => 'application/json'])
@@ -205,7 +212,7 @@ it('can resolve bank account from DTO', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('resolve')
         ->once()
         ->with('044', '0123456789', 'NGN')
@@ -226,7 +233,7 @@ it('can resolve bank account from DTO', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::BANK_ACCOUNT_RESOLVE, 'test_token', ['Content-Type' => 'application/json'])
@@ -262,10 +269,10 @@ it('can create virtual account', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('create')
         ->once()
-        ->with(\Mockery::type('array'))
+        ->with(Mockery::type('array'))
         ->andReturn($response);
 
     $this->baseService
@@ -283,24 +290,24 @@ it('can create virtual account', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
             ->andReturn($apiMock);
     }));
 
-    $request = new \Gowelle\Flutterwave\Data\VirtualAccount\CreateVirtualAccountRequestDTO(
+    $request = new CreateVirtualAccountRequestDTO(
         reference: 'test_ref_123',
         customerId: 'cus_123',
         amount: 0,
-        currency: \Gowelle\Flutterwave\Enums\VirtualAccountCurrency::NGN,
-        accountType: \Gowelle\Flutterwave\Enums\VirtualAccountType::STATIC,
+        currency: VirtualAccountCurrency::NGN,
+        accountType: VirtualAccountType::STATIC,
     );
 
     $result = $this->service->createVirtualAccount($request);
 
-    expect($result)->toBeInstanceOf(\Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData::class);
+    expect($result)->toBeInstanceOf(VirtualAccountData::class);
     expect($result->id)->toBe('va_123');
 });
 
@@ -311,7 +318,7 @@ it('throws exception when creating virtual account fails', function () {
         data: null,
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('create')
         ->once()
         ->andReturn($response);
@@ -331,19 +338,19 @@ it('throws exception when creating virtual account fails', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
             ->andReturn($apiMock);
     }));
 
-    $request = new \Gowelle\Flutterwave\Data\VirtualAccount\CreateVirtualAccountRequestDTO(
+    $request = new CreateVirtualAccountRequestDTO(
         reference: 'test_ref_123',
         customerId: 'cus_123',
         amount: 0,
-        currency: \Gowelle\Flutterwave\Enums\VirtualAccountCurrency::NGN,
-        accountType: \Gowelle\Flutterwave\Enums\VirtualAccountType::STATIC,
+        currency: VirtualAccountCurrency::NGN,
+        accountType: VirtualAccountType::STATIC,
     );
 
     expect(fn () => $this->service->createVirtualAccount($request))
@@ -368,7 +375,7 @@ it('can retrieve virtual account', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('retrieve')
         ->once()
         ->with('va_123')
@@ -389,7 +396,7 @@ it('can retrieve virtual account', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
@@ -398,7 +405,7 @@ it('can retrieve virtual account', function () {
 
     $result = $this->service->retrieveVirtualAccount('va_123');
 
-    expect($result)->toBeInstanceOf(\Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData::class);
+    expect($result)->toBeInstanceOf(VirtualAccountData::class);
     expect($result->id)->toBe('va_123');
 });
 
@@ -434,7 +441,7 @@ it('can list virtual accounts', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('list')
         ->once()
         ->andReturn($response);
@@ -454,7 +461,7 @@ it('can list virtual accounts', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
@@ -465,7 +472,7 @@ it('can list virtual accounts', function () {
 
     expect($result)->toBeArray();
     expect(\count($result))->toBe(2);
-    expect($result[0])->toBeInstanceOf(\Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData::class);
+    expect($result[0])->toBeInstanceOf(VirtualAccountData::class);
 });
 
 it('can list virtual accounts with params', function () {
@@ -488,10 +495,10 @@ it('can list virtual accounts with params', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('listWithParams')
         ->once()
-        ->with(\Mockery::type('array'))
+        ->with(Mockery::type('array'))
         ->andReturn($response);
 
     $this->baseService
@@ -509,14 +516,14 @@ it('can list virtual accounts with params', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
             ->andReturn($apiMock);
     }));
 
-    $params = new \Gowelle\Flutterwave\Data\VirtualAccount\ListVirtualAccountsParamsDTO(
+    $params = new ListVirtualAccountsParamsDTO(
         page: 1,
         size: 10,
         reference: 'test_ref_123',
@@ -526,7 +533,7 @@ it('can list virtual accounts with params', function () {
 
     expect($result)->toBeArray();
     expect(\count($result))->toBe(1);
-    expect($result[0])->toBeInstanceOf(\Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData::class);
+    expect($result[0])->toBeInstanceOf(VirtualAccountData::class);
 });
 
 it('can update virtual account', function () {
@@ -547,10 +554,10 @@ it('can update virtual account', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('update')
         ->once()
-        ->with('va_123', \Mockery::type('array'))
+        ->with('va_123', Mockery::type('array'))
         ->andReturn($response);
 
     $this->baseService
@@ -568,20 +575,20 @@ it('can update virtual account', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
             ->andReturn($apiMock);
     }));
 
-    $request = \Gowelle\Flutterwave\Data\VirtualAccount\UpdateVirtualAccountRequestDTO::forStatusUpdate(
-        \Gowelle\Flutterwave\Enums\VirtualAccountStatus::INACTIVE
+    $request = UpdateVirtualAccountRequestDTO::forStatusUpdate(
+        VirtualAccountStatus::INACTIVE
     );
 
     $result = $this->service->updateVirtualAccount('va_123', $request);
 
-    expect($result)->toBeInstanceOf(\Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData::class);
+    expect($result)->toBeInstanceOf(VirtualAccountData::class);
     expect($result->status->value)->toBe('inactive');
 });
 
@@ -592,7 +599,7 @@ it('throws exception when updating virtual account fails', function () {
         data: null,
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('update')
         ->once()
         ->andReturn($response);
@@ -612,15 +619,15 @@ it('throws exception when updating virtual account fails', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
             ->andReturn($apiMock);
     }));
 
-    $request = \Gowelle\Flutterwave\Data\VirtualAccount\UpdateVirtualAccountRequestDTO::forStatusUpdate(
-        \Gowelle\Flutterwave\Enums\VirtualAccountStatus::INACTIVE
+    $request = UpdateVirtualAccountRequestDTO::forStatusUpdate(
+        VirtualAccountStatus::INACTIVE
     );
 
     expect(fn () => $this->service->updateVirtualAccount('va_123', $request))

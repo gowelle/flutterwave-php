@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Services;
 
+use Gowelle\Flutterwave\Api\Banks\MobileNetworksApi;
 use Gowelle\Flutterwave\Data\MobileNetworkData;
 use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 use Gowelle\Flutterwave\FlutterwaveApiProvider;
@@ -26,7 +27,7 @@ final class FlutterwaveMobileNetworkService
         $api = app(FlutterwaveApiProvider::class)
             ->useApi(FlutterwaveApi::MOBILE_NETWORKS, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
 
-        /** @var \Gowelle\Flutterwave\Api\Banks\MobileNetworksApi $api */
+        /** @var MobileNetworksApi $api */
         $response = $api->retrieveByCountry($country);
 
         return MobileNetworkData::collection($response->data)->toArray();

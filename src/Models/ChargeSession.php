@@ -7,17 +7,24 @@ namespace Gowelle\Flutterwave\Models;
 use Gowelle\Flutterwave\Data\NextActionData;
 use Gowelle\Flutterwave\Enums\DirectChargeStatus;
 use Gowelle\Flutterwave\Enums\NextActionType;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * Flutterwave Charge Session Model
  *
  * Tracks the state of a direct charge transaction that may require
  * multiple authorization steps (PIN, OTP, AVS, etc.).
+ *
+ * Uses Laravel 13+ class attributes for table and mass-assignment metadata
+ * ({@see Table}, {@see Guarded}). Native typed properties can be added later for
+ * stricter static analysis once all instantiation paths are covered.
  *
  * @property string $id
  * @property string $user_id
@@ -30,10 +37,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property array|null $payment_method_details
  * @property string|null $remote_customer_id
  * @property array|null $meta
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Model $user
- * @property-read \Illuminate\Database\Eloquent\Model $payment
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Model $user
+ * @property-read Model $payment
  *
  * @method static Builder<static>|ChargeSession newModelQuery()
  * @method static Builder<static>|ChargeSession newQuery()
@@ -61,18 +68,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
+#[Table('flutterwave_charge_sessions', keyType: 'string', incrementing: false)]
+#[Guarded(['id'])]
 final class ChargeSession extends Model
 {
     use HasFactory;
     use HasUlids;
-
-    public $incrementing = false;
-
-    protected $keyType = 'string';
-
-    protected $table = 'flutterwave_charge_sessions';
-
-    protected $guarded = ['id'];
 
     /**
      * Get the user that owns the charge session.

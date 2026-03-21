@@ -21,7 +21,7 @@ use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwaveTransferService;
 
 beforeEach(function () {
-    $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);
+    $this->baseService = Mockery::mock(FlutterwaveBaseService::class);
     $this->service = new FlutterwaveTransferService($this->baseService);
 });
 
@@ -49,7 +49,7 @@ it('can create a bank transfer via orchestrator', function () {
     $this->baseService
         ->shouldReceive('create')
         ->once()
-        ->with(FlutterwaveApi::DIRECT_TRANSFER, \Mockery::any(), \Mockery::any())
+        ->with(FlutterwaveApi::DIRECT_TRANSFER, Mockery::any(), Mockery::any())
         ->andReturn($response);
 
     $request = new BankTransferRequest(
@@ -132,7 +132,7 @@ it('can get a transfer by id', function () {
     $this->baseService
         ->shouldReceive('retrieve')
         ->once()
-        ->with(FlutterwaveApi::TRANSFER, \Mockery::any(), 'trf_123')
+        ->with(FlutterwaveApi::TRANSFER, Mockery::any(), 'trf_123')
         ->andReturn($response);
 
     $result = $this->service->get('trf_123');
@@ -208,7 +208,7 @@ it('can create a recipient', function () {
     $this->baseService
         ->shouldReceive('create')
         ->once()
-        ->with(FlutterwaveApi::TRANSFER_RECIPIENTS, \Mockery::any(), \Mockery::any())
+        ->with(FlutterwaveApi::TRANSFER_RECIPIENTS, Mockery::any(), Mockery::any())
         ->andReturn($response);
 
     $request = CreateRecipientRequest::bankNgn(
@@ -242,7 +242,7 @@ it('can create a sender', function () {
     $this->baseService
         ->shouldReceive('create')
         ->once()
-        ->with(FlutterwaveApi::TRANSFER_SENDERS, \Mockery::any(), \Mockery::any())
+        ->with(FlutterwaveApi::TRANSFER_SENDERS, Mockery::any(), Mockery::any())
         ->andReturn($response);
 
     $request = CreateSenderRequest::generic(
@@ -278,7 +278,7 @@ it('can get transfer rate', function () {
     $this->baseService
         ->shouldReceive('create')
         ->once()
-        ->with(FlutterwaveApi::TRANSFER_RATES, \Mockery::any(), \Mockery::any())
+        ->with(FlutterwaveApi::TRANSFER_RATES, Mockery::any(), Mockery::any())
         ->andReturn($response);
 
     $request = new GetRateRequest(

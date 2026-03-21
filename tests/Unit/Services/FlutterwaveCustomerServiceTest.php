@@ -14,7 +14,7 @@ use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwaveCustomerService;
 
 beforeEach(function () {
-    $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);
+    $this->baseService = Mockery::mock(FlutterwaveBaseService::class);
     $this->service = new FlutterwaveCustomerService($this->baseService);
 });
 
@@ -123,7 +123,7 @@ it('can get a customer by id', function () {
     $this->baseService
         ->shouldReceive('retrieve')
         ->once()
-        ->with(FlutterwaveApi::CUSTOMER, \Mockery::any(), 'cust_123')
+        ->with(FlutterwaveApi::CUSTOMER, Mockery::any(), 'cust_123')
         ->andReturn($response);
 
     $result = $this->service->get('cust_123');
@@ -150,7 +150,7 @@ it('can update a customer', function () {
     $this->baseService
         ->shouldReceive('update')
         ->once()
-        ->with(FlutterwaveApi::CUSTOMER, \Mockery::any(), 'cust_123', \Mockery::any())
+        ->with(FlutterwaveApi::CUSTOMER, Mockery::any(), 'cust_123', Mockery::any())
         ->andReturn($response);
 
     $result = $this->service->update('cust_123', [
@@ -178,7 +178,7 @@ it('can update a customer from DTO', function () {
     $this->baseService
         ->shouldReceive('update')
         ->once()
-        ->with(FlutterwaveApi::CUSTOMER, \Mockery::any(), 'cust_123', \Mockery::any())
+        ->with(FlutterwaveApi::CUSTOMER, Mockery::any(), 'cust_123', Mockery::any())
         ->andReturn($response);
 
     $request = new UpdateCustomerRequest(
@@ -213,7 +213,7 @@ it('can search for a customer by email', function () {
     $this->baseService
         ->shouldReceive('search')
         ->once()
-        ->with(FlutterwaveApi::CUSTOMER, \Mockery::any(), ['email' => 'test@example.com'])
+        ->with(FlutterwaveApi::CUSTOMER, Mockery::any(), ['email' => 'test@example.com'])
         ->andReturn($response);
 
     $result = $this->service->search('test@example.com');
@@ -240,7 +240,7 @@ it('can search for a customer from DTO', function () {
     $this->baseService
         ->shouldReceive('search')
         ->once()
-        ->with(FlutterwaveApi::CUSTOMER, \Mockery::any(), ['email' => 'test@example.com'])
+        ->with(FlutterwaveApi::CUSTOMER, Mockery::any(), ['email' => 'test@example.com'])
         ->andReturn($response);
 
     $request = new SearchCustomerRequest(email: 'test@example.com');
@@ -269,7 +269,7 @@ it('throws when searchFromDto finds no customer', function () {
     $request = new SearchCustomerRequest(email: 'missing@example.com');
 
     $this->service->searchFromDto($request);
-})->throws(\RuntimeException::class, 'No customer found with email: missing@example.com');
+})->throws(RuntimeException::class, 'No customer found with email: missing@example.com');
 
 it('returns empty array when list response has no data', function () {
     $response = new ApiResponse(

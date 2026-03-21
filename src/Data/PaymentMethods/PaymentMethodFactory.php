@@ -17,7 +17,7 @@ final class PaymentMethodFactory
      *
      * @throws InvalidArgumentException
      */
-    public static function create(array $data): ?PaymentMethodData
+    public static function create(array $data): PaymentMethodData
     {
         if (! isset($data['type'])) {
             throw new InvalidArgumentException('Payment method type is required');

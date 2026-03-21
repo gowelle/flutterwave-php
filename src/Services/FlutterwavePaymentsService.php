@@ -41,10 +41,10 @@ final class FlutterwavePaymentsService implements PaymentsServiceInterface
             return [];
         }
 
-        return array_filter(array_map(
+        return array_map(
             fn (array $item) => PaymentMethodFactory::create($item),
             $response->data
-        ));
+        );
     }
 
     /**

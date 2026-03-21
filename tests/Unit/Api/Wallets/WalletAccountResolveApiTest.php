@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 use Gowelle\Flutterwave\Api\Wallets\WalletAccountResolveApi;
 use Gowelle\Flutterwave\Credentials\AbstractHeadersConfig;
+use Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException;
 use Gowelle\Flutterwave\Support\RateLimiter;
 use Gowelle\Flutterwave\Support\RetryHandler;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
     config([
@@ -58,39 +60,39 @@ it('can resolve wallet account', function () {
 it('validates provider is required', function () {
     expect(function () {
         $this->api->resolve('', 'wallet_123');
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('validates identifier is required', function () {
     expect(function () {
         $this->api->resolve('flutterwave', '');
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('validates provider must be flutterwave', function () {
     expect(function () {
         $this->api->resolve('invalid_provider', 'wallet_123');
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('throws exception for unimplemented methods', function () {
     expect(function () {
         $this->api->create([]);
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 
     expect(function () {
         $this->api->update('id', []);
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 
     expect(function () {
         $this->api->retrieve('id');
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 
     expect(function () {
         $this->api->list();
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 
     expect(function () {
         $this->api->search([]);
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 });

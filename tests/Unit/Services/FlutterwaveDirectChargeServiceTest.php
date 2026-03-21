@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Event;
 
 beforeEach(function () {
     Event::fake();
-    $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);
+    $this->baseService = Mockery::mock(FlutterwaveBaseService::class);
     $this->service = new FlutterwaveDirectChargeService($this->baseService);
 });
 
@@ -104,7 +104,7 @@ it('can get charge status', function () {
     $this->baseService
         ->shouldReceive('retrieve')
         ->once()
-        ->with(FlutterwaveApi::DIRECT_CHARGE, \Mockery::any(), 'dc_123')
+        ->with(FlutterwaveApi::DIRECT_CHARGE, Mockery::any(), 'dc_123')
         ->andReturn($response);
 
     $result = $this->service->status('dc_123');

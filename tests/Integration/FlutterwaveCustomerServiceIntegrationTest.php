@@ -93,7 +93,7 @@ describe('FlutterwaveCustomerService Integration', function () {
             expect($foundCustomer)
                 ->toBeInstanceOf(CustomerData::class)
                 ->email->toBe($customerData['email']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Staging API search may not find newly created customers immediately
             $this->markTestSkipped('Staging API search may have delay: '.$e->getMessage());
         }

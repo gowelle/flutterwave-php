@@ -1,3 +1,15 @@
+# Release v3.0.0
+
+**Release Date:** 2026-03-22
+
+Major release: **PHP 8.3+** required, **Laravel 11 / 12 / 13** supported, **Pest 4**, **PHPStan 2**, CI on **PHP 8.3–8.5**, `ChargeSession` uses Laravel 13 `#[Table]` / `#[Guarded]` attributes.
+
+See the full write-up: [`RELEASE_NOTES_v3.0.0.md`](RELEASE_NOTES_v3.0.0.md).
+
+**Full Changelog**: https://github.com/gowelle/flutterwave-php/compare/v2.12.0...v3.0.0
+
+---
+
 # Release v2.12.0
 
 **Release Date:** 2025-02-02

@@ -7,6 +7,7 @@ namespace Gowelle\Flutterwave\Services;
 use Gowelle\Flutterwave\Concerns\BuildsWavable;
 use Gowelle\Flutterwave\Contracts\DirectChargeServiceInterface;
 use Gowelle\Flutterwave\Data\AuthorizationData;
+use Gowelle\Flutterwave\Data\DirectCharge\CreateDirectChargeRequest;
 use Gowelle\Flutterwave\Data\DirectChargeData;
 use Gowelle\Flutterwave\Enums\DirectChargeStatus;
 use Gowelle\Flutterwave\Events\FlutterwaveChargeCreated;
@@ -129,7 +130,7 @@ final class FlutterwaveDirectChargeService implements DirectChargeServiceInterfa
      *
      * Type-safe alternative to create() using CreateDirectChargeRequest DTO.
      *
-     * @param  \Gowelle\Flutterwave\Data\DirectCharge\CreateDirectChargeRequest  $request  Charge request DTO
+     * @param  CreateDirectChargeRequest  $request  Charge request DTO
      *
      * @throws FlutterwaveApiException
      *
@@ -145,7 +146,7 @@ final class FlutterwaveDirectChargeService implements DirectChargeServiceInterfa
      * );
      * $charge = $service->createFromDto($request);
      */
-    public function createFromDto(\Gowelle\Flutterwave\Data\DirectCharge\CreateDirectChargeRequest $request): DirectChargeData
+    public function createFromDto(CreateDirectChargeRequest $request): DirectChargeData
     {
         return $this->create($request->toApiPayload());
     }

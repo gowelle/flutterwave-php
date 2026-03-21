@@ -62,7 +62,7 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
 - **Automatic Retry Logic** - Exponential backoff for transient failures (5xx errors, rate limits, timeouts)
 - **Rate Limiting** - Configurable per-request rate limiting to prevent API quota exhaustion
 - **Webhook Verification** - Secure webhook signature validation with automatic event dispatching
-- **Type-Safe DTOs** - Full TypeScript-like typing with PHP 8.2+ for better IDE support and fewer runtime errors
+- **Type-Safe DTOs** - Full TypeScript-like typing with PHP 8.3+ for better IDE support and fewer runtime errors
 - **Comprehensive Error Handling** - Detailed error messages with categorization (validation, authentication, API errors)
 - **Database Migrations** - Built-in migrations for charge session tracking
 - **Testing Ready** - Full test suite with Pest framework and HTTP faking support
@@ -71,8 +71,8 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
 
 ## Requirements
 
-- PHP 8.2 or higher
-- Laravel 11.0 or 12.0
+- PHP 8.3 or higher
+- Laravel 11.0, 12.0, or 13.0
 - Composer
 - Flutterwave account with API credentials
 

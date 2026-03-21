@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Gowelle\Flutterwave\Api\Refund\RefundApi;
 use Gowelle\Flutterwave\Data\ApiResponse;
 use Gowelle\Flutterwave\Data\FlutterwaveConfig;
 use Gowelle\Flutterwave\Data\Refund\CreateRefundRequest;
@@ -10,13 +11,14 @@ use Gowelle\Flutterwave\Data\RefundData;
 use Gowelle\Flutterwave\Enums\FlutterwaveEnvironment;
 use Gowelle\Flutterwave\Enums\RefundReason;
 use Gowelle\Flutterwave\Enums\RefundStatus;
+use Gowelle\Flutterwave\FlutterwaveApiProvider;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwaveRefundService;
 use Gowelle\Flutterwave\Support\HeaderBuilder;
 
 beforeEach(function () {
-    $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);
+    $this->baseService = Mockery::mock(FlutterwaveBaseService::class);
     $this->service = new FlutterwaveRefundService($this->baseService);
 });
 
@@ -78,7 +80,7 @@ it('can get a refund by id', function () {
     $this->baseService
         ->shouldReceive('retrieve')
         ->once()
-        ->with(FlutterwaveApi::REFUND, \Mockery::any(), 'ref_123')
+        ->with(FlutterwaveApi::REFUND, Mockery::any(), 'ref_123')
         ->andReturn($response);
 
     $result = $this->service->get('ref_123');
@@ -114,7 +116,7 @@ it('can list refunds', function () {
         ->andReturn(new FlutterwaveConfig('test_client_id', 'test_client_secret', 'test_secret_hash', FlutterwaveEnvironment::STAGING));
 
     // Mock header builder to return an array (not a mock object)
-    $mockHeaderBuilder = \Mockery::mock(HeaderBuilder::class);
+    $mockHeaderBuilder = Mockery::mock(HeaderBuilder::class);
     $mockHeaderBuilder->shouldReceive('build')->andReturn(['Authorization' => 'Bearer test_token']);
     $this->baseService
         ->shouldReceive('getHeaderBuilder')
@@ -125,14 +127,14 @@ it('can list refunds', function () {
         ->andReturn('test_token');
 
     // Mock the API provider
-    $mockApi = \Mockery::mock(\Gowelle\Flutterwave\Api\Refund\RefundApi::class);
+    $mockApi = Mockery::mock(RefundApi::class);
     $mockApi->shouldReceive('listWithParams')
         ->andReturn($response);
 
-    $mockApiProvider = \Mockery::mock(\Gowelle\Flutterwave\FlutterwaveApiProvider::class);
+    $mockApiProvider = Mockery::mock(FlutterwaveApiProvider::class);
     $mockApiProvider->shouldReceive('useApi')->andReturn($mockApi);
 
-    app()->instance(\Gowelle\Flutterwave\FlutterwaveApiProvider::class, $mockApiProvider);
+    app()->instance(FlutterwaveApiProvider::class, $mockApiProvider);
 
     $result = $this->service->list();
 
@@ -153,7 +155,7 @@ it('returns empty array when list response has no data', function () {
         ->andReturn(new FlutterwaveConfig('test_client_id', 'test_client_secret', 'test_secret_hash', FlutterwaveEnvironment::STAGING));
 
     // Mock header builder to return an array (not a mock object)
-    $mockHeaderBuilder = \Mockery::mock(HeaderBuilder::class);
+    $mockHeaderBuilder = Mockery::mock(HeaderBuilder::class);
     $mockHeaderBuilder->shouldReceive('build')->andReturn(['Authorization' => 'Bearer test_token']);
     $this->baseService
         ->shouldReceive('getHeaderBuilder')
@@ -164,14 +166,14 @@ it('returns empty array when list response has no data', function () {
         ->andReturn('test_token');
 
     // Mock the API provider
-    $mockApi = \Mockery::mock(\Gowelle\Flutterwave\Api\Refund\RefundApi::class);
+    $mockApi = Mockery::mock(RefundApi::class);
     $mockApi->shouldReceive('listWithParams')
         ->andReturn($response);
 
-    $mockApiProvider = \Mockery::mock(\Gowelle\Flutterwave\FlutterwaveApiProvider::class);
+    $mockApiProvider = Mockery::mock(FlutterwaveApiProvider::class);
     $mockApiProvider->shouldReceive('useApi')->andReturn($mockApi);
 
-    app()->instance(\Gowelle\Flutterwave\FlutterwaveApiProvider::class, $mockApiProvider);
+    app()->instance(FlutterwaveApiProvider::class, $mockApiProvider);
 
     $result = $this->service->list();
 
@@ -198,7 +200,7 @@ it('can list refunds with filters', function () {
         ->andReturn(new FlutterwaveConfig('test_client_id', 'test_client_secret', 'test_secret_hash', FlutterwaveEnvironment::STAGING));
 
     // Mock header builder to return an array (not a mock object)
-    $mockHeaderBuilder = \Mockery::mock(HeaderBuilder::class);
+    $mockHeaderBuilder = Mockery::mock(HeaderBuilder::class);
     $mockHeaderBuilder->shouldReceive('build')->andReturn(['Authorization' => 'Bearer test_token']);
     $this->baseService
         ->shouldReceive('getHeaderBuilder')
@@ -209,14 +211,14 @@ it('can list refunds with filters', function () {
         ->andReturn('test_token');
 
     // Mock the API provider
-    $mockApi = \Mockery::mock(\Gowelle\Flutterwave\Api\Refund\RefundApi::class);
+    $mockApi = Mockery::mock(RefundApi::class);
     $mockApi->shouldReceive('listWithParams')
         ->andReturn($response);
 
-    $mockApiProvider = \Mockery::mock(\Gowelle\Flutterwave\FlutterwaveApiProvider::class);
+    $mockApiProvider = Mockery::mock(FlutterwaveApiProvider::class);
     $mockApiProvider->shouldReceive('useApi')->andReturn($mockApi);
 
-    app()->instance(\Gowelle\Flutterwave\FlutterwaveApiProvider::class, $mockApiProvider);
+    app()->instance(FlutterwaveApiProvider::class, $mockApiProvider);
 
     $request = new ListRefundsRequest(page: 1, size: 10);
 

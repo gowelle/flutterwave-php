@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 use Gowelle\Flutterwave\Api\VirtualAccount\VirtualAccountApi;
 use Gowelle\Flutterwave\Credentials\AbstractHeadersConfig;
+use Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException;
 use Gowelle\Flutterwave\Support\RateLimiter;
 use Gowelle\Flutterwave\Support\RetryHandler;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
     config([
@@ -77,7 +79,7 @@ it('validates create request reference length', function () {
             'currency' => 'NGN',
             'account_type' => 'static',
         ]);
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('validates required fields for create', function () {
@@ -86,7 +88,7 @@ it('validates required fields for create', function () {
             'reference' => 'test_ref_123',
             // Missing customer_id, amount, currency, account_type
         ]);
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('requires customer_account_number for EGP currency', function () {
@@ -99,7 +101,7 @@ it('requires customer_account_number for EGP currency', function () {
             'account_type' => 'static',
             // Missing customer_account_number
         ]);
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('requires customer_account_number for KES currency', function () {
@@ -112,7 +114,7 @@ it('requires customer_account_number for KES currency', function () {
             'account_type' => 'dynamic',
             // Missing customer_account_number
         ]);
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('validates update request action_type', function () {
@@ -121,7 +123,7 @@ it('validates update request action_type', function () {
             'action_type' => 'invalid_action',
             'bvn' => '12345678901',
         ]);
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('requires bvn for update_bvn action', function () {
@@ -130,7 +132,7 @@ it('requires bvn for update_bvn action', function () {
             'action_type' => 'update_bvn',
             // Missing bvn
         ]);
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('requires status for update_status action', function () {
@@ -139,7 +141,7 @@ it('requires status for update_status action', function () {
             'action_type' => 'update_status',
             // Missing status
         ]);
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('can validate create with optional fields', function () {
@@ -179,7 +181,7 @@ it('can validate create with optional fields', function () {
 it('throws exception for search operation', function () {
     expect(function () {
         $this->api->search([]);
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 });
 
 it('validates expiry seconds range', function () {
@@ -192,7 +194,7 @@ it('validates expiry seconds range', function () {
             'account_type' => 'dynamic',
             'expiry' => 30, // Too low, minimum is 60
         ]);
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('accepts valid currency enum values', function () {

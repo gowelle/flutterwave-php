@@ -14,7 +14,7 @@ use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwavePaymentsService;
 
 beforeEach(function () {
-    $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);
+    $this->baseService = Mockery::mock(FlutterwaveBaseService::class);
     $this->service = new FlutterwavePaymentsService($this->baseService);
 });
 
@@ -87,7 +87,7 @@ it('can get a payment method by id', function () {
     $this->baseService
         ->shouldReceive('retrieve')
         ->once()
-        ->with(FlutterwaveApi::PAYMENT_METHODS, \Mockery::any(), 'pm_123')
+        ->with(FlutterwaveApi::PAYMENT_METHODS, Mockery::any(), 'pm_123')
         ->andReturn($response);
 
     $result = $this->service->getMethod('pm_123');
@@ -165,7 +165,7 @@ it('can get charge status', function () {
     $this->baseService
         ->shouldReceive('retrieve')
         ->once()
-        ->with(FlutterwaveApi::CHARGE, \Mockery::any(), 'ch_123')
+        ->with(FlutterwaveApi::CHARGE, Mockery::any(), 'ch_123')
         ->andReturn($response);
 
     $result = $this->service->status('ch_123');

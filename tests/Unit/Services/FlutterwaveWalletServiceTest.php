@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Gowelle\Flutterwave\Data\ApiResponse;
 use Gowelle\Flutterwave\Data\Wallet\WalletAccountResolveData;
 use Gowelle\Flutterwave\Data\Wallet\WalletBalanceData;
+use Gowelle\Flutterwave\Data\Wallet\WalletStatementCursor;
 use Gowelle\Flutterwave\Data\Wallet\WalletStatementData;
 use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 use Gowelle\Flutterwave\FlutterwaveApiProvider;
@@ -15,8 +16,8 @@ use Gowelle\Flutterwave\Services\FlutterwaveWalletService;
 use Gowelle\Flutterwave\Support\HeaderBuilder;
 
 beforeEach(function () {
-    $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);
-    $this->headerBuilder = \Mockery::mock(HeaderBuilder::class);
+    $this->baseService = Mockery::mock(FlutterwaveBaseService::class);
+    $this->headerBuilder = Mockery::mock(HeaderBuilder::class);
     $this->service = new FlutterwaveWalletService($this->baseService);
 });
 
@@ -31,7 +32,7 @@ it('can resolve wallet account', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('resolve')
         ->once()
         ->with('flutterwave', 'wallet_123')
@@ -52,7 +53,7 @@ it('can resolve wallet account', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::WALLET_ACCOUNT_RESOLVE, 'test_token', ['Content-Type' => 'application/json'])
@@ -74,7 +75,7 @@ it('throws exception when resolving wallet account fails', function () {
         data: null,
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('resolve')
         ->once()
         ->with('flutterwave', 'wallet_123')
@@ -95,7 +96,7 @@ it('throws exception when resolving wallet account fails', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::WALLET_ACCOUNT_RESOLVE, 'test_token', ['Content-Type' => 'application/json'])
@@ -127,7 +128,7 @@ it('can get wallet statement', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('getStatement')
         ->once()
         ->with(['currency' => 'NGN'])
@@ -148,7 +149,7 @@ it('can get wallet statement', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::WALLET_STATEMENT, 'test_token', ['Content-Type' => 'application/json'])
@@ -158,7 +159,7 @@ it('can get wallet statement', function () {
     $result = $this->service->getStatement(['currency' => 'NGN']);
 
     expect($result)->toBeInstanceOf(WalletStatementData::class);
-    expect($result->cursor)->toBeInstanceOf(\Gowelle\Flutterwave\Data\Wallet\WalletStatementCursor::class);
+    expect($result->cursor)->toBeInstanceOf(WalletStatementCursor::class);
     expect($result->transactions)->toBeArray();
 });
 
@@ -169,7 +170,7 @@ it('throws exception when getting wallet statement fails', function () {
         data: null,
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('getStatement')
         ->once()
         ->with(['currency' => 'NGN'])
@@ -190,7 +191,7 @@ it('throws exception when getting wallet statement fails', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::WALLET_STATEMENT, 'test_token', ['Content-Type' => 'application/json'])
@@ -211,7 +212,7 @@ it('can get wallet balance for a currency', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('getBalance')
         ->once()
         ->with('NGN')
@@ -232,7 +233,7 @@ it('can get wallet balance for a currency', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::WALLET_BALANCE, 'test_token', ['Content-Type' => 'application/json'])
@@ -253,7 +254,7 @@ it('throws exception when getting wallet balance fails', function () {
         data: null,
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('getBalance')
         ->once()
         ->with('NGN')
@@ -274,7 +275,7 @@ it('throws exception when getting wallet balance fails', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::WALLET_BALANCE, 'test_token', ['Content-Type' => 'application/json'])
@@ -301,7 +302,7 @@ it('can get wallet balances for multiple currencies', function () {
         ],
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('getBalances')
         ->once()
         ->andReturn($response);
@@ -321,7 +322,7 @@ it('can get wallet balances for multiple currencies', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::WALLET_BALANCES, 'test_token', ['Content-Type' => 'application/json'])
@@ -344,7 +345,7 @@ it('throws exception when getting wallet balances fails', function () {
         data: null,
     );
 
-    $apiMock = \Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('getBalances')
         ->once()
         ->andReturn($response);
@@ -364,7 +365,7 @@ it('throws exception when getting wallet balances fails', function () {
         ->once()
         ->andReturn(['Content-Type' => 'application/json']);
 
-    app()->instance(FlutterwaveApiProvider::class, \Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
             ->with(FlutterwaveApi::WALLET_BALANCES, 'test_token', ['Content-Type' => 'application/json'])

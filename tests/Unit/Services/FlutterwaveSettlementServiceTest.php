@@ -11,7 +11,7 @@ use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
 use Gowelle\Flutterwave\Services\FlutterwaveSettlementService;
 
 beforeEach(function () {
-    $this->baseService = \Mockery::mock(FlutterwaveBaseService::class);
+    $this->baseService = Mockery::mock(FlutterwaveBaseService::class);
     $this->service = new FlutterwaveSettlementService($this->baseService);
 });
 
@@ -34,7 +34,7 @@ it('can get a settlement by id', function () {
     $this->baseService
         ->shouldReceive('retrieve')
         ->once()
-        ->with(FlutterwaveApi::SETTLEMENT, \Mockery::any(), 'set_123')
+        ->with(FlutterwaveApi::SETTLEMENT, Mockery::any(), 'set_123')
         ->andReturn($response);
 
     $result = $this->service->get('set_123');

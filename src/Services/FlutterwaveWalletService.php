@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Services;
 
+use Gowelle\Flutterwave\Api\Wallets\WalletAccountResolveApi;
+use Gowelle\Flutterwave\Api\Wallets\WalletBalanceApi;
+use Gowelle\Flutterwave\Api\Wallets\WalletBalancesApi;
+use Gowelle\Flutterwave\Api\Wallets\WalletStatementApi;
 use Gowelle\Flutterwave\Data\Wallet\WalletAccountResolveData;
 use Gowelle\Flutterwave\Data\Wallet\WalletBalanceData;
 use Gowelle\Flutterwave\Data\Wallet\WalletStatementData;
@@ -25,7 +29,7 @@ final class FlutterwaveWalletService
         $api = app(FlutterwaveApiProvider::class)
             ->useApi(FlutterwaveApi::WALLET_ACCOUNT_RESOLVE, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
 
-        /** @var \Gowelle\Flutterwave\Api\Wallets\WalletAccountResolveApi $api */
+        /** @var WalletAccountResolveApi $api */
         $response = $api->resolve($provider, $identifier);
 
         if (! $response->isSuccessful()) {
@@ -50,7 +54,7 @@ final class FlutterwaveWalletService
         $api = app(FlutterwaveApiProvider::class)
             ->useApi(FlutterwaveApi::WALLET_STATEMENT, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
 
-        /** @var \Gowelle\Flutterwave\Api\Wallets\WalletStatementApi $api */
+        /** @var WalletStatementApi $api */
         $response = $api->getStatement($params);
 
         if (! $response->isSuccessful()) {
@@ -73,7 +77,7 @@ final class FlutterwaveWalletService
         $api = app(FlutterwaveApiProvider::class)
             ->useApi(FlutterwaveApi::WALLET_BALANCE, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
 
-        /** @var \Gowelle\Flutterwave\Api\Wallets\WalletBalanceApi $api */
+        /** @var WalletBalanceApi $api */
         $response = $api->getBalance($currency);
 
         if (! $response->isSuccessful()) {
@@ -98,7 +102,7 @@ final class FlutterwaveWalletService
         $api = app(FlutterwaveApiProvider::class)
             ->useApi(FlutterwaveApi::WALLET_BALANCES, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
 
-        /** @var \Gowelle\Flutterwave\Api\Wallets\WalletBalancesApi $api */
+        /** @var WalletBalancesApi $api */
         $response = $api->getBalances();
 
         if (! $response->isSuccessful()) {

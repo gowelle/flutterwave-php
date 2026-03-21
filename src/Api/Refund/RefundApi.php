@@ -6,6 +6,7 @@ namespace Gowelle\Flutterwave\Api\Refund;
 
 use Exception;
 use Gowelle\Flutterwave\Data\ApiResponse;
+use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 use Gowelle\Flutterwave\FlutterwaveBaseApi;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
@@ -120,9 +121,9 @@ class RefundApi extends FlutterwaveBaseApi
     /**
      * Create API exception from request exception
      */
-    protected function createApiException(RequestException $e): \Gowelle\Flutterwave\Exceptions\FlutterwaveApiException
+    protected function createApiException(RequestException $e): FlutterwaveApiException
     {
-        return \Gowelle\Flutterwave\Exceptions\FlutterwaveApiException::fromResponseBody(
+        return FlutterwaveApiException::fromResponseBody(
             responseBody: $e->response?->body(),
             statusCode: $e->response?->status() ?? 500,
             previous: $e,

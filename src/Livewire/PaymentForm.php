@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Livewire;
 
+use Gowelle\Flutterwave\Data\AuthorizationData;
 use Gowelle\Flutterwave\Data\DirectChargeData;
 use Gowelle\Flutterwave\Enums\NextActionType;
 use Gowelle\Flutterwave\Exceptions\FlutterwaveException;
@@ -233,7 +234,7 @@ class PaymentForm extends Component
         try {
             $this->charge = Flutterwave::directCharge()->updateChargeAuthorization(
                 chargeId: $this->chargeId,
-                authorizationData: \Gowelle\Flutterwave\Data\AuthorizationData::createPin($nonce, $encryptedPin)
+                authorizationData: AuthorizationData::createPin($nonce, $encryptedPin)
             );
 
             $this->handleChargeResult($this->charge);
@@ -261,7 +262,7 @@ class PaymentForm extends Component
         try {
             $this->charge = Flutterwave::directCharge()->updateChargeAuthorization(
                 chargeId: $this->chargeId,
-                authorizationData: \Gowelle\Flutterwave\Data\AuthorizationData::createOtp($otp)
+                authorizationData: AuthorizationData::createOtp($otp)
             );
 
             $this->handleChargeResult($this->charge);

@@ -10,7 +10,7 @@ on:
 jobs:
   integration-test:
     runs-on: ubuntu-latest
-    name: Integration Tests (PHP 8.2)
+    name: Integration Tests (PHP 8.3)
 
     steps:
       - name: Checkout code
@@ -19,7 +19,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.3"
           extensions: curl, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath
           coverage: none
 

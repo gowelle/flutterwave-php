@@ -8,6 +8,7 @@ use Gowelle\Flutterwave\Concerns\BuildsWavable;
 use Gowelle\Flutterwave\Data\Refund\CreateRefundRequest;
 use Gowelle\Flutterwave\Data\Refund\ListRefundsRequest;
 use Gowelle\Flutterwave\Data\RefundData;
+use Gowelle\Flutterwave\FlutterwaveApiProvider;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
 
 final class FlutterwaveRefundService
@@ -69,7 +70,7 @@ final class FlutterwaveRefundService
 
         $headers = $this->flutterwaveBaseService->getHeaderBuilder()->build($wavable);
 
-        $api = app(\Gowelle\Flutterwave\FlutterwaveApiProvider::class)->useApi(
+        $api = app(FlutterwaveApiProvider::class)->useApi(
             FlutterwaveApi::REFUND,
             $this->flutterwaveBaseService->getAccessToken(),
             $headers

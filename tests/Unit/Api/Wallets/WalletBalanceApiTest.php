@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Gowelle\Flutterwave\Api\Wallets\WalletBalanceApi;
 use Gowelle\Flutterwave\Credentials\AbstractHeadersConfig;
+use Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException;
 use Gowelle\Flutterwave\Support\RateLimiter;
 use Gowelle\Flutterwave\Support\RetryHandler;
 use Illuminate\Support\Facades\Http;
@@ -56,33 +57,33 @@ it('can get wallet balance for a currency', function () {
 it('validates currency is required', function () {
     expect(function () {
         $this->api->getBalance('');
-    })->toThrow(\Exception::class);
+    })->toThrow(Exception::class);
 });
 
 it('validates currency must be 3 characters', function () {
     expect(function () {
         $this->api->getBalance('NG');
-    })->toThrow(\Exception::class);
+    })->toThrow(Exception::class);
 });
 
 it('throws exception for unimplemented methods', function () {
     expect(function () {
         $this->api->create([]);
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 
     expect(function () {
         $this->api->update('id', []);
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 
     expect(function () {
         $this->api->retrieve('id');
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 
     expect(function () {
         $this->api->list();
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 
     expect(function () {
         $this->api->search([]);
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 });

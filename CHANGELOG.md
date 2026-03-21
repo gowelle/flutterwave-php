@@ -4,6 +4,26 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-03-22
+
+### Added
+
+- Support for **Laravel 13** (`illuminate/*` `^11.0|^12.0|^13.0`).
+- **`ChargeSession`**: Laravel 13 Eloquent class attributes `#[Table]` and `#[Guarded]` for table name, key type, incrementing, and mass assignment.
+
+### Changed
+
+- **Minimum PHP is now `^8.3`** (Laravel 13 and Pest 4 require it; PHP 8.2 is dropped).
+- **Development tooling:** Pest 4, `pestphp/pest-plugin-laravel` 4.x, Orchestra Testbench 9 / 10 / 11, `spatie/laravel-package-tools` `^1.93`, PHPStan 2.x.
+- **CI:** Test workflow runs on PHP 8.3, 8.4, and 8.5; integration and Pint workflows on PHP 8.3.
+- **README:** Requirements updated for PHP 8.3+ and Laravel 11 / 12 / 13.
+- Code style (Pint) and PHPStan 2 fixes: customer request DTOs, `PaymentMethodFactory`, `FlutterwavePaymentsService::methods()`, and related tests.
+
+### Upgrade
+
+- Upgrade PHP to 8.3+ before installing this version.
+- See `RELEASE_NOTES_v3.0.0.md` for detailed release notes.
+
 ## [2.12.0] - 2025-02-02
 
 ### Added

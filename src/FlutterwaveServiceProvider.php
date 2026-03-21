@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gowelle\Flutterwave;
 
 use Gowelle\Flutterwave\Console\Commands\CleanupChargeSessionsCommand;
+use Gowelle\Flutterwave\Console\Commands\VerifyCredentialsCommand;
 use Gowelle\Flutterwave\Contracts\CustomerServiceInterface;
 use Gowelle\Flutterwave\Contracts\DirectChargeServiceInterface;
 use Gowelle\Flutterwave\Contracts\PaymentsServiceInterface;
@@ -16,6 +17,11 @@ use Gowelle\Flutterwave\Events\FlutterwaveWebhookReceived;
 use Gowelle\Flutterwave\Listeners\CreateChargeSession;
 use Gowelle\Flutterwave\Listeners\UpdateChargeSession;
 use Gowelle\Flutterwave\Listeners\UpdateChargeSessionFromWebhook;
+use Gowelle\Flutterwave\Livewire\OtpInput;
+use Gowelle\Flutterwave\Livewire\PaymentForm;
+use Gowelle\Flutterwave\Livewire\PaymentMethods;
+use Gowelle\Flutterwave\Livewire\PaymentStatus;
+use Gowelle\Flutterwave\Livewire\PinInput;
 use Gowelle\Flutterwave\Services\FlutterwaveAuthService;
 use Gowelle\Flutterwave\Services\FlutterwaveBanksService;
 use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
@@ -52,7 +58,7 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
             ->hasMigration('create_flutterwave_charge_sessions_table')
             ->hasCommands([
                 CleanupChargeSessionsCommand::class,
-                \Gowelle\Flutterwave\Console\Commands\VerifyCredentialsCommand::class,
+                VerifyCredentialsCommand::class,
             ])
             ->hasRoutes('webhook');
     }
@@ -118,11 +124,11 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
             return;
         }
 
-        $livewireClass::component('flutterwave-payment-form', \Gowelle\Flutterwave\Livewire\PaymentForm::class);
-        $livewireClass::component('flutterwave-pin-input', \Gowelle\Flutterwave\Livewire\PinInput::class);
-        $livewireClass::component('flutterwave-otp-input', \Gowelle\Flutterwave\Livewire\OtpInput::class);
-        $livewireClass::component('flutterwave-payment-status', \Gowelle\Flutterwave\Livewire\PaymentStatus::class);
-        $livewireClass::component('flutterwave-payment-methods', \Gowelle\Flutterwave\Livewire\PaymentMethods::class);
+        $livewireClass::component('flutterwave-payment-form', PaymentForm::class);
+        $livewireClass::component('flutterwave-pin-input', PinInput::class);
+        $livewireClass::component('flutterwave-otp-input', OtpInput::class);
+        $livewireClass::component('flutterwave-payment-status', PaymentStatus::class);
+        $livewireClass::component('flutterwave-payment-methods', PaymentMethods::class);
     }
 
     /**

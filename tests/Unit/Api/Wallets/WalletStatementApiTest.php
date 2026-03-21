@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 use Gowelle\Flutterwave\Api\Wallets\WalletStatementApi;
 use Gowelle\Flutterwave\Credentials\AbstractHeadersConfig;
+use Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException;
 use Gowelle\Flutterwave\Support\RateLimiter;
 use Gowelle\Flutterwave\Support\RetryHandler;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 
 beforeEach(function () {
     config([
@@ -68,23 +70,23 @@ it('can get wallet statement', function () {
 it('validates currency is required', function () {
     expect(function () {
         $this->api->getStatement([]);
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('validates currency must be 3 characters', function () {
     expect(function () {
         $this->api->getStatement(['currency' => 'NG']);
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('validates size must be between 10 and 50', function () {
     expect(function () {
         $this->api->getStatement(['currency' => 'NGN', 'size' => 5]);
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 
     expect(function () {
         $this->api->getStatement(['currency' => 'NGN', 'size' => 100]);
-    })->toThrow(\Illuminate\Validation\ValidationException::class);
+    })->toThrow(ValidationException::class);
 });
 
 it('accepts valid query parameters', function () {
@@ -110,21 +112,21 @@ it('accepts valid query parameters', function () {
 it('throws exception for unimplemented methods', function () {
     expect(function () {
         $this->api->create([]);
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 
     expect(function () {
         $this->api->update('id', []);
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 
     expect(function () {
         $this->api->retrieve('id');
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 
     expect(function () {
         $this->api->list();
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 
     expect(function () {
         $this->api->search([]);
-    })->toThrow(\Gowelle\Flutterwave\Exceptions\ApiMethodNotImplementedException::class);
+    })->toThrow(ApiMethodNotImplementedException::class);
 });

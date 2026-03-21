@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gowelle\Flutterwave\Builders;
 
 use Gowelle\Flutterwave\Data\DirectChargeRequestDTO;
+use Gowelle\Flutterwave\Exceptions\EncryptionException;
 use Gowelle\Flutterwave\Support\EncryptionService;
 
 final class ChargeRequestBuilder
@@ -199,7 +200,7 @@ final class ChargeRequestBuilder
      * @param  array|null  $billingAddress  Optional billing address
      * @return $this
      *
-     * @throws \Gowelle\Flutterwave\Exceptions\EncryptionException
+     * @throws EncryptionException
      */
     public function card(
         string $cardNumber,

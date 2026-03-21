@@ -50,7 +50,7 @@ final readonly class UpdateCustomerRequest
             $payload['name'] = $name;
         }
 
-        if ($this->phone !== null && $this->phone !== []) {
+        if ($this->phone !== null) {
             $countryCode = trim((string) ($this->phone['country_code'] ?? ''));
             $number = trim((string) ($this->phone['number'] ?? ''));
             if ($countryCode !== '' && $number !== '') {
@@ -61,7 +61,7 @@ final readonly class UpdateCustomerRequest
             }
         }
 
-        if ($this->address !== null && $this->address !== []) {
+        if ($this->address !== null) {
             $payload['address'] = array_filter([
                 'line1' => $this->address['line1'] ?? '',
                 'line2' => $this->address['line2'] ?? null,

@@ -291,7 +291,7 @@ describe('DirectChargeData', function () {
             ->toHaveKey('customer')
             ->toHaveKey('payment_method_details')
             ->toHaveKey('meta')
-            ->toHaveKey('created_at');
+            ->toHaveKey('created_datetime');
     });
 
     it('handles customer as string (customer_id)', function () {

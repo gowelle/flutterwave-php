@@ -20,6 +20,9 @@ final readonly class DirectChargeData
      * @param  array<string, mixed>|null  $paymentMethodDetails
      * @param  array<string, mixed>|null  $issuerResponse
      * @param  array<string, mixed>|null  $meta
+     * @param  list<array{type: string, amount: float}>|null  $fees
+     * @param  list<string>|null  $settlementId
+     * @param  array<string, mixed>|null  $processorResponse
      */
     public function __construct(
         public string $id,
@@ -35,11 +38,13 @@ final readonly class DirectChargeData
         public ?array $paymentMethodDetails = null,
         public ?array $issuerResponse = null,
         public ?array $meta = null,
-        public ?float $fees = null,
+        public ?array $fees = null,
         public ?string $description = null,
         public ?bool $disputed = null,
         public ?bool $settled = null,
-        public ?string $settlementId = null,
+        public ?bool $refunded = null,
+        public ?array $settlementId = null,
+        public ?array $processorResponse = null,
         public ?string $createdAt = null,
     ) {}
 
@@ -103,12 +108,18 @@ final readonly class DirectChargeData
             paymentMethodDetails: $paymentMethodDetails,
             issuerResponse: $issuerResponse,
             meta: $meta,
-            fees: isset($data['fees']) ? (float) $data['fees'] : null,
+            fees: isset($data['fees']) && \is_array($data['fees']) ? $data['fees'] : null,
             description: $data['description'] ?? null,
             disputed: isset($data['disputed']) ? (bool) $data['disputed'] : null,
             settled: isset($data['settled']) ? (bool) $data['settled'] : null,
-            settlementId: $data['settlement_id'] ?? null,
-            createdAt: $data['created_at'] ?? $data['created_datetime'] ?? null,
+            refunded: isset($data['refunded']) ? (bool) $data['refunded'] : null,
+            settlementId: isset($data['settlement_id']) && \is_array($data['settlement_id'])
+                ? $data['settlement_id']
+                : (isset($data['settlement_id']) && \is_string($data['settlement_id']) ? [$data['settlement_id']] : null),
+            processorResponse: isset($data['processor_response']) && \is_array($data['processor_response'])
+                ? $data['processor_response']
+                : null,
+            createdAt: $data['created_datetime'] ?? $data['created_at'] ?? null,
         );
     }
 
@@ -269,8 +280,10 @@ final readonly class DirectChargeData
             'description' => $this->description,
             'disputed' => $this->disputed,
             'settled' => $this->settled,
+            'refunded' => $this->refunded,
             'settlement_id' => $this->settlementId,
-            'created_at' => $this->createdAt,
+            'processor_response' => $this->processorResponse,
+            'created_datetime' => $this->createdAt,
         ];
     }
 }

@@ -140,6 +140,46 @@ final readonly class ChargeData
     }
 
     /**
+     * Check if charge is refunded
+     */
+    public function isRefunded(): bool
+    {
+        return $this->refunded;
+    }
+
+    /**
+     * Check if charge is disputed
+     */
+    public function isDisputed(): bool
+    {
+        return $this->disputed;
+    }
+
+    /**
+     * Check if charge is settled
+     */
+    public function isSettled(): bool
+    {
+        return $this->settled;
+    }
+
+    /**
+     * Get processor response type if available
+     */
+    public function getProcessorResponseType(): ?string
+    {
+        return $this->processorResponse['type'] ?? null;
+    }
+
+    /**
+     * Get processor response code if available
+     */
+    public function getProcessorResponseCode(): ?string
+    {
+        return $this->processorResponse['code'] ?? null;
+    }
+
+    /**
      * Get customer email if available
      */
     public function getCustomerEmail(): ?string

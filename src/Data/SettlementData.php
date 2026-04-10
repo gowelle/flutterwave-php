@@ -20,12 +20,12 @@ final readonly class SettlementData
     {
         return new self(
             id: (string) $data['id'],
-            amount: (float) ($data['amount'] ?? 0.0),
+            amount: (float) ($data['net_amount'] ?? $data['amount'] ?? 0.0),
             currency: $data['currency'] ?? '',
             status: $data['status'] ?? 'unknown',
-            settlementDate: $data['settlement_date'] ?? null,
+            settlementDate: $data['due_datetime'] ?? $data['settlement_date'] ?? null,
             meta: $data['meta'] ?? null,
-            createdAt: $data['created_at'] ?? $data['created_datetime'] ?? null,
+            createdAt: $data['created_datetime'] ?? $data['created_at'] ?? null,
         );
     }
 

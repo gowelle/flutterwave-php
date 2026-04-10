@@ -68,14 +68,16 @@ class CustomerApi extends FlutterwaveBaseApi
         try {
             $normalizedData = $this->validateSearchData($data);
 
+            $searchUrl = $this->buildApiSpecificBaseUrl().'/search';
+
             $response = Http::withToken($this->getAccessToken())
                 ->withHeaders($this->getHeaders()->toArray())
-                ->post($this->buildApiSpecificBaseUrl(), $normalizedData)
+                ->post($searchUrl, $normalizedData)
                 ->json();
 
             return ApiResponse::fromArray($response);
         } catch (Exception $exception) {
-            $this->logApiError('SEARCH', $this->buildApiSpecificBaseUrl(), $exception);
+            $this->logApiError('SEARCH', $this->buildApiSpecificBaseUrl().'/search', $exception);
 
             throw $this->createApiException($exception);
         }
@@ -89,14 +91,16 @@ class CustomerApi extends FlutterwaveBaseApi
     public function searchFromDto(SearchCustomerRequest $request): ApiResponse
     {
         try {
+            $searchUrl = $this->buildApiSpecificBaseUrl().'/search';
+
             $response = Http::withToken($this->getAccessToken())
                 ->withHeaders($this->getHeaders()->toArray())
-                ->post($this->buildApiSpecificBaseUrl(), $request->toApiPayload())
+                ->post($searchUrl, $request->toApiPayload())
                 ->json();
 
             return ApiResponse::fromArray($response);
         } catch (Exception $exception) {
-            $this->logApiError('SEARCH', $this->buildApiSpecificBaseUrl(), $exception);
+            $this->logApiError('SEARCH', $this->buildApiSpecificBaseUrl().'/search', $exception);
 
             throw $this->createApiException($exception);
         }

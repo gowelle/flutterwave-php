@@ -108,24 +108,30 @@ class RefundApi extends FlutterwaveBaseApi
     /**
      * Log API error
      */
-    protected function logApiError(string $method, string $url, RequestException $e): void
+    protected function logApiError(string $method, string $url, \Throwable $e): void
     {
+        $response = $e instanceof RequestException ? $e->response : null;
+
         Log::error('Flutterwave Refund API error', [
             'method' => $method,
             'url' => $url,
-            'status' => $e->response?->status() ?? 500,
-            'response' => $e->response?->body(),
+            'status' => $response?->status() ?? 0,
+            'response' => $response?->body(),
+            'exception_class' => $e::class,
+            'exception_message' => $e->getMessage(),
         ]);
     }
 
     /**
-     * Create API exception from request exception
+     * Create API exception from a throwable
      */
-    protected function createApiException(RequestException $e): FlutterwaveApiException
+    protected function createApiException(\Throwable $e): FlutterwaveApiException
     {
+        $response = $e instanceof RequestException ? $e->response : null;
+
         return FlutterwaveApiException::fromResponseBody(
-            responseBody: $e->response?->body(),
-            statusCode: $e->response?->status() ?? 500,
+            responseBody: $response?->body(),
+            statusCode: $response?->status() ?? 0,
             previous: $e,
         );
     }

@@ -220,11 +220,15 @@ abstract class FlutterwaveBaseApi implements FlutterwaveApiContract
 
     /**
      * Log API error
+     *
+     * Accepts any Throwable so that ConnectionException (no HTTP response)
+     * is handled gracefully alongside RequestException.
      */
-    protected function logApiError(string $method, string $url, RequestException $e): void
+    protected function logApiError(string $method, string $url, \Throwable $e): void
     {
-        $statusCode = $e->response?->status() ?? 500;
-        $errorData = FlutterwaveErrorMapper::mapFromResponse($e->response?->body(), $statusCode);
+        $response = $e instanceof RequestException ? $e->response : null;
+        $statusCode = $response?->status() ?? 0;
+        $errorData = FlutterwaveErrorMapper::mapFromResponse($response?->body(), $statusCode);
 
         Log::error('Flutterwave API error', [
             'method' => $method,
@@ -239,17 +243,24 @@ abstract class FlutterwaveBaseApi implements FlutterwaveApiContract
             'is_retriable' => $errorData->isRetriable(),
             'is_client_error' => $errorData->isClientError(),
             'is_system_error' => $errorData->isSystemError(),
+            'exception_class' => $e::class,
+            'exception_message' => $e->getMessage(),
         ]);
     }
 
     /**
-     * Create API exception from request exception
+     * Create API exception from a throwable
+     *
+     * Accepts any Throwable so that ConnectionException is handled
+     * alongside RequestException without a type error.
      */
-    protected function createApiException(RequestException $e): FlutterwaveApiException
+    protected function createApiException(\Throwable $e): FlutterwaveApiException
     {
+        $response = $e instanceof RequestException ? $e->response : null;
+
         return FlutterwaveApiException::fromResponseBody(
-            responseBody: $e->response?->body(),
-            statusCode: $e->response?->status() ?? 500,
+            responseBody: $response?->body(),
+            statusCode: $response?->status() ?? 0,
             previous: $e,
         );
     }

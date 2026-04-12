@@ -1,8 +1,58 @@
 # Upgrade Guide
 
-## Upgrading from v1.x to v2.0
+## Upgrading from v3.0 to v3.1
 
-Version 2.0 introduces several breaking changes to improve code quality, maintainability, and adherence to best practices.
+Version 3.1 introduces several strictness optimizations resolving mapping faults with the official API endpoints alongside some typing adjustments to improve integration payload reliability.
+
+---
+
+## Breaking Changes
+
+### 1. Transfer & Transfer Retries API Adjustments
+
+The transfer execution wrappers have historically omitted validating payload internals allowing empty requests.
+
+**Impact:** `TransferApi::retry` will no longer bypass missing arguments. Calling `$api->retry()` triggers an explicit requirement for parameter validation.
+You must replace existing array mappings acting out transfer retries with the `RetryTransferRequest` payload DTO.
+
+**Before:**
+```php
+Flutterwave::transfers()->retry($transferId);
+```
+
+**After:**
+```php
+use Gowelle\Flutterwave\Data\Transfer\RetryTransferRequest;
+
+Flutterwave::transfers()->retry(
+    new RetryTransferRequest(
+        action: 'retry',
+        reference: 'UNIQUE_RETRY_UUID'
+    )
+);
+```
+
+### 2. Standardization of Unsupported Endpoints
+
+Calling undefined behaviors against resources previously pushed generic exceptions. These calls no longer attempt to reach the external server but immediately trigger native integration logic blocks.
+
+**Impact:** Invoking `RatesApi::list`, `DirectChargeApi::update`, or `DirectChargeApi::retrieve` now correctly outputs `ApiMethodNotImplementedException`.
+
+### 3. Refund Reasons Constraint Enforcement
+
+Refunds pushed out using unstructured reasons will now hard fail before reaching Flutterwave nodes.
+
+**Impact:** Supplying string values for `reason` that do not exist in the official API enum list will throw an `Illuminate\Validation\ValidationException`. Valid values are constrained to: `duplicate`, `fraudulent`, `requested_by_customer`, and `expired_uncaptured_charge`.
+
+### 4. Transfer Service Wrapper Deprecations
+
+Using internal inline wrappers for Sender, Recipient, and Rate configurations within the primary `TransferApi` class has been marked `@deprecated`.
+
+**Impact:** Calls like `Flutterwave::transfers()->listRates()` should be replaced by routing directly to the target module equivalent wrappers such as `Flutterwave::rates()->list()`.
+
+---
+
+## Upgrading from v1.x to v2.0
 
 ---
 

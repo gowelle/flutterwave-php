@@ -28,6 +28,8 @@ enum FlutterwaveApi: string
     case WALLET_STATEMENT = 'wallet-statement';
     case WALLET_BALANCE = 'wallet-balance';
     case WALLET_BALANCES = 'wallet-balances';
+    case CHARGEBACK = 'chargeback';
+    case FEES = 'fees';
 
     public function getEndpoint(): string
     {
@@ -51,9 +53,11 @@ enum FlutterwaveApi: string
             self::SETTLEMENT => '/settlements',
             self::VIRTUAL_ACCOUNT => '/virtual-accounts',
             self::WALLET_ACCOUNT_RESOLVE => '/wallets/account-resolve',
-            self::WALLET_STATEMENT => '/wallets/statement',
-            self::WALLET_BALANCE => '/wallets/balances',
-            self::WALLET_BALANCES => '/wallets/balances',
+            self::WALLET_STATEMENT       => '/wallets/statement',
+            self::WALLET_BALANCE         => '/wallets/balances',
+            self::WALLET_BALANCES        => '/wallets/balances',
+            self::CHARGEBACK             => '/chargebacks',
+            self::FEES                   => '/fees',
         };
     }
 }

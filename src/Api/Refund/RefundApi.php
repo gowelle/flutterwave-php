@@ -97,9 +97,9 @@ class RefundApi extends FlutterwaveBaseApi
     {
         $validator = Validator::make($data, [
             'charge_id' => 'required|string',
-            'amount' => 'required|numeric|min:0.01',
-            'reason' => 'nullable|string|max:500',
-            'meta' => 'nullable|array',
+            'amount'    => 'required|numeric|min:0.01',
+            'reason'    => 'nullable|string|in:duplicate,fraudulent,requested_by_customer,expired_uncaptured_charge',
+            'meta'      => 'nullable|array',
         ]);
 
         return $validator->validate();

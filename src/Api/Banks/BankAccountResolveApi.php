@@ -85,7 +85,7 @@ class BankAccountResolveApi extends FlutterwaveBaseApi
      */
     public function create(array $data): ApiResponse
     {
-        throw new Exception('Create method not implemented for Bank Account Resolve API');
+        $this->notImplemented('create');
     }
 
     /**
@@ -95,7 +95,7 @@ class BankAccountResolveApi extends FlutterwaveBaseApi
      */
     public function update(string $id, array $data): ApiResponse
     {
-        throw new Exception('Update method not implemented for Bank Account Resolve API');
+        $this->notImplemented('update');
     }
 
     /**
@@ -105,7 +105,7 @@ class BankAccountResolveApi extends FlutterwaveBaseApi
      */
     public function retrieve(string $id): ApiResponse
     {
-        throw new Exception('Retrieve method not implemented for Bank Account Resolve API');
+        $this->notImplemented('retrieve');
     }
 
     /**
@@ -115,7 +115,7 @@ class BankAccountResolveApi extends FlutterwaveBaseApi
      */
     public function list(): ApiResponse
     {
-        throw new Exception('List method not implemented for Bank Account Resolve API');
+        $this->notImplemented('list');
     }
 
     /**
@@ -125,7 +125,7 @@ class BankAccountResolveApi extends FlutterwaveBaseApi
      */
     public function search(array $data): ApiResponse
     {
-        throw new Exception('Search method not implemented for Bank Account Resolve API');
+        $this->notImplemented('search');
     }
 
     /**

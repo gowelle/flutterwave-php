@@ -9,9 +9,11 @@ use Gowelle\Flutterwave\Api\Banks\BankAccountResolveApi;
 use Gowelle\Flutterwave\Api\Banks\BankBranchesApi;
 use Gowelle\Flutterwave\Api\Banks\BanksApi;
 use Gowelle\Flutterwave\Api\Banks\MobileNetworksApi;
+use Gowelle\Flutterwave\Api\Chargeback\ChargebackApi;
 use Gowelle\Flutterwave\Api\Charge\ChargeApi;
 use Gowelle\Flutterwave\Api\Charge\DirectChargeApi;
 use Gowelle\Flutterwave\Api\Customer\CustomerApi;
+use Gowelle\Flutterwave\Api\Fees\FeesApi;
 use Gowelle\Flutterwave\Api\Order\OrderApi;
 use Gowelle\Flutterwave\Api\PaymentMethods\PaymentMethodsApi;
 use Gowelle\Flutterwave\Api\Refund\RefundApi;
@@ -85,6 +87,8 @@ class FlutterwaveApiProvider
                 FlutterwaveApi::WALLET_STATEMENT => new WalletStatementApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::WALLET_BALANCE => new WalletBalanceApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
                 FlutterwaveApi::WALLET_BALANCES => new WalletBalancesApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::CHARGEBACK => new ChargebackApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
+                FlutterwaveApi::FEES => new FeesApi($headersConfig, $accessToken, $this->retryHandler, $this->rateLimiter),
             };
 
         } catch (ValidationException $e) {

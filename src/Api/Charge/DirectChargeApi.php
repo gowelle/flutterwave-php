@@ -24,19 +24,21 @@ class DirectChargeApi extends FlutterwaveBaseApi
     }
 
     /**
-     * Retrieve a direct charge
+     * Retrieve is not supported for direct charges
+     * (GET /orchestration/direct-charges/{id} does not exist in the API)
      */
     public function retrieve(string $id): ApiResponse
     {
-        return parent::retrieve($id);
+        $this->notImplemented('retrieve');
     }
 
     /**
-     * Update a direct charge
+     * Update is not supported for direct charges
+     * (PUT /orchestration/direct-charges/{id} does not exist in the API)
      */
     public function update(string $id, array $data): ApiResponse
     {
-        return parent::update($id, $data);
+        $this->notImplemented('update');
     }
 
     /**

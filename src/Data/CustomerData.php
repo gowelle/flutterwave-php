@@ -128,7 +128,12 @@ final readonly class CustomerData
         }
 
         if ($this->phoneNumber !== null) {
-            $data['phone_number'] = $this->phoneNumber;
+            // Build the structured phone object expected by the Flutterwave API:
+            //   { "phone": { "country_code": "+234", "number": "8012345678" } }
+            // We also emit the legacy phone_number key for backward compatibility.
+            $phoneData = $this->parsePhoneNumber($this->phoneNumber);
+            $data['phone']        = $phoneData;
+            $data['phone_number'] = $this->phoneNumber; // @deprecated: kept for backward compat
         }
 
         if ($this->address !== null) {
@@ -143,5 +148,26 @@ final readonly class CustomerData
         }
 
         return $data;
+    }
+
+    /**
+     * Parse a phone number string into the structured format expected by the Flutterwave API.
+     *
+     * Handles formats like "+2348012345678", "2348012345678", or "08012345678".
+     *
+     * @return array{country_code?: string, number: string}
+     */
+    protected function parsePhoneNumber(string $phoneNumber): array
+    {
+        // Match an optional leading + and country code (1–4 digits), then the subscriber number
+        if (preg_match('/^(\+?\d{1,4})(\d{6,12})$/', preg_replace('/[\s\-().]+/', '', $phoneNumber), $matches)) {
+            return [
+                'country_code' => '+'.\ltrim($matches[1], '+'),
+                'number'       => $matches[2],
+            ];
+        }
+
+        // Could not split — return the full number without a country_code prefix
+        return ['number' => preg_replace('/[\s\-().]+/', '', $phoneNumber)];
     }
 }

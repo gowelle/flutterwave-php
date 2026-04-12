@@ -110,7 +110,7 @@ class WalletAccountResolveApi extends FlutterwaveBaseApi
     protected function validateResolveData(array $data): array
     {
         $validator = Validator::make($data, [
-            'provider' => 'required|string|in:flutterwave',
+            'provider'   => 'required|string',   // not restricted: API may support additional providers
             'identifier' => 'required|string',
         ]);
 

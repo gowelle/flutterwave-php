@@ -56,52 +56,42 @@ class BanksApi extends FlutterwaveBaseApi
     }
 
     /**
-     * Not implemented for banks API
-     *
-     * @throws Exception
+     * Create is not supported for banks
      */
     public function create(array $data): ApiResponse
     {
-        throw new Exception('Create method not implemented for Banks API');
+        $this->notImplemented('create');
     }
 
     /**
-     * Not implemented for banks API
-     *
-     * @throws Exception
+     * Update is not supported for banks
      */
     public function update(string $id, array $data): ApiResponse
     {
-        throw new Exception('Update method not implemented for Banks API');
+        $this->notImplemented('update');
     }
 
     /**
-     * Not implemented for banks API
-     *
-     * @throws Exception
+     * Retrieve is not supported for banks — use retrieveByCountry()
      */
     public function retrieve(string $id): ApiResponse
     {
-        throw new Exception('Retrieve method not implemented for Banks API');
+        $this->notImplemented('retrieve');
     }
 
     /**
-     * Not implemented for banks API
-     *
-     * @throws Exception
+     * List is not supported for banks — use retrieveByCountry()
      */
     public function list(): ApiResponse
     {
-        throw new Exception('List method not implemented for Banks API');
+        $this->notImplemented('list');
     }
 
     /**
-     * Not implemented for banks API
-     *
-     * @throws Exception
+     * Search is not supported for banks
      */
     public function search(array $data): ApiResponse
     {
-        throw new Exception('Search method not implemented for Banks API');
+        $this->notImplemented('search');
     }
 }

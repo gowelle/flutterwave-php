@@ -11,13 +11,17 @@ use Gowelle\Flutterwave\FlutterwaveBaseApi;
  * API client for Flutterwave Transfer Rates endpoint.
  *
  * Handles rate calculations at /transfers/rates.
+ *
+ * @see https://developer.flutterwave.com/reference/transfer_rates_post
  */
 class RateApi extends FlutterwaveBaseApi
 {
     protected string $endpoint = '/transfers/rates';
 
     /**
-     * Get transfer rate (POST)
+     * Create a rate conversion (POST /transfers/rates)
+     *
+     * @see https://developer.flutterwave.com/reference/transfer_rates_post
      */
     public function create(array $data): ApiResponse
     {
@@ -25,19 +29,22 @@ class RateApi extends FlutterwaveBaseApi
     }
 
     /**
-     * List available rates
-     */
-    public function list(): ApiResponse
-    {
-        return parent::list();
-    }
-
-    /**
-     * Retrieve is not supported for rates
+     * Fetch a specific converted rate by ID (GET /transfers/rates/{id})
+     *
+     * @see https://developer.flutterwave.com/reference/transfer_rates_get
      */
     public function retrieve(string $id): ApiResponse
     {
-        $this->notImplemented('retrieve');
+        return parent::retrieve($id);
+    }
+
+    /**
+     * List is not supported — use retrieve(string $id) for a specific rate.
+     * There is no list-all-rates endpoint in the Flutterwave API.
+     */
+    public function list(): ApiResponse
+    {
+        $this->notImplemented('list');
     }
 
     /**
@@ -47,4 +54,13 @@ class RateApi extends FlutterwaveBaseApi
     {
         $this->notImplemented('update');
     }
+
+    /**
+     * Search is not supported for rates
+     */
+    public function search(array $data): ApiResponse
+    {
+        $this->notImplemented('search');
+    }
 }
+

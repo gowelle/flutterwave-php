@@ -69,12 +69,7 @@ it('validates identifier is required', function () {
     })->toThrow(ValidationException::class);
 });
 
-it('validates provider must be flutterwave', function () {
-    expect(function () {
-        $this->api->resolve('invalid_provider', 'wallet_123');
-    })->toThrow(ValidationException::class);
-});
-
+// Removed test: provider validation has been loosened to support multiple providers
 it('throws exception for unimplemented methods', function () {
     expect(function () {
         $this->api->create([]);

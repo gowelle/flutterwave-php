@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Gowelle\Flutterwave\Api\Transfer;
 
 use Gowelle\Flutterwave\Data\ApiResponse;
+use Gowelle\Flutterwave\Data\Transfer\RetryTransferRequest;
 use Gowelle\Flutterwave\FlutterwaveBaseApi;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
@@ -71,16 +72,32 @@ class TransferApi extends FlutterwaveBaseApi
     }
 
     /**
-     * Retry a transfer
+     * Retry or duplicate a transfer
+     *
+     * @param  string  $action      'retry' or 'duplicate'
+     * @param  string|null  $reference   Unique transaction reference for this retry
+     * @param  string|null  $callbackUrl  Optional webhook URL for transfer status updates
+     *
+     * @see https://developer.flutterwave.com/reference/transfer_post_retry
      */
-    public function retry(string $id): ApiResponse
-    {
-        return $this->executeWithRetry(function () use ($id) {
+    public function retry(
+        string $id,
+        string $action = 'retry',
+        ?string $reference = null,
+        ?string $callbackUrl = null,
+    ): ApiResponse {
+        $body = array_filter([
+            'action'       => $action,
+            'reference'    => $reference,
+            'callback_url' => $callbackUrl,
+        ], fn ($value) => $value !== null);
+
+        return $this->executeWithRetry(function () use ($id, $body) {
             try {
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->post($this->getBaseApiUrl()."/transfers/{$id}/retries", [])
+                    ->post($this->getBaseApiUrl()."/transfers/{$id}/retries", $body)
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());
@@ -90,10 +107,27 @@ class TransferApi extends FlutterwaveBaseApi
         });
     }
 
+    /**
+     * Retry or duplicate a transfer from DTO
+     *
+     * @see https://developer.flutterwave.com/reference/transfer_post_retry
+     */
+    public function retryFromDto(RetryTransferRequest $request): ApiResponse
+    {
+        return $this->retry(
+            id: $request->transferId,
+            action: $request->action,
+            reference: $request->reference,
+            callbackUrl: $request->callbackUrl,
+        );
+    }
+
     // Recipients
 
     /**
      * Create a recipient
+     *
+     * @deprecated Use RecipientApi::create() via FlutterwaveApi::TRANSFER_RECIPIENTS instead.
      */
     public function createRecipient(array $data): ApiResponse
     {
@@ -114,6 +148,8 @@ class TransferApi extends FlutterwaveBaseApi
 
     /**
      * Get a recipient
+     *
+     * @deprecated Use RecipientApi::retrieve() via FlutterwaveApi::TRANSFER_RECIPIENTS instead.
      */
     public function getRecipient(string $id): ApiResponse
     {
@@ -134,6 +170,8 @@ class TransferApi extends FlutterwaveBaseApi
 
     /**
      * List recipients
+     *
+     * @deprecated Use RecipientApi::list() via FlutterwaveApi::TRANSFER_RECIPIENTS instead.
      */
     public function listRecipients(): ApiResponse
     {
@@ -154,6 +192,8 @@ class TransferApi extends FlutterwaveBaseApi
 
     /**
      * Delete a recipient
+     *
+     * @deprecated Use RecipientApi::delete() via FlutterwaveApi::TRANSFER_RECIPIENTS instead.
      */
     public function deleteRecipient(string $id): ApiResponse
     {
@@ -176,6 +216,8 @@ class TransferApi extends FlutterwaveBaseApi
 
     /**
      * Create a sender
+     *
+     * @deprecated Use SenderApi::create() via FlutterwaveApi::TRANSFER_SENDERS instead.
      */
     public function createSender(array $data): ApiResponse
     {
@@ -196,6 +238,8 @@ class TransferApi extends FlutterwaveBaseApi
 
     /**
      * Get a sender
+     *
+     * @deprecated Use SenderApi::retrieve() via FlutterwaveApi::TRANSFER_SENDERS instead.
      */
     public function getSender(string $id): ApiResponse
     {
@@ -216,6 +260,8 @@ class TransferApi extends FlutterwaveBaseApi
 
     /**
      * List senders
+     *
+     * @deprecated Use SenderApi::list() via FlutterwaveApi::TRANSFER_SENDERS instead.
      */
     public function listSenders(): ApiResponse
     {
@@ -238,6 +284,8 @@ class TransferApi extends FlutterwaveBaseApi
 
     /**
      * Get transfer rate
+     *
+     * @deprecated Use RateApi::create() via FlutterwaveApi::TRANSFER_RATES instead.
      */
     public function getRate(array $data): ApiResponse
     {
@@ -258,6 +306,8 @@ class TransferApi extends FlutterwaveBaseApi
 
     /**
      * List rates
+     *
+     * @deprecated Use RateApi::retrieve() via FlutterwaveApi::TRANSFER_RATES instead.
      */
     public function listRates(): ApiResponse
     {

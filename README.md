@@ -26,6 +26,8 @@ A comprehensive Laravel wrapper for Flutterwave Services API v4. This package pr
   - [Mobile Networks](#mobile-networks)
   - [Virtual Accounts](#virtual-accounts)
   - [Wallets](#wallets)
+  - [Chargebacks](#chargebacks)
+  - [Fees](#fees)
 - [UI Components](#ui-components)
   - [Livewire Components](#livewire-components)
   - [Vue Components](#vue-components)
@@ -967,7 +969,14 @@ $transfers = Flutterwave::transfers()->list();
 #### Retry Failed Transfer
 
 ```php
-$transfer = Flutterwave::transfers()->retry('transfer-id');
+use Gowelle\Flutterwave\Data\Transfer\RetryTransferRequest;
+
+$transfer = Flutterwave::transfers()->retry(
+    new RetryTransferRequest(
+        action: 'retry',
+        reference: 'UNIQUE_RETRY_UUID'
+    )
+);
 ```
 
 #### Create Recipient
@@ -1188,6 +1197,12 @@ $sender = Flutterwave::transfers()->createSender(
         ],
     )
 );
+```
+
+#### Delete Sender
+
+```php
+Flutterwave::transfers()->deleteSender('sender-id');
 ```
 
 #### Get Transfer Rate
@@ -1549,6 +1564,63 @@ $api->update($account['data']['id'], [
     'action_type' => 'update_status',
     'status' => 'inactive',
 ]);
+```
+
+### Chargebacks
+
+Manage dispute lifecycles including retrieving, accepting, and declining chargebacks raised against charges.
+
+#### List Chargebacks
+
+```php
+// Retrieve a list of all chargebacks/disputes
+$chargebacks = Flutterwave::chargebacks()->list();
+```
+
+#### Accept a Chargeback
+
+```php
+// Accept a chargeback (agree to refund the customer)
+$chargeback = Flutterwave::chargebacks()->accept('chargeback-id');
+```
+
+#### Decline a Chargeback
+
+```php
+use Gowelle\Flutterwave\Data\Chargeback\UpdateChargebackRequest;
+
+// Decline a chargeback with evidence
+$chargeback = Flutterwave::chargebacks()->decline(
+    'chargeback-id',
+    UpdateChargebackRequest::decline(
+        message: 'Service was securely delivered',
+        evidenceUrl: 'https://example.com/delivery/proof.jpg'
+    )
+);
+```
+
+#### Retrieve a Chargeback
+
+```php
+// Get details for a specific chargeback
+$chargeback = Flutterwave::chargebacks()->retrieve('chargeback-id');
+```
+
+### Fees
+
+Fetch accurate fee information to predict transaction costs across paths and card brands.
+
+#### Calculate Fees
+
+```php
+// Fetch transaction costs for a 5000 TZS charge
+$fees = Flutterwave::fees()->calculate([
+    'amount' => 5000,
+    'currency' => 'TZS',
+]);
+
+echo $fees->fee;            // Direct gateway transaction cost
+echo $fees->flutterwaveFee; // Direct markup
 ```
 
 ## UI Components

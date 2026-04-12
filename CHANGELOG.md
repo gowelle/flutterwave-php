@@ -4,6 +4,29 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-04-13
+
+### Added
+
+- **Chargebacks API**: New modules `ChargebackApi` and `ChargebackData` offering native interactions for resolving dispute flows.
+- **Fees API**: New `FeesApi` handling programmatic fetching of transaction fee limits and thresholds.
+- **Transfer Retries**: New `RetryTransferRequest` DTO added for `TransferApi::retry()`.
+- **Sender API**: `delete(string $id)` endpoint implemented for transfer senders.
+
+### Changed
+
+- **Rates API**: `list()` method removed and standardized to throw `ApiMethodNotImplementedException`.
+- **Direct Charge API**: Removed unsupported verbs from orchestrator mapping; `retrieve()` and `update()` now throw `ApiMethodNotImplementedException`.
+- **Customer API**: `CustomerData::phone` structured parsing added returning nested `country_code` and `number` payloads.
+- **Validation**: Enforced strict enums on `RefundApi` reasons (`duplicate`, `fraudulent`, `requested_by_customer`, `expired_uncaptured_charge`).
+- **Validation**: Adjusted `ChargeApi` bindings loosening `redirect_url` and `order_id` validations and applying `recurring` bindings.
+- **Validation**: Adjusted `WalletAccountResolveApi` to accept any provider string, opening resolution beyond `flutterwave`.
+- **Banks API**: Fixed missing exception behaviors across `BanksApi`, `BankBranchesApi`, and `BankAccountResolveApi` to uniformly raise `ApiMethodNotImplementedException`.
+
+### Deprecated
+
+- Inline wrapper methods mapped inside `TransferApi` targeting Recipient, Sender, and Rate structures are marked `@deprecated` suggesting use of their standalone counterparts.
+
 ## [3.0.0] - 2026-03-22
 
 ### Added

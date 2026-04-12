@@ -28,12 +28,10 @@ class ChargeApi extends FlutterwaveBaseApi
 
     /**
      * Search for a charge
-     *
-     * @throws Exception
      */
     public function search(array $data): ApiResponse
     {
-        throw new Exception('Charge search method not implemented');
+        $this->notImplemented('search');
     }
 
     /**
@@ -42,13 +40,14 @@ class ChargeApi extends FlutterwaveBaseApi
     protected function validateCreateData(array $data): array
     {
         $validator = Validator::make($data, [
-            'amount' => 'required|numeric|min:0',
-            'currency' => 'required|string|size:3',
-            'reference' => 'required|string',
-            'customer_id' => 'required|string',
-            'redirect_url' => 'required|url',
+            'amount'            => 'required|numeric|min:0',
+            'currency'          => 'required|string|size:3',
+            'reference'         => 'required|string',
+            'customer_id'       => 'required|string',
             'payment_method_id' => 'required|string',
-            'order_id' => 'required|string',
+            'redirect_url'      => 'nullable|url',        // optional: redirect after auth
+            'order_id'          => 'nullable|string',     // optional: for preauth captures only
+            'recurring'         => 'nullable|boolean',    // optional: bypass 3DS for repeat charges
         ]);
 
         return $validator->validate();

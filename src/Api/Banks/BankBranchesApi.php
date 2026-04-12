@@ -54,52 +54,42 @@ class BankBranchesApi extends FlutterwaveBaseApi
     }
 
     /**
-     * Not implemented for bank branches API
-     *
-     * @throws Exception
+     * Create is not supported for bank branches
      */
     public function create(array $data): ApiResponse
     {
-        throw new Exception('Create method not implemented for Bank Branches API');
+        $this->notImplemented('create');
     }
 
     /**
-     * Not implemented for bank branches API
-     *
-     * @throws Exception
+     * Update is not supported for bank branches
      */
     public function update(string $id, array $data): ApiResponse
     {
-        throw new Exception('Update method not implemented for Bank Branches API');
+        $this->notImplemented('update');
     }
 
     /**
-     * Not implemented for bank branches API
-     *
-     * @throws Exception
+     * Retrieve is not supported for bank branches — use retrieveByBankId()
      */
     public function retrieve(string $id): ApiResponse
     {
-        throw new Exception('Retrieve method not implemented for Bank Branches API');
+        $this->notImplemented('retrieve');
     }
 
     /**
-     * Not implemented for bank branches API
-     *
-     * @throws Exception
+     * List is not supported for bank branches — use retrieveByBankId()
      */
     public function list(): ApiResponse
     {
-        throw new Exception('List method not implemented for Bank Branches API');
+        $this->notImplemented('list');
     }
 
     /**
-     * Not implemented for bank branches API
-     *
-     * @throws Exception
+     * Search is not supported for bank branches
      */
     public function search(array $data): ApiResponse
     {
-        throw new Exception('Search method not implemented for Bank Branches API');
+        $this->notImplemented('search');
     }
 }

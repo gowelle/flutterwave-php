@@ -145,6 +145,175 @@ it('can process a charge', function () {
     expect($callbackTraceId)->not->toBeNull();
 });
 
+it('passes user provided scenario_key into wavable for charge requests', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Charge created',
+        data: [
+            'id' => 'ch_123',
+            'reference' => 'ref_123',
+            'amount' => 1000,
+            'currency' => 'TZS',
+            'status' => 'pending',
+        ],
+    );
+
+    $this->baseService
+        ->shouldReceive('getConfig')
+        ->andReturn(new FlutterwaveConfig('test_client_id', 'test_client_secret', 'test_secret_hash', FlutterwaveEnvironment::STAGING));
+
+    $this->baseService
+        ->shouldReceive('create')
+        ->once()
+        ->with(
+            FlutterwaveApi::CHARGE,
+            Mockery::on(fn ($wavable) => $wavable->getScenarioKey() === 'scenario:manual_review'),
+            Mockery::on(fn (array $payload) => $payload['scenario_key'] === 'scenario:manual_review'),
+        )
+        ->andReturn($response);
+
+    $this->service->process(
+        [
+            'payment_method_type' => 'card',
+            'customer_id' => 'cust_123',
+            'payment_method_id' => 'pm_123',
+            'amount' => 1000,
+            'currency' => 'TZS',
+            'reference' => 'ref_123',
+            'redirect_url' => 'https://example.com/callback',
+            'scenario_key' => 'scenario:manual_review',
+        ],
+        fn () => null,
+    );
+});
+
+it('prefers explicit idempotency_key over order_id for charge requests', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Charge created',
+        data: [
+            'id' => 'ch_123',
+            'reference' => 'ref_123',
+            'amount' => 1000,
+            'currency' => 'TZS',
+            'status' => 'pending',
+        ],
+    );
+
+    $this->baseService
+        ->shouldReceive('getConfig')
+        ->andReturn(new FlutterwaveConfig('test_client_id', 'test_client_secret', 'test_secret_hash', FlutterwaveEnvironment::STAGING));
+
+    $this->baseService
+        ->shouldReceive('create')
+        ->once()
+        ->with(
+            FlutterwaveApi::CHARGE,
+            Mockery::on(fn ($wavable) => $wavable->getIdempotencyKey() === 'idem-explicit-123'),
+            Mockery::any(),
+        )
+        ->andReturn($response);
+
+    $this->service->process(
+        [
+            'payment_method_type' => 'card',
+            'customer_id' => 'cust_123',
+            'payment_method_id' => 'pm_123',
+            'amount' => 1000,
+            'currency' => 'TZS',
+            'reference' => 'ref_123',
+            'redirect_url' => 'https://example.com/callback',
+            'order_id' => 'order-123',
+            'idempotency_key' => 'idem-explicit-123',
+        ],
+        fn () => null,
+    );
+});
+
+it('falls back to order_id for charge requests when idempotency_key is absent', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Charge created',
+        data: [
+            'id' => 'ch_123',
+            'reference' => 'ref_123',
+            'amount' => 1000,
+            'currency' => 'TZS',
+            'status' => 'pending',
+        ],
+    );
+
+    $this->baseService
+        ->shouldReceive('getConfig')
+        ->andReturn(new FlutterwaveConfig('test_client_id', 'test_client_secret', 'test_secret_hash', FlutterwaveEnvironment::STAGING));
+
+    $this->baseService
+        ->shouldReceive('create')
+        ->once()
+        ->with(
+            FlutterwaveApi::CHARGE,
+            Mockery::on(fn ($wavable) => $wavable->getIdempotencyKey() === 'order-123'),
+            Mockery::any(),
+        )
+        ->andReturn($response);
+
+    $this->service->process(
+        [
+            'payment_method_type' => 'card',
+            'customer_id' => 'cust_123',
+            'payment_method_id' => 'pm_123',
+            'amount' => 1000,
+            'currency' => 'TZS',
+            'reference' => 'ref_123',
+            'redirect_url' => 'https://example.com/callback',
+            'order_id' => 'order-123',
+        ],
+        fn () => null,
+    );
+});
+
+it('ignores user provided scenario_key in production', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Charge created',
+        data: [
+            'id' => 'ch_123',
+            'reference' => 'ref_123',
+            'amount' => 1000,
+            'currency' => 'TZS',
+            'status' => 'pending',
+        ],
+    );
+
+    $this->baseService
+        ->shouldReceive('getConfig')
+        ->andReturn(new FlutterwaveConfig('test_client_id', 'test_client_secret', 'test_secret_hash', FlutterwaveEnvironment::PRODUCTION));
+
+    $this->baseService
+        ->shouldReceive('create')
+        ->once()
+        ->with(
+            FlutterwaveApi::CHARGE,
+            Mockery::on(fn ($wavable) => $wavable->getScenarioKey() === null),
+            Mockery::on(fn (array $payload) => $payload['scenario_key'] === 'scenario:manual_review'),
+        )
+        ->andReturn($response);
+
+    $this->service->process(
+        [
+            'payment_method_type' => 'card',
+            'customer_id' => 'cust_123',
+            'payment_method_id' => 'pm_123',
+            'amount' => 1000,
+            'currency' => 'TZS',
+            'reference' => 'ref_123',
+            'redirect_url' => 'https://example.com/callback',
+            'scenario_key' => 'scenario:manual_review',
+        ],
+        fn () => null,
+    );
+});
+
 it('can get charge status', function () {
     $response = new ApiResponse(
         status: 'success',

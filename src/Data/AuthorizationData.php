@@ -20,12 +20,13 @@ final readonly class AuthorizationData
     public function __construct(
         public NextActionType $type,
         public array $data,
+        public ?string $scenarioKey = null,
     ) {}
 
     /**
      * Create PIN authorization
      */
-    public static function createPin(string $nonce, string $encryptedPin): self
+    public static function createPin(string $nonce, string $encryptedPin, ?string $scenarioKey = null): self
     {
         return new self(
             type: NextActionType::REQUIRES_PIN,
@@ -36,13 +37,14 @@ final readonly class AuthorizationData
                     'encrypted_pin' => $encryptedPin,
                 ],
             ],
+            scenarioKey: $scenarioKey,
         );
     }
 
     /**
      * Create OTP authorization
      */
-    public static function createOtp(string $code): self
+    public static function createOtp(string $code, ?string $scenarioKey = null): self
     {
         return new self(
             type: NextActionType::REQUIRES_OTP,
@@ -52,6 +54,7 @@ final readonly class AuthorizationData
                     'code' => $code,
                 ],
             ],
+            scenarioKey: $scenarioKey,
         );
     }
 
@@ -60,7 +63,7 @@ final readonly class AuthorizationData
      *
      * @param  array<string, mixed>  $address
      */
-    public static function createAvs(array $address): self
+    public static function createAvs(array $address, ?string $scenarioKey = null): self
     {
         return new self(
             type: NextActionType::REQUIRES_ADDITIONAL_FIELDS,
@@ -70,6 +73,7 @@ final readonly class AuthorizationData
                     'address' => $address,
                 ],
             ],
+            scenarioKey: $scenarioKey,
         );
     }
 
@@ -122,6 +126,12 @@ final readonly class AuthorizationData
         return [
             'type' => $this->type->value,
             'data' => $this->data,
+            'scenario_key' => $this->scenarioKey,
         ];
+    }
+
+    public function getScenarioKey(): ?string
+    {
+        return $this->scenarioKey;
     }
 }

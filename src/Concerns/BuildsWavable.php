@@ -19,12 +19,11 @@ trait BuildsWavable
      */
     private function buildWavable(array $data, ?FlutterwaveApi $apiType = null, bool $isProductEnvironment = false): Wavable
     {
-        // Generate UUID for idempotency key and trace id
-        // If request is for charge, use order_id as idempotency key for idempotency
+        // Prefer an explicit idempotency key. For charge requests, fall back to
+        // order_id when the business flow guarantees one order maps to one charge.
         $isChargeRequest = $apiType === FlutterwaveApi::CHARGE;
-        $idempotencyKey = ($isChargeRequest && isset($data['order_id']))
-            ? $data['order_id']
-            : ($data['idempotency_key'] ?? $data['user_id'] ?? Str::uuid()->toString());
+        $idempotencyKey = $data['idempotency_key']
+            ?? (($isChargeRequest && isset($data['order_id'])) ? $data['order_id'] : Str::uuid()->toString());
 
         $traceId = $data['trace_id'] ?? Str::uuid()->toString();
 
@@ -34,15 +33,6 @@ trait BuildsWavable
             // Check if explicit scenario key is provided
             if (isset($data['scenario_key'])) {
                 $scenarioKey = $data['scenario_key'];
-            } else {
-                // Use context-appropriate defaults based on API type
-                match ($apiType) {
-                    FlutterwaveApi::TRANSFER, FlutterwaveApi::DIRECT_TRANSFER => $scenarioKey = 'scenario:successful',
-                    FlutterwaveApi::CHARGE => $scenarioKey = 'scenario:auth_redirect',
-                    // Recipient/Sender endpoints don't support scenario keys
-                    FlutterwaveApi::TRANSFER_RECIPIENTS, FlutterwaveApi::TRANSFER_SENDERS => $scenarioKey = null,
-                    default => $scenarioKey = null,
-                };
             }
         }
 

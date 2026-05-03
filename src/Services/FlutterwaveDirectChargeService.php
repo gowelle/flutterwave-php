@@ -96,8 +96,14 @@ final class FlutterwaveDirectChargeService implements DirectChargeServiceInterfa
      */
     public function updateChargeAuthorization(string $chargeId, AuthorizationData $authorizationData): DirectChargeData
     {
+         $wavablePayload = ['charge_id' => $chargeId];
+
+        if (null !== $authorizationData->getScenarioKey()) {
+            $wavablePayload['scenario_key'] = $authorizationData->getScenarioKey();
+        }
+
         $wavable = $this->buildWavable(
-            ['charge_id' => $chargeId],
+            $wavablePayload,
             FlutterwaveApi::DIRECT_CHARGE,
             $this->flutterwaveBaseService->getConfig()->isProduction(),
         );

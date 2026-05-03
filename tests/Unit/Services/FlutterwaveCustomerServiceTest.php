@@ -47,6 +47,41 @@ it('can create a customer', function () {
     expect($result)->toBeInstanceOf(CustomerData::class);
 });
 
+it('does not use user_id as idempotency key fallback for non-charge requests', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Customer created',
+        data: [
+            'id' => 'cust_123',
+            'email' => 'test@example.com',
+            'name' => 'Test Customer',
+        ],
+    );
+
+    $this->baseService
+        ->shouldReceive('getConfig')
+        ->andReturn(new FlutterwaveConfig('test_client_id', 'test_client_secret', 'test_secret_hash', FlutterwaveEnvironment::STAGING));
+
+    $this->baseService
+        ->shouldReceive('create')
+        ->once()
+        ->with(
+            FlutterwaveApi::CUSTOMER,
+            Mockery::on(fn ($wavable) => $wavable->getIdempotencyKey() !== 'user-123'),
+            Mockery::any(),
+        )
+        ->andReturn($response);
+
+    $result = $this->service->create([
+        'email' => 'test@example.com',
+        'name' => 'Test Customer',
+        'user_id' => 'user-123',
+        'phone' => ['country_code' => 'TZA', 'number' => '712345678'],
+    ]);
+
+    expect($result)->toBeInstanceOf(CustomerData::class);
+});
+
 it('can create a customer from DTO', function () {
     $response = new ApiResponse(
         status: 'success',

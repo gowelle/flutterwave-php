@@ -474,6 +474,38 @@ if ($updatedCharge->status->isSuccessful()) {
 }
 ```
 
+##### Sandbox Scenario Keys for Authorization
+
+In non-production environments, each `AuthorizationData` factory method accepts an optional `scenarioKey` parameter. Pass it to simulate specific authorization outcomes in the sandbox:
+
+```php
+// PIN + OTP flow
+$authorization = AuthorizationData::createPin(
+    nonce: $nonce,
+    encryptedPin: $encryptedPin,
+    scenarioKey: 'scenario:auth_pin'
+);
+
+// OTP-only step (after PIN was submitted)
+$authorization = AuthorizationData::createOtp(
+    code: $otpCode,
+    scenarioKey: 'scenario:auth_pin'
+);
+
+// AVS flow
+$authorization = AuthorizationData::createAvs(
+    address: ['line1' => '123 Main St', 'city' => 'Lagos', 'country' => 'NG'],
+    scenarioKey: 'scenario:auth_avs'
+);
+
+$updatedCharge = Flutterwave::directCharge()->updateChargeAuthorization(
+    chargeId: $charge->id,
+    authorizationData: $authorization
+);
+```
+
+The `scenario_key` is forwarded as a header on the authorization request. It has no effect in production — only in staging/sandbox environments.
+
 #### Checking Charge Status
 
 ```php
@@ -3414,6 +3446,58 @@ FLUTTERWAVE_ENVIRONMENT=production
 FLUTTERWAVE_CLIENT_ID=your_production_client_id
 FLUTTERWAVE_CLIENT_SECRET=your_production_client_secret
 ```
+
+### Sandbox Scenario Keys
+
+Flutterwave's sandbox API uses `scenario_key` headers to simulate different charge outcomes without needing real card data. No scenario key is applied by default — you must pass one explicitly when you want to control the sandbox outcome.
+
+**For charge authorization**, pass `scenarioKey` to any `AuthorizationData` factory method:
+
+```php
+use Gowelle\Flutterwave\Data\AuthorizationData;
+
+// PIN + OTP flow
+$authorization = AuthorizationData::createPin(
+    nonce: $nonce,
+    encryptedPin: $encryptedPin,
+    scenarioKey: 'scenario:auth_pin'
+);
+
+// PIN with 3DS failover
+$authorization = AuthorizationData::createPin(
+    nonce: $nonce,
+    encryptedPin: $encryptedPin,
+    scenarioKey: 'scenario:auth_pin_3ds'
+);
+
+// 3DS redirect flow
+$authorization = AuthorizationData::createOtp(
+    code: $otpCode,
+    scenarioKey: 'scenario:auth_3ds'
+);
+
+// AVS flow
+$authorization = AuthorizationData::createAvs(
+    address: ['line1' => '123 Main St', 'city' => 'Lagos', 'country' => 'NG'],
+    scenarioKey: 'scenario:auth_avs'
+);
+```
+
+**For the initial charge request**, pass `scenario_key` in the data array:
+
+```php
+// Mobile money — redirect flow
+$charge = Flutterwave::directCharge()->create([
+    'amount' => 10000,
+    'currency' => 'NGN',
+    'reference' => 'ORDER-' . uniqid(),
+    'customer' => ['email' => 'test@example.com', 'name' => 'Test User'],
+    'payment_method' => ['type' => 'mobile_money', /* ... */],
+    'scenario_key' => 'scenario:auth_redirect',
+]);
+```
+
+> **Note:** Scenario keys are ignored in production environments.
 
 ## Static Analysis
 

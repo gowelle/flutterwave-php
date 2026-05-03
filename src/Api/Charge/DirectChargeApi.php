@@ -4,60 +4,50 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Api\Charge;
 
-use Exception;
 use Gowelle\Flutterwave\Data\ApiResponse;
-use Gowelle\Flutterwave\FlutterwaveBaseApi;
+use Illuminate\Support\Facades\Validator;
 
-class DirectChargeApi extends FlutterwaveBaseApi
+class DirectChargeApi extends ChargeApi
 {
     /**
-     * The endpoint for the direct charge API
+     * Use the canonical charge resource endpoint for list/retrieve/update.
      */
-    protected string $endpoint = '/orchestration/direct-charges';
+    protected string $endpoint = '/charges';
 
     /**
-     * Create a direct charge
+     * Orchestrator-only endpoint used when initiating a direct charge.
+     */
+    protected string $orchestrationEndpoint = '/orchestration/direct-charges';
+
+    /**
+     * Create a direct charge via the orchestrator endpoint.
      */
     public function create(array $data): ApiResponse
     {
-        return parent::create($data);
+        $validatedData = $this->validateCreateData($data);
+
+        return $this->postToUrl($this->getBaseApiUrl().$this->orchestrationEndpoint, $validatedData);
     }
 
     /**
-     * Retrieve is not supported for direct charges
-     * (GET /orchestration/direct-charges/{id} does not exist in the API)
+     * Validate direct charge creation data.
      */
-    public function retrieve(string $id): ApiResponse
+    protected function validateCreateData(array $data): array
     {
-        $this->notImplemented('retrieve');
-    }
+        $validator = Validator::make($data, [
+            'amount' => 'required|numeric|min:0.01',
+            'currency' => 'required|string|size:3',
+            'reference' => 'required|string|between:6,42',
+            'customer' => 'required|array',
+            'payment_method' => 'required|array',
+            'redirect_url' => 'nullable|url',
+            'meta' => 'nullable|array',
+            'authorization' => 'nullable|array',
+            'recurring' => 'nullable|boolean',
+            'order_id' => 'nullable|string',
+            'merchant_vat_amount' => 'nullable|numeric|min:0',
+        ]);
 
-    /**
-     * Update is not supported for direct charges
-     * (PUT /orchestration/direct-charges/{id} does not exist in the API)
-     */
-    public function update(string $id, array $data): ApiResponse
-    {
-        $this->notImplemented('update');
-    }
-
-    /**
-     * List direct charges is not implemented
-     *
-     * @throws Exception
-     */
-    public function list(): ApiResponse
-    {
-        $this->notImplemented('list');
-    }
-
-    /**
-     * Search for a direct charge is not implemented
-     *
-     * @throws Exception
-     */
-    public function search(array $data): ApiResponse
-    {
-        $this->notImplemented('search');
+        return $validator->validate();
     }
 }

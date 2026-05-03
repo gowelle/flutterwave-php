@@ -111,17 +111,27 @@ abstract class FlutterwaveBaseApi implements FlutterwaveApiContract
      */
     public function create(array $data): ApiResponse
     {
-        return $this->executeWithRetry(function () use ($data) {
+        return $this->postToUrl($this->buildApiSpecificBaseUrl(), $data);
+    }
+
+    /**
+     * Create an item at a custom URL.
+     *
+     * Useful for APIs whose create endpoint differs from their canonical resource endpoint.
+     */
+    protected function postToUrl(string $url, array $data): ApiResponse
+    {
+        return $this->executeWithRetry(function () use ($url, $data) {
             try {
                 $response = Http::timeout(config('flutterwave.timeout', 30))
                     ->withToken($this->getAccessToken())
                     ->withHeaders($this->getHeaders()->toArray())
-                    ->post($this->buildApiSpecificBaseUrl(), $data)
+                    ->post($url, $data)
                     ->throw();
 
                 return ApiResponse::fromArray($response->json());
             } catch (RequestException $e) {
-                $this->logApiError('POST', $this->buildApiSpecificBaseUrl(), $e);
+                $this->logApiError('POST', $url, $e);
 
                 throw $this->createApiException($e);
             }

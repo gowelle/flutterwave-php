@@ -1,3 +1,23 @@
+# Release v3.2.3
+
+**Release Date:** 2026-05-09
+
+## What's Changed
+
+### Tooling fix
+
+- Fixed a PHPStan regression in `FlutterwaveChargebackService` where chargeback-specific API methods were being called through the generic `FlutterwaveApiContract` type.
+- The service now keeps the concrete `ChargebackApi` type for static analysis without introducing a runtime type mismatch in tests or mocks.
+
+## Verification
+
+- `vendor\bin\phpstan analyse --memory-limit=512M`
+- `vendor\bin\pest tests/Unit/Services/FlutterwaveChargebackServiceTest.php`
+
+**Full Changelog**: https://github.com/gowelle/flutterwave-php/compare/v3.2.2...v3.2.3
+
+---
+
 # Release v3.2.2
 
 **Release Date:** 2026-05-09

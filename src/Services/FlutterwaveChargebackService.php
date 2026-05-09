@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Services;
 
+use Gowelle\Flutterwave\Api\Chargeback\ChargebackApi;
 use Gowelle\Flutterwave\Data\Chargeback\ChargebackData;
 use Gowelle\Flutterwave\Data\Chargeback\CreateChargebackRequest;
 use Gowelle\Flutterwave\Data\Chargeback\UpdateChargebackRequest;
@@ -26,8 +27,7 @@ final class FlutterwaveChargebackService
      */
     public function list(array $params = []): array
     {
-        $api = app(FlutterwaveApiProvider::class)
-            ->useApi(FlutterwaveApi::CHARGEBACK, $this->flutterwaveBaseService->getAccessToken(), $this->buildTraceHeaders());
+        $api = $this->chargebackApi($this->buildTraceHeaders());
 
         $response = $api->listWithParams($params);
 
@@ -49,8 +49,7 @@ final class FlutterwaveChargebackService
      */
     public function create(CreateChargebackRequest $request): ChargebackData
     {
-        $api = app(FlutterwaveApiProvider::class)
-            ->useApi(FlutterwaveApi::CHARGEBACK, $this->flutterwaveBaseService->getAccessToken(), $this->buildCreateHeaders());
+        $api = $this->chargebackApi($this->buildCreateHeaders());
 
         $response = $api->createFromDto($request);
 
@@ -68,8 +67,7 @@ final class FlutterwaveChargebackService
      */
     public function retrieve(string $id): ChargebackData
     {
-        $api = app(FlutterwaveApiProvider::class)
-            ->useApi(FlutterwaveApi::CHARGEBACK, $this->flutterwaveBaseService->getAccessToken(), $this->buildTraceHeaders());
+        $api = $this->chargebackApi($this->buildTraceHeaders());
 
         $response = $api->retrieve($id);
 
@@ -97,8 +95,7 @@ final class FlutterwaveChargebackService
      */
     public function update(string $id, UpdateChargebackRequest $request): ChargebackData
     {
-        $api = app(FlutterwaveApiProvider::class)
-            ->useApi(FlutterwaveApi::CHARGEBACK, $this->flutterwaveBaseService->getAccessToken(), $this->buildTraceHeaders());
+        $api = $this->chargebackApi($this->buildTraceHeaders());
 
         $response = $api->updateFromDto($id, $request);
 
@@ -154,5 +151,20 @@ final class FlutterwaveChargebackService
             'X-Idempotency-Key' => Str::uuid()->toString(),
             'X-Trace-Id' => Str::uuid()->toString(),
         ]);
+    }
+
+    /**
+     * Resolve the chargeback API with the correct concrete type.
+     *
+     * @param  array<string, string>  $headers
+     * @return ChargebackApi
+     */
+    private function chargebackApi(array $headers)
+    {
+        /** @var ChargebackApi $api */
+        $api = app(FlutterwaveApiProvider::class)
+            ->useApi(FlutterwaveApi::CHARGEBACK, $this->flutterwaveBaseService->getAccessToken(), $headers);
+
+        return $api;
     }
 }

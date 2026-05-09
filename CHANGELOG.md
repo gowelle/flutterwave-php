@@ -4,6 +4,12 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [3.2.3] - 2026-05-09
+
+### Fixed
+
+- **Chargebacks service**: Adjusted the internal `ChargebackApi` typing in `FlutterwaveChargebackService` so PHPStan recognizes endpoint-specific `createFromDto()` and `updateFromDto()` calls without breaking the existing service tests.
+
 ## [3.2.2] - 2026-05-09
 
 ### Added

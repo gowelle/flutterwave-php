@@ -107,7 +107,7 @@ class VirtualAccountApi extends FlutterwaveBaseApi
             'reference' => 'required|string|min:6|max:42',
             'customer_id' => 'required|string',
             'amount' => 'required|numeric|min:0',
-            'currency' => 'required|string|in:NGN,GHS,EGP,KES',
+            'currency' => 'required|string|in:NGN,GHS,EGP,KES,MAD,ZAR',
             'account_type' => 'required|string|in:static,dynamic',
             'expiry' => 'nullable|integer|min:60|max:31536000',
             'meta' => 'nullable|array',
@@ -115,6 +115,7 @@ class VirtualAccountApi extends FlutterwaveBaseApi
             'bvn' => 'nullable|string',
             'nin' => 'nullable|string',
             'customer_account_number' => 'nullable|string',
+            'bank_code' => 'nullable|string',
         ]);
 
         $validated = $validator->validate();

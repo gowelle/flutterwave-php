@@ -1,3 +1,51 @@
+# Release v3.2.2
+
+**Release Date:** 2026-05-09
+
+## What's Changed
+
+### API contract alignment
+
+- **Bank account resolve** now follows Flutterwave’s documented payload variants for `NGN`, `USD` / `NG`, `GBP corporate`, and `GBP individual`.
+- **Fees** now uses the live `/fees` contract with required `payment_method` and optional `card6`, `country`, and `network`.
+- **Chargebacks** now follow the current v4 create/update contract instead of the older simplified wrapper shape.
+- **Virtual accounts** now support `MAD`, `ZAR`, and optional `bank_code` during creation.
+
+### New public wrappers
+
+- Added **`Flutterwave::chargebacks()`** with:
+  - `list()`
+  - `create()`
+  - `retrieve()` / `get()`
+  - `update()`
+  - `accept()`
+  - `decline()`
+- Added **`Flutterwave::fees()->calculate()`** as the public service wrapper for fee calculations.
+
+### Header behavior fixes
+
+- **Bank-family APIs** now always send `X-Trace-Id`.
+- **Bank account resolve** optionally forwards `X-Scenario-Key`.
+- **Bank, branches, bank resolve, mobile networks, fees, and chargeback read/update flows** no longer force `X-Idempotency-Key`.
+- **Chargeback create** and **virtual account create** still send `X-Idempotency-Key` where the live docs require it.
+
+### Documentation and tests
+
+- README examples now match the implemented bank resolve, fees, virtual account, and chargeback flows.
+- Added focused unit coverage for:
+  - bank resolve DTO variants and service behavior
+  - fees API/service
+  - chargeback API/service
+  - virtual account currency and payload changes
+
+## Verification
+
+- `vendor\bin\pest tests/Unit/Data/Banks/BankAccountResolveRequestTest.php tests/Unit/Services/FlutterwaveBanksServiceTest.php tests/Unit/VirtualAccountApiTest.php tests/Unit/VirtualAccountDataTest.php tests/Unit/Api/Fees/FeesApiTest.php tests/Unit/Services/FlutterwaveFeesServiceTest.php tests/Unit/Api/Chargeback/ChargebackApiTest.php tests/Unit/Services/FlutterwaveChargebackServiceTest.php`
+
+**Full Changelog**: https://github.com/gowelle/flutterwave-php/compare/v3.2.1...v3.2.2
+
+---
+
 # Release v3.0.0
 
 **Release Date:** 2026-03-22

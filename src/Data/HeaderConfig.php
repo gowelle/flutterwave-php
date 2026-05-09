@@ -10,7 +10,7 @@ final readonly class HeaderConfig
 {
     public function __construct(
         public string $contentType,
-        public string $idempotencyKey,
+        public ?string $idempotencyKey,
         public string $traceId,
         public ?string $scenarioKey = null,
     ) {
@@ -40,7 +40,7 @@ final readonly class HeaderConfig
     {
         return new self(
             contentType: $headers['Content-Type'] ?? 'application/json',
-            idempotencyKey: $headers['X-Idempotency-Key'],
+            idempotencyKey: $headers['X-Idempotency-Key'] ?? null,
             traceId: $headers['X-Trace-Id'],
             scenarioKey: $headers['X-Scenario-Key'] ?? null,
         );
@@ -53,9 +53,12 @@ final readonly class HeaderConfig
     {
         $headers = [
             'Content-Type' => $this->contentType,
-            'X-Idempotency-Key' => $this->idempotencyKey,
             'X-Trace-Id' => $this->traceId,
         ];
+
+        if ($this->idempotencyKey !== null) {
+            $headers['X-Idempotency-Key'] = $this->idempotencyKey;
+        }
 
         if ($this->scenarioKey !== null) {
             $headers['X-Scenario-Key'] = $this->scenarioKey;
@@ -73,8 +76,8 @@ final readonly class HeaderConfig
             throw new InvalidArgumentException('Content-Type cannot be empty');
         }
 
-        if (empty($this->idempotencyKey)) {
-            throw new InvalidArgumentException('Idempotency-Key cannot be empty');
+        if ($this->idempotencyKey !== null && $this->idempotencyKey === '') {
+            throw new InvalidArgumentException('Idempotency-Key cannot be empty when provided');
         }
 
         if (empty($this->traceId)) {

@@ -26,6 +26,7 @@ final class CreateVirtualAccountRequestDTO
      * @param  ?string  $bvn  Customer's Bank Verification Number
      * @param  ?string  $nin  Customer's National Identity Number
      * @param  ?string  $customerAccountNumber  Bank account for transfers (required for EGP/KES)
+     * @param  ?string  $bankCode  Preferred bank code for account creation
      */
     public function __construct(
         public string $reference,
@@ -39,6 +40,7 @@ final class CreateVirtualAccountRequestDTO
         public ?string $bvn = null,
         public ?string $nin = null,
         public ?string $customerAccountNumber = null,
+        public ?string $bankCode = null,
     ) {}
 
     /**
@@ -62,6 +64,7 @@ final class CreateVirtualAccountRequestDTO
             bvn: $data['bvn'] ?? null,
             nin: $data['nin'] ?? null,
             customerAccountNumber: $data['customer_account_number'] ?? null,
+            bankCode: $data['bank_code'] ?? null,
         );
     }
 
@@ -100,6 +103,10 @@ final class CreateVirtualAccountRequestDTO
 
         if ($this->customerAccountNumber !== null) {
             $data['customer_account_number'] = $this->customerAccountNumber;
+        }
+
+        if ($this->bankCode !== null) {
+            $data['bank_code'] = $this->bankCode;
         }
 
         return $data;

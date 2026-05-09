@@ -1312,30 +1312,67 @@ $branches = Flutterwave::banks()->branches('bank-id');
 
 #### Resolve Bank Account
 
+The bank account lookup payload varies by documented variant. The wrapper exposes explicit methods and DTO constructors for each supported schema.
+
+**NGN**
+
 ```php
 $account = Flutterwave::banks()->resolveAccount(
     bankCode: '044',
     accountNumber: '0123456789',
-    currency: 'NGN'
 );
 
-// Access resolved account details
 echo $account->accountName;
-echo $account->accountNumber;
 ```
 
-**Using DTO (type-safe):**
+**USD bank account look up for NG accounts**
+
+```php
+$account = Flutterwave::banks()->resolveUsdNgAccount(
+    bankCode: '044',
+    accountNumber: '0690000031',
+);
+```
+
+**GBP corporate**
+
+```php
+$account = Flutterwave::banks()->resolveGbpCorporateAccount(
+    bankCode: '044',
+    accountNumber: '0690000031',
+    businessName: 'Ajadi & Sons Ltd.',
+);
+```
+
+**GBP individual**
+
+```php
+$account = Flutterwave::banks()->resolveGbpIndividualAccount(
+    bankCode: '044',
+    accountNumber: '0690000031',
+    firstName: 'King',
+    lastName: 'LeBron',
+    middleName: 'Leo', // optional
+);
+```
+
+**Using DTOs**
 
 ```php
 use Gowelle\Flutterwave\Data\Banks\BankAccountResolveRequest;
 
-$request = new BankAccountResolveRequest(
-    bankCode: '044',
-    accountNumber: '0123456789',
-    currency: 'NGN',  // defaults to NGN if omitted
+$ngnRequest = BankAccountResolveRequest::forNgn('044', '0123456789');
+$usdNgRequest = BankAccountResolveRequest::forUsdNg('044', '0690000031');
+$gbpCorporateRequest = BankAccountResolveRequest::forGbpCorporate('044', '0690000031', 'Ajadi & Sons Ltd.');
+$gbpIndividualRequest = BankAccountResolveRequest::forGbpIndividual(
+    '044',
+    '0690000031',
+    'King',
+    'LeBron',
+    'Leo',
 );
 
-$account = Flutterwave::banks()->resolveFromDto($request);
+$account = Flutterwave::banks()->resolveFromDto($gbpCorporateRequest);
 ```
 
 ### Mobile Networks
@@ -1454,10 +1491,11 @@ $request = new CreateVirtualAccountRequestDTO(
     reference: 'unique-ref-' . time(),      // 6-42 chars, unique
     customerId: 'cus_123',                  // Existing customer ID
     amount: 0,                              // 0 for static accounts
-    currency: VirtualAccountCurrency::NGN,  // NGN, GHS, EGP, or KES
+    currency: VirtualAccountCurrency::NGN,  // NGN, GHS, EGP, KES, MAD, or ZAR
     accountType: VirtualAccountType::STATIC, // STATIC or DYNAMIC
     narration: 'Payment for Order #123',    // Optional
     meta: ['order_id' => '123'],            // Optional metadata
+    bankCode: '044',                        // Optional preferred bank code
 );
 
 $account = Flutterwave::banks()->createVirtualAccount($request);
@@ -1551,6 +1589,8 @@ Virtual accounts support the following currencies:
 - **GHS** - Ghanaian Cedi
 - **EGP** - Egyptian Pound (requires `customer_account_number`)
 - **KES** - Kenyan Shilling (requires `customer_account_number`)
+- **MAD** - Moroccan Dirham
+- **ZAR** - South African Rand
 
 #### Account Types
 
@@ -1600,20 +1640,53 @@ $api->update($account['data']['id'], [
 
 ### Chargebacks
 
-Manage dispute lifecycles including retrieving, accepting, and declining chargebacks raised against charges.
+Manage dispute lifecycles including creating, retrieving, accepting, and declining chargebacks raised against charges.
 
 #### List Chargebacks
 
 ```php
 // Retrieve a list of all chargebacks/disputes
 $chargebacks = Flutterwave::chargebacks()->list();
+
+// Filter by page, size, and date range
+$chargebacks = Flutterwave::chargebacks()->list([
+    'page' => 1,
+    'size' => 10,
+    'from' => '2025-04-21T10:55:16Z',
+    'to' => '2025-05-21T10:48:18Z',
+]);
+```
+
+#### Create a Chargeback
+
+```php
+use Gowelle\Flutterwave\Data\Chargeback\CreateChargebackRequest;
+
+$chargeback = Flutterwave::chargebacks()->create(
+    new CreateChargebackRequest(
+        chargeId: 'chg_eahdhfThdHsgaSra',
+        amount: 12.34,
+        type: 'local',
+        expiry: 72,
+        stage: 'new',
+        status: 'pending',
+        comment: 'Customer claims the charge was unauthorized.',
+        provider: 'Visa',
+        arn: '1243453453434234534443423',
+        initiator: 'customer',
+        uploadedProof: 'https://example.com/proofs/proof_123.pdf',
+    )
+);
 ```
 
 #### Accept a Chargeback
 
 ```php
 // Accept a chargeback (agree to refund the customer)
-$chargeback = Flutterwave::chargebacks()->accept('chargeback-id');
+$chargeback = Flutterwave::chargebacks()->accept(
+    'chargeback-id',
+    'We accept this dispute and will process the reversal.'
+);
 ```
 
 #### Decline a Chargeback
@@ -1626,7 +1699,11 @@ $chargeback = Flutterwave::chargebacks()->decline(
     'chargeback-id',
     UpdateChargebackRequest::decline(
         message: 'Service was securely delivered',
-        evidenceUrl: 'https://example.com/delivery/proof.jpg'
+        evidenceUrl: 'https://example.com/delivery/proof.jpg',
+        proofData: base64_encode('proof document bytes'),
+        provider: 'Visa',
+        arn: '1243453453434234534443423',
+        dueDatetime: '2025-05-30T23:59:59Z',
     )
 );
 ```
@@ -1649,6 +1726,8 @@ Fetch accurate fee information to predict transaction costs across paths and car
 $fees = Flutterwave::fees()->calculate([
     'amount' => 5000,
     'currency' => 'TZS',
+    'payment_method' => 'mobile_money',
+    'network' => 'M-PESA', // Optional, for mobile money
 ]);
 
 echo $fees->fee;            // Direct gateway transaction cost
@@ -3188,6 +3267,8 @@ $charge = Flutterwave::directCharge()->create([
     // ... other data
 ]);
 ```
+
+For charge requests, if you omit `idempotency_key`, the package uses `order_id` when present. If neither value is provided, a UUID is generated automatically.
 
 ### Trace IDs
 

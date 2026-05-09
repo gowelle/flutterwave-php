@@ -25,8 +25,10 @@ use Gowelle\Flutterwave\Livewire\PinInput;
 use Gowelle\Flutterwave\Services\FlutterwaveAuthService;
 use Gowelle\Flutterwave\Services\FlutterwaveBanksService;
 use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
+use Gowelle\Flutterwave\Services\FlutterwaveChargebackService;
 use Gowelle\Flutterwave\Services\FlutterwaveCustomerService;
 use Gowelle\Flutterwave\Services\FlutterwaveDirectChargeService;
+use Gowelle\Flutterwave\Services\FlutterwaveFeesService;
 use Gowelle\Flutterwave\Services\FlutterwaveMobileNetworkService;
 use Gowelle\Flutterwave\Services\FlutterwaveOrderService;
 use Gowelle\Flutterwave\Services\FlutterwavePaymentsService;
@@ -247,6 +249,18 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
         ));
         $this->app->alias(FlutterwaveRefundService::class, 'flutterwave.refunds');
 
+        // Fees service
+        $this->app->singleton(FlutterwaveFeesService::class, fn (Application $app) => new FlutterwaveFeesService(
+            $app->make(FlutterwaveBaseService::class)
+        ));
+        $this->app->alias(FlutterwaveFeesService::class, 'flutterwave.fees');
+
+        // Chargeback service
+        $this->app->singleton(FlutterwaveChargebackService::class, fn (Application $app) => new FlutterwaveChargebackService(
+            $app->make(FlutterwaveBaseService::class)
+        ));
+        $this->app->alias(FlutterwaveChargebackService::class, 'flutterwave.chargebacks');
+
         // Transfer service
         $this->app->singleton(FlutterwaveTransferService::class, fn (Application $app) => new FlutterwaveTransferService(
             $app->make(FlutterwaveBaseService::class)
@@ -310,6 +324,16 @@ final class FlutterwaveServiceProvider extends PackageServiceProvider
                 public function refunds(): FlutterwaveRefundService
                 {
                     return $this->app->make(FlutterwaveRefundService::class);
+                }
+
+                public function fees(): FlutterwaveFeesService
+                {
+                    return $this->app->make(FlutterwaveFeesService::class);
+                }
+
+                public function chargebacks(): FlutterwaveChargebackService
+                {
+                    return $this->app->make(FlutterwaveChargebackService::class);
                 }
 
                 public function transfers(): FlutterwaveTransferService

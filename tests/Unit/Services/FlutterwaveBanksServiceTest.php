@@ -55,14 +55,21 @@ it('can get banks by country', function () {
         ->andReturn($this->headerBuilder);
 
     $this->headerBuilder
-        ->shouldReceive('build')
+        ->shouldReceive('fromArray')
         ->once()
-        ->andReturn(['Content-Type' => 'application/json']);
+        ->with(Mockery::on(fn (array $headers) => isset($headers['X-Trace-Id']) && ! isset($headers['X-Idempotency-Key']) && ! isset($headers['X-Scenario-Key'])))
+        ->andReturn([
+            'Content-Type' => 'application/json',
+            'X-Trace-Id' => 'trace-banks-123456',
+        ]);
 
     app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
-            ->with(FlutterwaveApi::BANKS, 'test_token', ['Content-Type' => 'application/json'])
+            ->with(FlutterwaveApi::BANKS, 'test_token', [
+                'Content-Type' => 'application/json',
+                'X-Trace-Id' => 'trace-banks-123456',
+            ])
             ->andReturn($apiMock);
     }));
 
@@ -97,14 +104,21 @@ it('throws exception when getting banks fails', function () {
         ->andReturn($this->headerBuilder);
 
     $this->headerBuilder
-        ->shouldReceive('build')
+        ->shouldReceive('fromArray')
         ->once()
-        ->andReturn(['Content-Type' => 'application/json']);
+        ->with(Mockery::on(fn (array $headers) => isset($headers['X-Trace-Id']) && ! isset($headers['X-Idempotency-Key']) && ! isset($headers['X-Scenario-Key'])))
+        ->andReturn([
+            'Content-Type' => 'application/json',
+            'X-Trace-Id' => 'trace-banks-123456',
+        ]);
 
     app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
-            ->with(FlutterwaveApi::BANKS, 'test_token', ['Content-Type' => 'application/json'])
+            ->with(FlutterwaveApi::BANKS, 'test_token', [
+                'Content-Type' => 'application/json',
+                'X-Trace-Id' => 'trace-banks-123456',
+            ])
             ->andReturn($apiMock);
     }));
 
@@ -139,14 +153,21 @@ it('can get bank branches by bank id', function () {
         ->andReturn($this->headerBuilder);
 
     $this->headerBuilder
-        ->shouldReceive('build')
+        ->shouldReceive('fromArray')
         ->once()
-        ->andReturn(['Content-Type' => 'application/json']);
+        ->with(Mockery::on(fn (array $headers) => isset($headers['X-Trace-Id']) && ! isset($headers['X-Idempotency-Key']) && ! isset($headers['X-Scenario-Key'])))
+        ->andReturn([
+            'Content-Type' => 'application/json',
+            'X-Trace-Id' => 'trace-branches-123456',
+        ]);
 
     app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
-            ->with(FlutterwaveApi::BANK_BRANCHES, 'test_token', ['Content-Type' => 'application/json'])
+            ->with(FlutterwaveApi::BANK_BRANCHES, 'test_token', [
+                'Content-Type' => 'application/json',
+                'X-Trace-Id' => 'trace-branches-123456',
+            ])
             ->andReturn($apiMock);
     }));
 
@@ -157,12 +178,12 @@ it('can get bank branches by bank id', function () {
     expect($result[0])->toBeInstanceOf(BankBranchData::class);
 });
 
-it('can resolve bank account', function () {
+it('can resolve NGN bank account', function () {
     $response = new ApiResponse(
         status: 'success',
         message: 'Account resolved',
         data: [
-            'account_number' => '0123456789',
+            'account_number' => '0690000031',
             'account_name' => 'John Doe',
             'bank_code' => '044',
         ],
@@ -171,7 +192,7 @@ it('can resolve bank account', function () {
     $apiMock = Mockery::mock(FlutterwaveApiContract::class);
     $apiMock->shouldReceive('resolve')
         ->once()
-        ->with('044', '0123456789', 'NGN')
+        ->with('044', '0690000031')
         ->andReturn($response);
 
     $this->baseService
@@ -185,18 +206,194 @@ it('can resolve bank account', function () {
         ->andReturn($this->headerBuilder);
 
     $this->headerBuilder
-        ->shouldReceive('build')
+        ->shouldReceive('fromArray')
         ->once()
-        ->andReturn(['Content-Type' => 'application/json']);
+        ->with(Mockery::on(fn (array $headers) => isset($headers['X-Trace-Id']) && ! isset($headers['X-Idempotency-Key']) && ! isset($headers['X-Scenario-Key'])))
+        ->andReturn([
+            'Content-Type' => 'application/json',
+            'X-Trace-Id' => 'trace-123456789012',
+        ]);
 
     app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
-            ->with(FlutterwaveApi::BANK_ACCOUNT_RESOLVE, 'test_token', ['Content-Type' => 'application/json'])
+            ->with(
+                FlutterwaveApi::BANK_ACCOUNT_RESOLVE,
+                'test_token',
+                [
+                    'Content-Type' => 'application/json',
+                    'X-Trace-Id' => 'trace-123456789012',
+                ]
+            )
             ->andReturn($apiMock);
     }));
 
-    $result = $this->service->resolveAccount('044', '0123456789', 'NGN');
+    $result = $this->service->resolveAccount('044', '0690000031');
+
+    expect($result)->toBeInstanceOf(BankAccountResolveData::class);
+});
+
+it('can resolve USD NG bank account', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Account resolved',
+        data: [
+            'account_number' => '0690000031',
+            'account_name' => 'John Doe',
+            'bank_code' => '044',
+        ],
+    );
+
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock->shouldReceive('resolveUsdNg')
+        ->once()
+        ->with('044', '0690000031')
+        ->andReturn($response);
+
+    $this->baseService
+        ->shouldReceive('getAccessToken')
+        ->once()
+        ->andReturn('test_token');
+
+    $this->baseService
+        ->shouldReceive('getHeaderBuilder')
+        ->once()
+        ->andReturn($this->headerBuilder);
+
+    $this->headerBuilder
+        ->shouldReceive('fromArray')
+        ->once()
+        ->with(Mockery::on(fn (array $headers) => isset($headers['X-Trace-Id']) && ! isset($headers['X-Idempotency-Key']) && ! isset($headers['X-Scenario-Key'])))
+        ->andReturn([
+            'Content-Type' => 'application/json',
+            'X-Trace-Id' => 'trace-123456789012',
+        ]);
+
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+        $mock->shouldReceive('useApi')
+            ->once()
+            ->with(
+                FlutterwaveApi::BANK_ACCOUNT_RESOLVE,
+                'test_token',
+                [
+                    'Content-Type' => 'application/json',
+                    'X-Trace-Id' => 'trace-123456789012',
+                ]
+            )
+            ->andReturn($apiMock);
+    }));
+
+    $result = $this->service->resolveUsdNgAccount('044', '0690000031');
+
+    expect($result)->toBeInstanceOf(BankAccountResolveData::class);
+});
+
+it('can resolve GBP corporate bank account', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Account resolved',
+        data: [
+            'account_number' => '0690000031',
+            'account_name' => 'Ajadi & Sons Ltd.',
+            'bank_code' => '044',
+        ],
+    );
+
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock->shouldReceive('resolveGbpCorporate')
+        ->once()
+        ->with('044', '0690000031', 'Ajadi & Sons Ltd.')
+        ->andReturn($response);
+
+    $this->baseService
+        ->shouldReceive('getAccessToken')
+        ->once()
+        ->andReturn('test_token');
+
+    $this->baseService
+        ->shouldReceive('getHeaderBuilder')
+        ->once()
+        ->andReturn($this->headerBuilder);
+
+    $this->headerBuilder
+        ->shouldReceive('fromArray')
+        ->once()
+        ->with(Mockery::on(fn (array $headers) => isset($headers['X-Trace-Id']) && ! isset($headers['X-Idempotency-Key']) && ! isset($headers['X-Scenario-Key'])))
+        ->andReturn([
+            'Content-Type' => 'application/json',
+            'X-Trace-Id' => 'trace-123456789012',
+        ]);
+
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+        $mock->shouldReceive('useApi')
+            ->once()
+            ->with(
+                FlutterwaveApi::BANK_ACCOUNT_RESOLVE,
+                'test_token',
+                [
+                    'Content-Type' => 'application/json',
+                    'X-Trace-Id' => 'trace-123456789012',
+                ]
+            )
+            ->andReturn($apiMock);
+    }));
+
+    $result = $this->service->resolveGbpCorporateAccount('044', '0690000031', 'Ajadi & Sons Ltd.');
+
+    expect($result)->toBeInstanceOf(BankAccountResolveData::class);
+});
+
+it('can resolve GBP individual bank account', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Account resolved',
+        data: [
+            'account_number' => '0690000031',
+            'account_name' => 'Ajadi Jackson',
+            'bank_code' => '044',
+        ],
+    );
+
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock->shouldReceive('resolveGbpIndividual')
+        ->once()
+        ->with('044', '0690000031', 'King', 'LeBron', 'Leo')
+        ->andReturn($response);
+
+    $this->baseService
+        ->shouldReceive('getAccessToken')
+        ->once()
+        ->andReturn('test_token');
+
+    $this->baseService
+        ->shouldReceive('getHeaderBuilder')
+        ->once()
+        ->andReturn($this->headerBuilder);
+
+    $this->headerBuilder
+        ->shouldReceive('fromArray')
+        ->once()
+        ->with(Mockery::on(fn (array $headers) => isset($headers['X-Trace-Id']) && ! isset($headers['X-Idempotency-Key']) && ! isset($headers['X-Scenario-Key'])))
+        ->andReturn([
+            'Content-Type' => 'application/json',
+            'X-Trace-Id' => 'trace-123456789012',
+        ]);
+
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+        $mock->shouldReceive('useApi')
+            ->once()
+            ->with(
+                FlutterwaveApi::BANK_ACCOUNT_RESOLVE,
+                'test_token',
+                [
+                    'Content-Type' => 'application/json',
+                    'X-Trace-Id' => 'trace-123456789012',
+                ]
+            )
+            ->andReturn($apiMock);
+    }));
+
+    $result = $this->service->resolveGbpIndividualAccount('044', '0690000031', 'King', 'LeBron', 'Leo');
 
     expect($result)->toBeInstanceOf(BankAccountResolveData::class);
 });
@@ -206,16 +403,18 @@ it('can resolve bank account from DTO', function () {
         status: 'success',
         message: 'Account resolved',
         data: [
-            'account_number' => '0123456789',
-            'account_name' => 'John Doe',
+            'account_number' => '0690000031',
+            'account_name' => 'Ajadi & Sons Ltd.',
             'bank_code' => '044',
         ],
     );
 
+    $request = BankAccountResolveRequest::forGbpCorporate('044', '0690000031', 'Ajadi & Sons Ltd.');
+
     $apiMock = Mockery::mock(FlutterwaveApiContract::class);
-    $apiMock->shouldReceive('resolve')
+    $apiMock->shouldReceive('resolveFromDto')
         ->once()
-        ->with('044', '0123456789', 'NGN')
+        ->with($request)
         ->andReturn($response);
 
     $this->baseService
@@ -229,24 +428,86 @@ it('can resolve bank account from DTO', function () {
         ->andReturn($this->headerBuilder);
 
     $this->headerBuilder
-        ->shouldReceive('build')
+        ->shouldReceive('fromArray')
         ->once()
-        ->andReturn(['Content-Type' => 'application/json']);
+        ->with(Mockery::on(fn (array $headers) => isset($headers['X-Trace-Id']) && ! isset($headers['X-Idempotency-Key']) && ! isset($headers['X-Scenario-Key'])))
+        ->andReturn([
+            'Content-Type' => 'application/json',
+            'X-Trace-Id' => 'trace-123456789012',
+        ]);
 
     app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
-            ->with(FlutterwaveApi::BANK_ACCOUNT_RESOLVE, 'test_token', ['Content-Type' => 'application/json'])
+            ->with(
+                FlutterwaveApi::BANK_ACCOUNT_RESOLVE,
+                'test_token',
+                [
+                    'Content-Type' => 'application/json',
+                    'X-Trace-Id' => 'trace-123456789012',
+                ]
+            )
             ->andReturn($apiMock);
     }));
 
-    $request = new BankAccountResolveRequest(
-        bankCode: '044',
-        accountNumber: '0123456789',
-        currency: 'NGN',
+    $result = $this->service->resolve($request);
+
+    expect($result)->toBeInstanceOf(BankAccountResolveData::class);
+});
+
+it('forwards scenario key only on bank resolve calls', function () {
+    $response = new ApiResponse(
+        status: 'success',
+        message: 'Account resolved',
+        data: [
+            'account_number' => '0690000031',
+            'account_name' => 'John Doe',
+            'bank_code' => '044',
+        ],
     );
 
-    $result = $this->service->resolveFromDto($request);
+    $apiMock = Mockery::mock(FlutterwaveApiContract::class);
+    $apiMock->shouldReceive('resolve')
+        ->once()
+        ->with('044', '0690000031')
+        ->andReturn($response);
+
+    $this->baseService
+        ->shouldReceive('getAccessToken')
+        ->once()
+        ->andReturn('test_token');
+
+    $this->baseService
+        ->shouldReceive('getHeaderBuilder')
+        ->once()
+        ->andReturn($this->headerBuilder);
+
+    $this->headerBuilder
+        ->shouldReceive('fromArray')
+        ->once()
+        ->with(Mockery::on(fn (array $headers) => ($headers['X-Scenario-Key'] ?? null) === 'scenario:manual_review'))
+        ->andReturn([
+            'Content-Type' => 'application/json',
+            'X-Trace-Id' => 'trace-123456789012',
+            'X-Scenario-Key' => 'scenario:manual_review',
+        ]);
+
+    app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
+        $mock->shouldReceive('useApi')
+            ->once()
+            ->with(
+                FlutterwaveApi::BANK_ACCOUNT_RESOLVE,
+                'test_token',
+                [
+                    'Content-Type' => 'application/json',
+                    'X-Trace-Id' => 'trace-123456789012',
+                    'X-Scenario-Key' => 'scenario:manual_review',
+                ]
+            )
+            ->andReturn($apiMock);
+    }));
+
+    $result = $this->service->resolveAccount('044', '0690000031', 'scenario:manual_review');
 
     expect($result)->toBeInstanceOf(BankAccountResolveData::class);
 });
@@ -286,14 +547,23 @@ it('can create virtual account', function () {
         ->andReturn($this->headerBuilder);
 
     $this->headerBuilder
-        ->shouldReceive('build')
+        ->shouldReceive('fromArray')
         ->once()
-        ->andReturn(['Content-Type' => 'application/json']);
+        ->with(Mockery::on(fn (array $headers) => isset($headers['X-Trace-Id']) && isset($headers['X-Idempotency-Key']) && ! isset($headers['X-Scenario-Key'])))
+        ->andReturn([
+            'Content-Type' => 'application/json',
+            'X-Idempotency-Key' => 'idem-virtual-123456',
+            'X-Trace-Id' => 'trace-virtual-123456',
+        ]);
 
     app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
-            ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
+            ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', [
+                'Content-Type' => 'application/json',
+                'X-Idempotency-Key' => 'idem-virtual-123456',
+                'X-Trace-Id' => 'trace-virtual-123456',
+            ])
             ->andReturn($apiMock);
     }));
 
@@ -334,14 +604,23 @@ it('throws exception when creating virtual account fails', function () {
         ->andReturn($this->headerBuilder);
 
     $this->headerBuilder
-        ->shouldReceive('build')
+        ->shouldReceive('fromArray')
         ->once()
-        ->andReturn(['Content-Type' => 'application/json']);
+        ->with(Mockery::on(fn (array $headers) => isset($headers['X-Trace-Id']) && isset($headers['X-Idempotency-Key']) && ! isset($headers['X-Scenario-Key'])))
+        ->andReturn([
+            'Content-Type' => 'application/json',
+            'X-Idempotency-Key' => 'idem-virtual-123456',
+            'X-Trace-Id' => 'trace-virtual-123456',
+        ]);
 
     app()->instance(FlutterwaveApiProvider::class, Mockery::mock(FlutterwaveApiProvider::class, function ($mock) use ($apiMock) {
         $mock->shouldReceive('useApi')
             ->once()
-            ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', ['Content-Type' => 'application/json'])
+            ->with(FlutterwaveApi::VIRTUAL_ACCOUNT, 'test_token', [
+                'Content-Type' => 'application/json',
+                'X-Idempotency-Key' => 'idem-virtual-123456',
+                'X-Trace-Id' => 'trace-virtual-123456',
+            ])
             ->andReturn($apiMock);
     }));
 

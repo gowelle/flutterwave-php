@@ -173,6 +173,7 @@ it('can validate create with optional fields', function () {
         'narration' => 'Payment for Order #123',
         'meta' => ['order_id' => '123'],
         'bvn' => '12345678901',
+        'bank_code' => '044',
     ]);
 
     expect($response->status)->toBe('success');
@@ -224,6 +225,66 @@ it('accepts valid currency enum values', function () {
         'currency' => 'GHS',
         'account_type' => 'dynamic',
         'expiry' => 3600,
+    ]);
+
+    expect($response->status)->toBe('success');
+});
+
+it('accepts MAD currency for create', function () {
+    Http::fake([
+        '*' => Http::response([
+            'status' => 'success',
+            'data' => [
+                'id' => 'va_123',
+                'amount' => 100,
+                'account_number' => '7824822527',
+                'reference' => 'test_ref_mad',
+                'account_bank_name' => 'BANK',
+                'account_type' => 'dynamic',
+                'status' => 'active',
+                'account_expiration_datetime' => '2025-12-31T23:59:59Z',
+                'customer_id' => 'cus_123',
+                'currency' => 'MAD',
+            ],
+        ]),
+    ]);
+
+    $response = $this->api->create([
+        'reference' => 'test_ref_mad',
+        'customer_id' => 'cus_123',
+        'amount' => 100,
+        'currency' => 'MAD',
+        'account_type' => 'dynamic',
+    ]);
+
+    expect($response->status)->toBe('success');
+});
+
+it('accepts ZAR currency for create', function () {
+    Http::fake([
+        '*' => Http::response([
+            'status' => 'success',
+            'data' => [
+                'id' => 'va_123',
+                'amount' => 100,
+                'account_number' => '7824822527',
+                'reference' => 'test_ref_zar',
+                'account_bank_name' => 'BANK',
+                'account_type' => 'dynamic',
+                'status' => 'active',
+                'account_expiration_datetime' => '2025-12-31T23:59:59Z',
+                'customer_id' => 'cus_123',
+                'currency' => 'ZAR',
+            ],
+        ]),
+    ]);
+
+    $response = $this->api->create([
+        'reference' => 'test_ref_zar',
+        'customer_id' => 'cus_123',
+        'amount' => 100,
+        'currency' => 'ZAR',
+        'account_type' => 'dynamic',
     ]);
 
     expect($response->status)->toBe('success');

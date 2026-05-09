@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace Gowelle\Flutterwave\Api\Banks;
 
-use Exception;
 use Gowelle\Flutterwave\Data\ApiResponse;
 use Gowelle\Flutterwave\Data\Banks\BankAccountResolveRequest;
 use Gowelle\Flutterwave\FlutterwaveBaseApi;
-use Illuminate\Http\Client\RequestException;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class BankAccountResolveApi extends FlutterwaveBaseApi
@@ -21,61 +17,59 @@ class BankAccountResolveApi extends FlutterwaveBaseApi
     protected string $endpoint = '/banks/account-resolve';
 
     /**
-     * Resolve bank account details
-     *
-     * @throws Exception
+     * Resolve NGN bank account details.
      */
-    public function resolve(string $bankCode, string $accountNumber, string $currency = 'NGN'): ApiResponse
+    public function resolve(string $bankCode, string $accountNumber): ApiResponse
     {
-        $validatedData = $this->validateResolveData([
-            'bank_code' => $bankCode,
-            'account_number' => $accountNumber,
-            'currency' => mb_strtoupper($currency),
-        ]);
+        return $this->resolveFromDto(BankAccountResolveRequest::forNgn($bankCode, $accountNumber));
+    }
 
-        try {
-            $url = $this->getBaseApiUrl().$this->endpoint;
+    /**
+     * Resolve USD bank account details for Nigerian bank accounts.
+     */
+    public function resolveUsdNg(string $bankCode, string $accountNumber): ApiResponse
+    {
+        return $this->resolveFromDto(BankAccountResolveRequest::forUsdNg($bankCode, $accountNumber));
+    }
 
-            $response = Http::timeout(30)
-                ->withToken($this->getAccessToken())
-                ->withHeaders($this->getHeaders()->toArray())
-                ->post($url, $validatedData)
-                ->throw();
+    /**
+     * Resolve GBP corporate bank account details.
+     */
+    public function resolveGbpCorporate(string $bankCode, string $accountNumber, string $businessName): ApiResponse
+    {
+        return $this->resolveFromDto(
+            BankAccountResolveRequest::forGbpCorporate($bankCode, $accountNumber, $businessName)
+        );
+    }
 
-            $data = $response->json();
-
-            return new ApiResponse(
-                status: $data['status'] ?? 'unknown',
-                message: $data['message'] ?? null,
-                data: $data['data'] ?? [],
-            );
-        } catch (RequestException $e) {
-            Log::error('Flutterwave Bank Account Resolve API Error', [
-                'endpoint' => $this->endpoint,
-                'bank_code' => $bankCode,
-                'account_number' => $accountNumber,
-                'status_code' => $e->response?->status(),
-                'response' => $e->response?->body(),
-            ]);
-
-            throw new Exception('Failed to resolve bank account: '.$e->getMessage());
-        }
+    /**
+     * Resolve GBP individual bank account details.
+     */
+    public function resolveGbpIndividual(
+        string $bankCode,
+        string $accountNumber,
+        string $firstName,
+        string $lastName,
+        ?string $middleName = null,
+    ): ApiResponse {
+        return $this->resolveFromDto(BankAccountResolveRequest::forGbpIndividual(
+            $bankCode,
+            $accountNumber,
+            $firstName,
+            $lastName,
+            $middleName,
+        ));
     }
 
     /**
      * Resolve bank account details from DTO
-     *
-     * @throws Exception
      */
     public function resolveFromDto(BankAccountResolveRequest $request): ApiResponse
     {
         $payload = $request->toApiPayload();
+        $validatedData = $this->validateResolveData($payload);
 
-        return $this->resolve(
-            bankCode: $payload['bank_code'],
-            accountNumber: $payload['account_number'],
-            currency: $payload['currency'],
-        );
+        return $this->postToUrl($this->getBaseApiUrl().$this->endpoint, $validatedData);
     }
 
     /**
@@ -130,13 +124,16 @@ class BankAccountResolveApi extends FlutterwaveBaseApi
 
     /**
      * Validate bank account resolve data
+     *
+     * @param  array{account: array<string, mixed>}  $data
+     * @return array{account: array<string, mixed>}
      */
     protected function validateResolveData(array $data): array
     {
         $validator = Validator::make($data, [
-            'bank_code' => 'required|string',
-            'account_number' => 'required|string',
-            'currency' => 'required|string|size:3',
+            'account' => 'required|array|min:1',
+            'account.code' => 'required|string',
+            'account.number' => 'required|string',
         ]);
 
         return $validator->validate();

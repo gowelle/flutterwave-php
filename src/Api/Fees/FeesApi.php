@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Validator;
 /**
  * API client for the Flutterwave Fees endpoint.
  *
- * Retrieves transaction fees for a given amount, currency, and payment type.
+ * Retrieves transaction fees for a given amount, currency, and payment method.
  *
  * @see https://developer.flutterwave.com/reference/fees_get
  */
@@ -25,7 +25,7 @@ class FeesApi extends FlutterwaveBaseApi
     /**
      * Retrieve transaction fees
      *
-     * @param  array<string, mixed>  $params  {amount: float, currency: string, payment_type?: string}
+     * @param  array<string, mixed>  $params
      *
      * @throws Exception
      *
@@ -106,9 +106,12 @@ class FeesApi extends FlutterwaveBaseApi
     protected function validateParams(array $params): array
     {
         $validator = Validator::make($params, [
-            'amount'       => 'required|numeric|min:0.01',
-            'currency'     => 'required|string|size:3',
-            'payment_type' => 'nullable|string',
+            'amount' => 'required|numeric|min:0.01',
+            'currency' => 'required|string|size:3',
+            'payment_method' => 'required|string',
+            'card6' => 'nullable|string|size:6',
+            'country' => 'nullable|string|size:2',
+            'network' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {

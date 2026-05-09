@@ -214,6 +214,7 @@ describe('CreateVirtualAccountRequestDTO', function () {
             'account_type' => 'static',
             'narration' => 'Test account',
             'bvn' => '12345678901',
+            'bank_code' => '044',
         ]);
 
         expect($data->reference)->toBe('test_ref_123');
@@ -221,6 +222,7 @@ describe('CreateVirtualAccountRequestDTO', function () {
         expect($data->amount)->toBe(0.0);
         expect($data->currency)->toEqual(VirtualAccountCurrency::NGN);
         expect($data->accountType)->toEqual(VirtualAccountType::STATIC);
+        expect($data->bankCode)->toBe('044');
     });
 
     it('converts to API request format', function () {
@@ -233,6 +235,7 @@ describe('CreateVirtualAccountRequestDTO', function () {
             narration: 'Test account',
             bvn: '12345678901',
             meta: ['key' => 'value'],
+            bankCode: '044',
         );
 
         $array = $dto->toArray();
@@ -243,6 +246,7 @@ describe('CreateVirtualAccountRequestDTO', function () {
         expect($array['account_type'])->toBe('static');
         expect($array['narration'])->toBe('Test account');
         expect($array['bvn'])->toBe('12345678901');
+        expect($array['bank_code'])->toBe('044');
     });
 
     it('excludes null values from request array', function () {
@@ -274,6 +278,27 @@ describe('CreateVirtualAccountRequestDTO', function () {
 
         expect($data->currency)->toEqual(VirtualAccountCurrency::GHS);
         expect($data->accountType)->toEqual(VirtualAccountType::DYNAMIC);
+    });
+
+    it('supports MAD and ZAR currencies', function () {
+        $mad = CreateVirtualAccountRequestDTO::fromArray([
+            'reference' => 'test_ref_mad',
+            'customer_id' => 'cus_123',
+            'amount' => 100,
+            'currency' => 'MAD',
+            'account_type' => 'dynamic',
+        ]);
+
+        $zar = CreateVirtualAccountRequestDTO::fromArray([
+            'reference' => 'test_ref_zar',
+            'customer_id' => 'cus_123',
+            'amount' => 100,
+            'currency' => 'ZAR',
+            'account_type' => 'dynamic',
+        ]);
+
+        expect($mad->currency)->toEqual(VirtualAccountCurrency::MAD);
+        expect($zar->currency)->toEqual(VirtualAccountCurrency::ZAR);
     });
 });
 

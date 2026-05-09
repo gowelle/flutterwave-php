@@ -54,10 +54,9 @@ class FlutterwaveApiProvider
     public function useApi(FlutterwaveApi $api, $accessToken, array $headers = []): FlutterwaveApiContract
     {
         try {
-
             $normalizedHeaders = Validator::validate($headers, [
                 'Content-Type' => 'required|string',
-                'X-Idempotency-Key' => 'required|string',
+                'X-Idempotency-Key' => $this->requiresIdempotencyHeader($api) ? 'required|string' : 'nullable|string',
                 'X-Trace-Id' => 'required|string',
                 'X-Scenario-Key' => 'nullable|string',
             ]);
@@ -97,5 +96,17 @@ class FlutterwaveApiProvider
             throw new Exception("Failed to initialize Flutterwave API: {$e->getMessage()}", 0, $e);
         }
 
+    }
+
+    private function requiresIdempotencyHeader(FlutterwaveApi $api): bool
+    {
+        return ! \in_array($api, [
+            FlutterwaveApi::BANKS,
+            FlutterwaveApi::BANK_BRANCHES,
+            FlutterwaveApi::BANK_ACCOUNT_RESOLVE,
+            FlutterwaveApi::MOBILE_NETWORKS,
+            FlutterwaveApi::CHARGEBACK,
+            FlutterwaveApi::FEES,
+        ], true);
     }
 }

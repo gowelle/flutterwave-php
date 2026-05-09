@@ -10,13 +10,13 @@ final class AbstractHeadersConfig
 {
     public string $contentType = 'application/json';
 
-    public string $idempotencyKey;
+    public ?string $idempotencyKey;
 
     public string $traceId;
 
     public ?string $scenarioKey;
 
-    private function __construct(string $contentType, string $idempotencyKey, string $traceId, ?string $scenarioKey = null)
+    private function __construct(string $contentType, ?string $idempotencyKey, string $traceId, ?string $scenarioKey = null)
     {
         $this->contentType = $contentType;
         $this->idempotencyKey = $idempotencyKey;
@@ -28,7 +28,7 @@ final class AbstractHeadersConfig
     {
         return new self(
             contentType: $headers['Content-Type'],
-            idempotencyKey: $headers['X-Idempotency-Key'],
+            idempotencyKey: $headers['X-Idempotency-Key'] ?? null,
             traceId: $headers['X-Trace-Id'],
             scenarioKey: $headers['X-Scenario-Key'] ?? null,
         );
@@ -48,9 +48,12 @@ final class AbstractHeadersConfig
     {
         $headers = [
             'Content-Type' => $this->contentType,
-            'X-Idempotency-Key' => $this->idempotencyKey,
             'X-Trace-Id' => $this->traceId,
         ];
+
+        if ($this->idempotencyKey !== null) {
+            $headers['X-Idempotency-Key'] = $this->idempotencyKey;
+        }
 
         if ($this->scenarioKey !== null) {
             $headers['X-Scenario-Key'] = $this->scenarioKey;

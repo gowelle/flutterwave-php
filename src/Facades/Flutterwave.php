@@ -6,8 +6,10 @@ namespace Gowelle\Flutterwave\Facades;
 
 use Gowelle\Flutterwave\Services\FlutterwaveBanksService;
 use Gowelle\Flutterwave\Services\FlutterwaveBaseService;
+use Gowelle\Flutterwave\Services\FlutterwaveChargebackService;
 use Gowelle\Flutterwave\Services\FlutterwaveCustomerService;
 use Gowelle\Flutterwave\Services\FlutterwaveDirectChargeService;
+use Gowelle\Flutterwave\Services\FlutterwaveFeesService;
 use Gowelle\Flutterwave\Services\FlutterwaveMobileNetworkService;
 use Gowelle\Flutterwave\Services\FlutterwaveOrderService;
 use Gowelle\Flutterwave\Services\FlutterwavePaymentsService;
@@ -27,6 +29,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static FlutterwaveMobileNetworkService mobileNetworks()
  * @method static FlutterwaveOrderService orders()
  * @method static FlutterwaveRefundService refunds()
+ * @method static FlutterwaveFeesService fees()
+ * @method static FlutterwaveChargebackService chargebacks()
  * @method static FlutterwaveTransferService transfers()
  * @method static FlutterwaveSettlementService settlements()
  * @method static FlutterwaveWebhookService webhook()
@@ -39,6 +43,8 @@ use Illuminate\Support\Facades\Facade;
  * @see FlutterwaveMobileNetworkService
  * @see FlutterwaveOrderService
  * @see FlutterwaveRefundService
+ * @see FlutterwaveFeesService
+ * @see FlutterwaveChargebackService
  * @see FlutterwaveTransferService
  * @see FlutterwaveSettlementService
  * @see FlutterwaveWebhookService

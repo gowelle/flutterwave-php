@@ -13,13 +13,29 @@ final readonly class CreateChargebackRequest
 {
     /**
      * @param  string  $chargeId  ID of the charge to raise a chargeback against
-     * @param  string  $reason    Reason for the chargeback
-     * @param  array<string, mixed>|null  $meta  Optional metadata
+     * @param  float  $amount  The disputed payment amount
+     * @param  string  $type  local or international
+     * @param  int  $expiry  Duration in hours used to calculate due_datetime
+     * @param  string|null  $stage  Optional dispute stage
+     * @param  string|null  $status  Optional initial status
+     * @param  string|null  $uploadedProof  Optional URL to supporting proof
+     * @param  string|null  $comment  Optional comment
+     * @param  string|null  $provider  Optional chargeback provider
+     * @param  string|null  $arn  Optional acquirer reference number
+     * @param  string|null  $initiator  Optional chargeback initiator
      */
     public function __construct(
         public string $chargeId,
-        public string $reason,
-        public ?array $meta = null,
+        public float $amount,
+        public string $type,
+        public int $expiry,
+        public ?string $stage = null,
+        public ?string $status = null,
+        public ?string $uploadedProof = null,
+        public ?string $comment = null,
+        public ?string $provider = null,
+        public ?string $arn = null,
+        public ?string $initiator = null,
     ) {}
 
     /**
@@ -31,8 +47,16 @@ final readonly class CreateChargebackRequest
     {
         return array_filter([
             'charge_id' => $this->chargeId,
-            'reason'    => $this->reason,
-            'meta'      => $this->meta,
+            'amount' => $this->amount,
+            'stage' => $this->stage,
+            'status' => $this->status,
+            'type' => $this->type,
+            'uploaded_proof' => $this->uploadedProof,
+            'comment' => $this->comment,
+            'provider' => $this->provider,
+            'arn' => $this->arn,
+            'initiator' => $this->initiator,
+            'expiry' => $this->expiry,
         ], fn ($value) => $value !== null);
     }
 }

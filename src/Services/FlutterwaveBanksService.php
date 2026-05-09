@@ -19,6 +19,7 @@ use Gowelle\Flutterwave\Data\VirtualAccount\VirtualAccountData;
 use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 use Gowelle\Flutterwave\FlutterwaveApiProvider;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
+use Illuminate\Support\Str;
 
 final class FlutterwaveBanksService
 {
@@ -35,7 +36,7 @@ final class FlutterwaveBanksService
     public function get(string $country): array
     {
         $api = app(FlutterwaveApiProvider::class)
-            ->useApi(FlutterwaveApi::BANKS, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
+            ->useApi(FlutterwaveApi::BANKS, $this->flutterwaveBaseService->getAccessToken(), $this->buildBankHeaders());
 
         /** @var BanksApi $api */
         $response = $api->retrieveByCountry($country);
@@ -57,7 +58,7 @@ final class FlutterwaveBanksService
     public function branches(string $bankId): array
     {
         $api = app(FlutterwaveApiProvider::class)
-            ->useApi(FlutterwaveApi::BANK_BRANCHES, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
+            ->useApi(FlutterwaveApi::BANK_BRANCHES, $this->flutterwaveBaseService->getAccessToken(), $this->buildBankHeaders());
 
         /** @var BankBranchesApi $api */
         $response = $api->retrieveByBankId($bankId);
@@ -70,20 +71,88 @@ final class FlutterwaveBanksService
     }
 
     /**
-     * Resolve bank account details
-     *
+     * Resolve NGN bank account details.
      *
      * @throws FlutterwaveApiException
      */
-    public function resolveAccount(string $bankCode, string $accountNumber, ?string $currency = null): BankAccountResolveData
+    public function resolveAccount(string $bankCode, string $accountNumber, ?string $scenarioKey = null): BankAccountResolveData
     {
-        $currency = $currency ?? config('flutterwave.default_currency', 'TZS');
-
         $api = app(FlutterwaveApiProvider::class)
-            ->useApi(FlutterwaveApi::BANK_ACCOUNT_RESOLVE, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
+            ->useApi(FlutterwaveApi::BANK_ACCOUNT_RESOLVE, $this->flutterwaveBaseService->getAccessToken(), $this->buildResolveHeaders($scenarioKey));
 
         /** @var BankAccountResolveApi $api */
-        $response = $api->resolve($bankCode, $accountNumber, $currency);
+        $response = $api->resolve($bankCode, $accountNumber);
+
+        if (! $response->isSuccessful()) {
+            throw new FlutterwaveApiException('Failed to resolve bank account: '.($response->message ?? 'Unknown error'));
+        }
+
+        return BankAccountResolveData::fromApiResponse($response->data);
+    }
+
+    /**
+     * Resolve USD bank account details for Nigerian bank accounts.
+     *
+     * @throws FlutterwaveApiException
+     */
+    public function resolveUsdNgAccount(string $bankCode, string $accountNumber, ?string $scenarioKey = null): BankAccountResolveData
+    {
+        $api = app(FlutterwaveApiProvider::class)
+            ->useApi(FlutterwaveApi::BANK_ACCOUNT_RESOLVE, $this->flutterwaveBaseService->getAccessToken(), $this->buildResolveHeaders($scenarioKey));
+
+        /** @var BankAccountResolveApi $api */
+        $response = $api->resolveUsdNg($bankCode, $accountNumber);
+
+        if (! $response->isSuccessful()) {
+            throw new FlutterwaveApiException('Failed to resolve bank account: '.($response->message ?? 'Unknown error'));
+        }
+
+        return BankAccountResolveData::fromApiResponse($response->data);
+    }
+
+    /**
+     * Resolve GBP corporate bank account details.
+     *
+     * @throws FlutterwaveApiException
+     */
+    public function resolveGbpCorporateAccount(
+        string $bankCode,
+        string $accountNumber,
+        string $businessName,
+        ?string $scenarioKey = null,
+    ): BankAccountResolveData
+    {
+        $api = app(FlutterwaveApiProvider::class)
+            ->useApi(FlutterwaveApi::BANK_ACCOUNT_RESOLVE, $this->flutterwaveBaseService->getAccessToken(), $this->buildResolveHeaders($scenarioKey));
+
+        /** @var BankAccountResolveApi $api */
+        $response = $api->resolveGbpCorporate($bankCode, $accountNumber, $businessName);
+
+        if (! $response->isSuccessful()) {
+            throw new FlutterwaveApiException('Failed to resolve bank account: '.($response->message ?? 'Unknown error'));
+        }
+
+        return BankAccountResolveData::fromApiResponse($response->data);
+    }
+
+    /**
+     * Resolve GBP individual bank account details.
+     *
+     * @throws FlutterwaveApiException
+     */
+    public function resolveGbpIndividualAccount(
+        string $bankCode,
+        string $accountNumber,
+        string $firstName,
+        string $lastName,
+        ?string $middleName = null,
+        ?string $scenarioKey = null,
+    ): BankAccountResolveData {
+        $api = app(FlutterwaveApiProvider::class)
+            ->useApi(FlutterwaveApi::BANK_ACCOUNT_RESOLVE, $this->flutterwaveBaseService->getAccessToken(), $this->buildResolveHeaders($scenarioKey));
+
+        /** @var BankAccountResolveApi $api */
+        $response = $api->resolveGbpIndividual($bankCode, $accountNumber, $firstName, $lastName, $middleName);
 
         if (! $response->isSuccessful()) {
             throw new FlutterwaveApiException('Failed to resolve bank account: '.($response->message ?? 'Unknown error'));
@@ -101,13 +170,27 @@ final class FlutterwaveBanksService
      */
     public function resolveFromDto(BankAccountResolveRequest $request): BankAccountResolveData
     {
-        $payload = $request->toApiPayload();
+        return $this->resolve($request);
+    }
 
-        return $this->resolveAccount(
-            $payload['bank_code'],
-            $payload['account_number'],
-            $payload['currency'],
-        );
+    /**
+     * Resolve bank account details from a currency-aware DTO payload.
+     *
+     * @throws FlutterwaveApiException
+     */
+    public function resolve(BankAccountResolveRequest $request): BankAccountResolveData
+    {
+        $api = app(FlutterwaveApiProvider::class)
+            ->useApi(FlutterwaveApi::BANK_ACCOUNT_RESOLVE, $this->flutterwaveBaseService->getAccessToken(), $this->buildResolveHeaders());
+
+        /** @var BankAccountResolveApi $api */
+        $response = $api->resolveFromDto($request);
+
+        if (! $response->isSuccessful()) {
+            throw new FlutterwaveApiException('Failed to resolve bank account: '.($response->message ?? 'Unknown error'));
+        }
+
+        return BankAccountResolveData::fromApiResponse($response->data);
     }
 
     /**
@@ -115,10 +198,10 @@ final class FlutterwaveBanksService
      *
      * @throws FlutterwaveApiException
      */
-    public function createVirtualAccount(CreateVirtualAccountRequestDTO $request): VirtualAccountData
+    public function createVirtualAccount(CreateVirtualAccountRequestDTO $request, ?string $scenarioKey = null): VirtualAccountData
     {
         $api = app(FlutterwaveApiProvider::class)
-            ->useApi(FlutterwaveApi::VIRTUAL_ACCOUNT, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
+            ->useApi(FlutterwaveApi::VIRTUAL_ACCOUNT, $this->flutterwaveBaseService->getAccessToken(), $this->buildVirtualAccountHeaders($scenarioKey));
 
         /** @var VirtualAccountApi $api */
         $response = $api->create($request->toArray());
@@ -212,5 +295,51 @@ final class FlutterwaveBanksService
         }
 
         return VirtualAccountData::fromApi($response->data);
+    }
+
+    /**
+     * Build safe headers for account lookup operations.
+     */
+    private function buildBankHeaders(): array
+    {
+        return $this->flutterwaveBaseService->getHeaderBuilder()->fromArray([
+            'Content-Type' => 'application/json',
+            'X-Trace-Id' => Str::uuid()->toString(),
+        ]);
+    }
+
+    /**
+     * Build headers for bank account resolve operations.
+     */
+    private function buildResolveHeaders(?string $scenarioKey = null): array
+    {
+        $headers = [
+            'Content-Type' => 'application/json',
+            'X-Trace-Id' => Str::uuid()->toString(),
+        ];
+
+        if ($scenarioKey !== null) {
+            $headers['X-Scenario-Key'] = $scenarioKey;
+        }
+
+        return $this->flutterwaveBaseService->getHeaderBuilder()->fromArray($headers);
+    }
+
+    /**
+     * Build headers for virtual account creation.
+     */
+    private function buildVirtualAccountHeaders(?string $scenarioKey = null): array
+    {
+        $headers = [
+            'Content-Type' => 'application/json',
+            'X-Idempotency-Key' => Str::uuid()->toString(),
+            'X-Trace-Id' => Str::uuid()->toString(),
+        ];
+
+        if ($scenarioKey !== null) {
+            $headers['X-Scenario-Key'] = $scenarioKey;
+        }
+
+        return $this->flutterwaveBaseService->getHeaderBuilder()->fromArray($headers);
     }
 }

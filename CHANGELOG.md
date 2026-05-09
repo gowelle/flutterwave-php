@@ -4,6 +4,28 @@ All notable changes to `gowelle/flutterwave-php` will be documented in this file
 
 ## [Unreleased]
 
+## [3.2.2] - 2026-05-09
+
+### Added
+
+- **Chargebacks service**: Added `FlutterwaveChargebackService` and exposed `Flutterwave::chargebacks()` with `list()`, `create()`, `retrieve()`, `get()`, `update()`, `accept()`, and `decline()` helpers.
+- **Fees service**: Added `FlutterwaveFeesService` and exposed `Flutterwave::fees()->calculate()` as the public wrapper for the `/fees` endpoint.
+- **Bank account resolve DTO variants**: Added explicit request constructors for `NGN`, `USD-NG`, `GBP corporate`, and `GBP individual` account resolution payloads.
+
+### Changed
+
+- **Bank account resolve**: Reworked request building to match Flutterwave’s documented currency-specific payload shapes instead of a flat universal schema.
+- **Bank-family headers**: Bank lookup, bank branches, mobile networks, and bank resolve requests now always send trace IDs; `scenario_key` is only forwarded on bank account resolve; idempotency is omitted for bank-family read/resolve calls.
+- **Fees API**: Updated the wrapper to require `payment_method` and support optional `card6`, `country`, and `network` query parameters.
+- **Virtual accounts**: Added support for `MAD` and `ZAR` currencies and optional `bank_code` on virtual account creation.
+- **Chargebacks API**: Updated create/update validation and DTOs to match the current v4 chargebacks contract, including structured create fields and explicit accept/decline update flows.
+- **Documentation**: Refreshed README examples for bank resolve, fees, virtual accounts, chargebacks, and charge idempotency behavior.
+
+### Fixed
+
+- **Headers config**: `AbstractHeadersConfig` and `HeaderConfig` now correctly allow APIs that do not require `X-Idempotency-Key`.
+- **README/service mismatch**: The previously documented `Flutterwave::chargebacks()` and `Flutterwave::fees()` surfaces are now implemented and tested.
+
 ## [3.1.0] - 2026-04-13
 
 ### Added

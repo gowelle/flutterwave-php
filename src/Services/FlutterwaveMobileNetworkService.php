@@ -9,6 +9,7 @@ use Gowelle\Flutterwave\Data\MobileNetworkData;
 use Gowelle\Flutterwave\Exceptions\FlutterwaveApiException;
 use Gowelle\Flutterwave\FlutterwaveApiProvider;
 use Gowelle\Flutterwave\Infrastructure\FlutterwaveApi;
+use Illuminate\Support\Str;
 
 final class FlutterwaveMobileNetworkService
 {
@@ -25,11 +26,19 @@ final class FlutterwaveMobileNetworkService
     public function list(string $country): array
     {
         $api = app(FlutterwaveApiProvider::class)
-            ->useApi(FlutterwaveApi::MOBILE_NETWORKS, $this->flutterwaveBaseService->getAccessToken(), $this->flutterwaveBaseService->getHeaderBuilder()->build());
+            ->useApi(FlutterwaveApi::MOBILE_NETWORKS, $this->flutterwaveBaseService->getAccessToken(), $this->buildBankHeaders());
 
         /** @var MobileNetworksApi $api */
         $response = $api->retrieveByCountry($country);
 
         return MobileNetworkData::collection($response->data)->toArray();
+    }
+
+    private function buildBankHeaders(): array
+    {
+        return $this->flutterwaveBaseService->getHeaderBuilder()->fromArray([
+            'Content-Type' => 'application/json',
+            'X-Trace-Id' => Str::uuid()->toString(),
+        ]);
     }
 }

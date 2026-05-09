@@ -55,7 +55,7 @@ class ChargebackApi extends FlutterwaveBaseApi
      */
     public function createFromDto(CreateChargebackRequest $request): ApiResponse
     {
-        return parent::create($request->toApiPayload());
+        return $this->create($request->toApiPayload());
     }
 
     /**
@@ -91,7 +91,7 @@ class ChargebackApi extends FlutterwaveBaseApi
      */
     public function updateFromDto(string $id, UpdateChargebackRequest $request): ApiResponse
     {
-        return parent::update($id, $request->toApiPayload());
+        return $this->update($id, $request->toApiPayload());
     }
 
     /**
@@ -114,8 +114,16 @@ class ChargebackApi extends FlutterwaveBaseApi
     {
         $validator = Validator::make($data, [
             'charge_id' => 'required|string',
-            'reason'    => 'required|string',
-            'meta'      => 'nullable|array',
+            'amount' => 'required|numeric|min:0.01',
+            'stage' => 'nullable|in:new,second,pre-arbitration,arbitration',
+            'status' => 'nullable|in:pending,initiated',
+            'type' => 'required|in:local,international',
+            'uploaded_proof' => 'nullable|string',
+            'comment' => 'nullable|string',
+            'provider' => 'nullable|string',
+            'arn' => 'nullable|string',
+            'initiator' => 'nullable|string',
+            'expiry' => 'required|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -136,9 +144,13 @@ class ChargebackApi extends FlutterwaveBaseApi
     protected function validateUpdateData(array $data): array
     {
         $validator = Validator::make($data, [
-            'status'  => 'required|string',
+            'status' => 'required|in:accepted,declined',
+            'uploaded_proof' => 'nullable|string',
             'comment' => 'nullable|string',
-            'meta'    => 'nullable|array',
+            'provider' => 'nullable|string',
+            'arn' => 'nullable|string',
+            'due_datetime' => 'nullable|date',
+            'proof_data' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {

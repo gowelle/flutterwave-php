@@ -32,6 +32,16 @@ enum VirtualAccountCurrency: string
     case KES = 'KES';
 
     /**
+     * Moroccan Dirham
+     */
+    case MAD = 'MAD';
+
+    /**
+     * South African Rand
+     */
+    case ZAR = 'ZAR';
+
+    /**
      * Create from Flutterwave API response currency
      */
     public static function fromApiResponse(string $currency): self
@@ -41,6 +51,8 @@ enum VirtualAccountCurrency: string
             'GHS' => self::GHS,
             'EGP' => self::EGP,
             'KES' => self::KES,
+            'MAD' => self::MAD,
+            'ZAR' => self::ZAR,
             default => self::NGN,
         };
     }
